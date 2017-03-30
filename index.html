@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head profile="http://www.w3.org/2005/10/profile">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./favicon.ico">
+
+    <title>BARD Micro Hydro Power Calculator </title>
+
+    <link rel="stylesheet" href="css/styleguide.min.css">
+    <link rel="stylesheet" type="text/css" href="css/icons.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+
+    <!-- Esri Leaflet -->
+    <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+    <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
+    <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+    
+    <!-- Esri Terraformer 
+    <script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.6/terraformer.min.js"></script>
+    <script src="https://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.5/terraformer-arcgis-parser.min.js"></script>
+    -->
+    
+
+    <link rel="icon" type="image/png" href="./favicon.ico">
+</head>
+
+<body>
+
+<div class="HeaderFixed HeaderFixed--red color-white">
+    <div class="Grid">
+        <div class="Grid-inner Grid-inner--vcenter">
+            <div class="Grid-cell Grid-cell--col6">
+                <h1 class="u-iblock u-malign main-title">
+                    <strong>
+                        <span style="color: white;">BARD Micro Hydro Power Calculator</span>
+                        <span style="font-size:0.5em;">alpha</span>
+                    </strong>
+                    <br>
+                </h1>
+            </div>
+            <!--div class="Grid-cell Grid-cell--col6 clearfix u-txt-right">
+                <nav class="">
+                    <ul class="u-ilist">
+                        <li class="u-malign u-lspace-xl">
+                            <p class="button button--white">
+                                <a class="js-about" href="#">About</a>
+                            </p>
+                        </li>
+                        <li class="u-malign u-lspace-xl">
+                            <p class="button button--white">
+                                <a href="https://github.com/civicmapper/3rww-sustain-app">Fork Me on Github</a>
+                            </p>
+                        </li>
+                        <li class="u-malign u-lspace-xl">
+                            <p class="button button--white">
+                                <a href="http://data.3rww.opendata.arcgis.com/">Get All The Data</a>
+                            </p>
+                        </li>
+                    </ul>
+                </nav>
+            </div-->
+        </div>
+    </div>
+</div>
+
+<div class="Grid-inner Grid-inner--hfull">
+    <div class="Grid-cell fill-blue Grid-cell--col8 u-pr">
+        <div id="map" class="u-pa">
+        </div>
+    </div>
+    <div class="Grid-cell Grid-cell--col4 sidebar-cell">
+        <div id="sidebar" class="u-padding-m u-pr">
+            <ul class="List-blocks">
+                <li>
+                    <div class="u-vspace-l">
+                        <h2 class="u-iblock u-malign"><strong>Assess Micro Hydro Power Potential</strong></h2>
+                    </div>
+                </li>
+                <li>
+                    <p class="button button--small button--blue">
+                        <!--span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">1</span-->
+                        <a href="#" id="analyze" class="btn btn-sm btn-default download">Analyze</a>
+                    </p>
+                </li>
+                <li>
+                    <ul class="u-ilist u-vspace-xxl">
+                        <li>
+                            <p class="button button--small button--blue" id="gpmessages" style="display: none;">
+                                <a href="#" class="btn btn-sm btn-success">Analysis started&nbsp;<img src="static\loading2.gif"/></a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="button button--small button--green" id="gpsuccess" style="display: none;">
+                                <a href="#" class="btn btn-sm btn-success">Analysis complete!</a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="button button--small button--red" id="gperror" style="display: none;">
+                                <a href="#" class="btn btn-sm btn-error">There was an error during the Analysis. Please try again.</a>
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="u-valign u-txt-center" style="display: none;">
+    <div class="modal-inner u-iblock u-malign u-padding-xxl">
+        <div class="modal-header navbar-custom u-vspace-xxl">
+            <h1>3RWW EPA SUSTAIN</h1>
+            <h2>2013 Green Stormwater Infrastructure (GSI) Suitability Model Results</h2>
+            <h3>Data Extractor<em> alpha (version 0.1.0, December 2016)</em></h3>
+        </div>
+        <div class="modal-body u-txt-left">
+            <p>This map illustrates <a href="http://3riverswetweather.org/">3 Rivers Wet  Weather's (3RWW)</a> 2013 analysis from the EPA <span style="font-weight: bold;"><span style="font-style: italic;">System Urban Stormwater Treatment and Analysis Integration</span></span> (SUSTAIN) model for the ALCOSAN service area. The data on this map is intended to help municipalities comply with certain wet weather regulations, particularly the Pennsylvania Department of Environmental Protection's geographic information systems (GIS) map submission requirements of the <a href="http://www.3riverswetweather.org/municipalities/municipal-consent-orders/interim-municipal-consent-orders">Phase I Municipal Consent Orders</a>. The SUSTAIN modeling work was conducted by 3RWW and finalized May 15 2013.</p><br>
+            <p>SUSTAIN is a <span style="font-weight: bold;">planning-level </span> analysis that could be used by municipalities to evaluate the potential for incorporating site specific green stormwater infrastructure (GSI) methods and projects into their source reduction studies. <span style="font-weight: bold;">The results are informational only. Locations for GSI must be further screened based on local information, hydraulic performance (runoff capture), and cost to determine the true feasibility of GSI for sites and projects. </span></p><br>
+            <p>More info on SUSTAIN can be found on the <a href="https://www.epa.gov/water-research/system-urban-stormwater-treatment-and-analysis-integration-sustain">US EPA website</a>. See <a href="http://www.3riverswetweather.org/stormwater-green-solutions/3rww-epa-sustain-modeling">3RWW's SUSTAIN page</a> or contact <a href="mailto:bdutton@3rww.org">bdutton@3rww.org</a> for more information about 3RWW's model run.</p> 
+            <br><hr><br>
+            <p>This open-source web mapping tool is based on the <a href="https://github.com/WPRDC/property-information-extractor">WPRDC's Property Information Extractor</a>, which was based on Chris Whong's <a href="https://github.com/chriswhong/plutoplus" >plutoplus</a>. In adapting those tools for this project, we made some big changes under the hood. To utilize ArcGIS Server map services, this version swaps out the <a href="https://carto.com/docs/carto-engine/carto-js/" >CARTO JS javascript library</a> used by those tools for the <a href="https://esri.github.io/esri-leaflet">Esri-Leaflet javascript library</a>.</p><br>
+            <p>This is an <em>alpha</em>-stage product and therfore a work-in-progress. Please send questions, concerns, or feature requests for this software to <a href="mailto:3rww@civicmapper.com">3rww@civicmapper.com</a>...or, file an issue or submit a pull request on <a href="https://github.com/civicmapper/3rww-sustain-app/">Github</a>!</p>
+        </div>
+    </div>
+</div>
+
+<!--div id="infoWindow">...
+</div-->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="js/script.js"></script>
+
+</body>
+</html>
