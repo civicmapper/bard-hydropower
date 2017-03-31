@@ -1,3 +1,34 @@
+  /**
+   * Authentication
+   */
+  var clientID = 'Rl33Ikhm8yr4xlz4';
+  var accessToken;
+  var callbacks = [];
+  var protocol = window.location.protocol;
+  //var callbackPage = protocol + '//esri.github.io/esri-leaflet/examples/oauth/callback.html';
+  //var callbackPage = 'http://esri.github.io/esri-leaflet/examples/oauth/callback.html';
+  var callbackPage = protocol + '//localhost:8000';
+
+  // this function will be called when the oauth process is complete
+  window.oauthCallback = function(token) {
+    accessToken = token;
+    for (var i = 0; i < callbacks.length; i++) {
+      callbacks[i](token);
+    }
+    callbacks = [];
+  };
+   // this function will open a window and start the oauth process
+  function oauth(callback) {
+    if(accessToken){
+      callback(accessToken);
+    } else {
+      callbacks.push(callback);
+      window.open('https://www.arcgis.com/sharing/oauth2/authorize?client_id='+clientID+'&response_type=token&expiration=20160&redirect_uri=' + window.encodeURIComponent(callbackPage), 'oauth-window', 'height=400,width=600,menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes');
+    }
+  }
+  
+
+
 /**
  * create map with basemap and supplemental layers
  */
@@ -129,85 +160,104 @@ map.on(L.Draw.Event.EDITED, function(event) {
 });
 
 $('#analyze').click(function() {
-  
+
+  /**
+   * print geometries to console
+   */
   console.log(drawnPolyline.toGeoJSON());
   console.log(drawnPoint.toGeoJSON());
-
+  /**
+   * set up services
+   */  
+  var watershedService, elevProfileService, watershed, elevProfile;
+  
   /**
    * set up the geoprocessing services and tasks
    */
-  var elevProfileService = L.esri.GP.service({
+  elevProfileService = L.esri.GP.service({
     url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
     useCors: true
   });
-  var elevProfile = elevProfileService.createTask();
+  elevProfile = elevProfileService.createTask();
   
-  var watershedService = L.esri.GP.service({
-    url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
-    useCors: true
+  oauth(function(token){
+    
+    watershedService = L.esri.GP.service({
+      url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
+      useCors: true,
+      token: token
+    });
+    
+    watershedService.on('authenticationrequired', function(e){
+      oauth(function(token){
+        e.authenticate(token);
+        watershed = watershedService.createTask();
+        
+        /*
+        elevProfile.on('initialized', function() {
+          elevProfile.setParam("DEMResolution ", "FINEST");
+          elevProfile.setParam("ProfileIdField", "OID");
+          elevProfile.setParam("MaximumSampleDistance", 50000);
+          elevProfile.setParam("returnZ", true);
+          // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
+          elevProfile.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
+          
+          console.log("Elevation initialized. Submitting Request...");
+          $('#gpmessages').show();
+          
+          elevProfile.run(function(error, result, response) {
+            $('#gpmessages').hide();
+            console.log(response);
+            if (error) {
+              $('#gperror').show();
+              console.log("There was an error processing your request. Please try again.");
+              console.log(error);
+            } else {
+              $('#gpsuccess').show();
+              console.log("Elevation Profile complete!");
+              console.log(result);
+            }
+          });
+          
+        });
+        */
+        console.log(watershed);
+        watershed.on('initialized', function() {
+          watershed.setParam("SourceDatabase", "FINEST");
+          watershed.setParam("PointIDField", "OID");
+          watershed.setParam("SnapDistance", 50);
+          watershed.setParam("ReturnSnappedPoints", true);
+          // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
+          watershed.setParam("InputPoints", drawnPoint.toGeoJSON());
+          
+          console.log("Watershed initialized. Submitting Request...");
+          $('#gpmessages').show();
+          
+          watershed.run(function(error, result, response) {
+            $('#gpmessages').hide();
+            console.log(response);
+            if (error) {
+              $('#gperror').show();
+              console.log("There was an error processing your request. Please try again.");
+              console.log(error);
+            } else {
+              $('#gpsuccess').show();
+              console.log("Watershed complete!");
+              console.log(result);
+            }
+          });
+          
+        });
+        
+        
+      });
+    });
+    
   });
-  var watershed = watershedService.createTask();
 
-
-  function runGP1() {
-    /*
-    elevProfile.on('initialized', function() {
-      elevProfile.setParam("DEMResolution ", "FINEST");
-      elevProfile.setParam("ProfileIdField", "OID");
-      elevProfile.setParam("MaximumSampleDistance", 50000);
-      elevProfile.setParam("returnZ", true);
-      // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-      elevProfile.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
-      
-      console.log("Elevation initialized. Submitting Request...");
-      $('#gpmessages').show();
-      
-      elevProfile.run(function(error, result, response) {
-        $('#gpmessages').hide();
-        console.log(response);
-        if (error) {
-          $('#gperror').show();
-          console.log("There was an error processing your request. Please try again.");
-          console.log(error);
-        } else {
-          $('#gpsuccess').show();
-          console.log("Elevation Profile complete!");
-          console.log(result);
-        }
-      });
-      
-    });
-    */
     
-    watershed.on('initialized', function() {
-      watershed.setParam("SourceDatabase", "FINEST");
-      watershed.setParam("PointIDField", "OID");
-      watershed.setParam("SnapDistance", 50);
-      watershed.setParam("ReturnSnappedPoints", true);
-      // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-      watershed.setParam("InputPoints", drawnPoint.toGeoJSON());
-      
-      console.log("Watershed initialized. Submitting Request...");
-      $('#gpmessages').show();
-      
-      watershed.run(function(error, result, response) {
-        $('#gpmessages').hide();
-        console.log(response);
-        if (error) {
-          $('#gperror').show();
-          console.log("There was an error processing your request. Please try again.");
-          console.log(error);
-        } else {
-          $('#gpsuccess').show();
-          console.log("Watershed complete!");
-          console.log(result);
-        }
-      });
-      
-    });
-    
-  }
 
+  /*
   function getToken() {
     console.log("authorizing...");
     $.ajax({
@@ -224,10 +274,10 @@ $('#analyze').click(function() {
       succes: runGP1
     });
   }
+  */
 
 
-  getToken();
-  //runGP1();
+  //getToken();
 
 
 });
