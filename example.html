@@ -1,126 +1,164 @@
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset=utf-8 />
-  <title>D3 Elevation</title>
-  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7, IE=9, IE=10">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Watershed Delineation</title>
 
-  <!-- Load D3 from CDN-->
-  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/css/esri.css">
+    
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+      }
+      #info {
+        bottom: 20px;
+        color: #444;
+        height: auto;
+        font-family: arial;
+        left: 20px;
+        margin: 5px;
+        padding: 10px;
+        position: absolute;
+        text-align: left;
+        width: 200px;
+        z-index: 40;
+      }
+    </style>
 
-  <!-- Load Leaflet from CDN-->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.0.1"></script>
-
-  <!-- Load Esri Leaflet from CDN -->
-  <script src="https://unpkg.com/esri-leaflet@2.0.4"></script>
-
-  <!-- Esri Leaflet GP -->
-  <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
-
-  <script src="./support/Leaflet.Elevation-0.0.2.src.js"></script>
-  <link rel="stylesheet" href="./support/Leaflet.Elevation-0.0.2.css">
-
-  <style>
-    body {margin:0;padding:0;}
-    #map {position: absolute;top:0;bottom:0;right:0;left:0;}
-
-    .lime-theme .leaflet-control.elevation .background {
-      background: transparent;
-    }
-
-    .elevation {
-      box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-      border-radius: 4px;
-      background: white;
-      padding: 1em;
-    }
-
-    #info-pane {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 150px;
-      z-index: 1000;
-      padding: 1em;
-      background: white;
-    }
-
-    .leaflet-bar a {
-      background-color: #f4f4f4;
-      display: inline;
-    }
-
-    .leaflet-bar a:hover {
-      display: inline;
-    }
-  </style>
-</head>
-<body>
-
-<div id="map"></div>
-<div id="info-pane" class="leaflet-bar">
-  <label>sketch a line to display elevation data.<br><br>information about the associated geoprocessing service can be found <a href="https://developers.arcgis.com/rest/elevation/api-reference/profile.htm">here.</a></label>
-</div>
-
-<script>
-  var map = L.map('map', {
-    zoomControl: false
-  }).setView([38.9074, -119.9908], 13);
-
-  // Disable drag and zoom handlers.
-  map.dragging.disable();
-  map.touchZoom.disable();
-  map.doubleClickZoom.disable();
-  map.scrollWheelZoom.disable();
-
-  // Disable tap handler, if present.
-  if (map.tap) {
-    map.tap.disable()
-  };
-
-  L.esri.basemapLayer('Topographic').addTo(map);
-
-  var active = false;
-  var polyline;
-
-  var profileService = L.esri.GP.service({
-    url: "https://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile"
-  });
-
-  map.on('click', function (e) {
-    if (active) {
-      // are active build line and query
-      active = false;
-      var profile = profileService.createTask();
-
-      profile.setParam("DEMResolution", "FINEST");
-      profile.setParam("ProfileIdField", "OID");
-      profile.setParam("MaximumSampleDistance", 50000);
-      profile.setParam("returnZ", true);
-      profile.setParam("InputLineFeatures", polyline.toGeoJSON());
-
-      profile.run(function(error, result, response){
-        var geojson = result.OutputProfile.features;
-        var el = L.control.elevation().addTo(map)
-
-        L.geoJson(geojson,{
-          onEachFeature: el.addData.bind(el)
-        }).addTo(map);
+    <script src="http://js.arcgis.com/3.20/"></script>
+    <script>
+      require([
+          "dojo/dom",
+          "dojo/_base/Color",
+          "esri/map",
+          "esri/arcgis/utils",
+          "esri/graphic",
+          "esri/tasks/Geoprocessor",
+          "esri/tasks/FeatureSet",
+          "esri/layers/FeatureLayer",
+          "esri/layers/ArcGISTiledMapServiceLayer",
+          "esri/layers/GraphicsLayer",
+          "esri/symbols/SimpleMarkerSymbol",
+          "esri/symbols/SimpleFillSymbol",
+          "esri/symbols/CartographicLineSymbol",
+          "esri/IdentityManager",
+      ], function(dom, Color, Map, arcgisUtils, Graphic, Geoprocessor, FeatureSet, FeatureLayer, ArcGISTiledMapServiceLayer, GraphicsLayer, SimpleMarkerSymbol, SimpleFillSymbol, CartographicLineSymbol) {
+  
+        var map, gp;
+  
+        arcgisUtils.createMap("c7bad780627d4175abc7174278f69308", "map").then(function(response) {
+          
+          map = response.map;
+          //Initialize Map
+          /*
+            map = new Map("mapDiv", {
+                center: [-73.9144284, 42.0170202],
+                zoom: 18
+            });
+            // base map
+            var basemap = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer");
+            var overlay = new ArcGISTiledMapServiceLayer("http://hydrology.esri.com/arcgis/rest/services/WorldHydroReferenceOverlay/MapServer");
+            // our reference layers
+            var layer_streams = new FeatureLayer("https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7");
+            var layer_dams = new FeatureLayer("https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/1");
+            */
+          // drawing layers
+          var tempPoint = new GraphicsLayer();
+          var watersheds = new GraphicsLayer();
+          //map.addLayers([basemap, overlay, layer_streams, layer_dams, tempPoint, watersheds])
+          map.addLayers([tempPoint, watersheds]);
+  
+          //Set GP Symbology
+          var outline = new CartographicLineSymbol(CartographicLineSymbol.STYLE_SOLID, new Color([0, 0, 0, 1]), 2);
+          outline.setCap(CartographicLineSymbol.CAP_ROUND);
+          outline.setJoin(CartographicLineSymbol.JOIN_ROUND);
+  
+          var pointSymbol = new SimpleMarkerSymbol();
+          pointSymbol.setStyle(SimpleMarkerSymbol.STYLE_CIRCLE)
+          pointSymbol.setSize("10");
+          pointSymbol.setColor(new Color([59, 148, 0, 1]));
+          pointSymbol.setOutline(outline);
+  
+          var polySymbol = new SimpleFillSymbol();
+          polySymbol.setColor(new Color([55, 138, 73, 0.25]));
+          polySymbol.setOutline(outline);
+  
+          //Add Watershed Delineation Geoprocessing Function
+          gp = new Geoprocessor("https://utility.arcgis.com/usrsvcs/appservices/ZSL5wIQkfFRBVvKH/rest/services/Tools/Hydrology/GPServer/Watershed");
+          //gp = new Geoprocessor("http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed/submitJob")
+          gp.setOutSpatialReference({
+            wkid: 102100
+          });
+          map.on("click", computeWatershed);
+  
+          function computeWatershed(evt) {
+            var graphic = new Graphic(evt.mapPoint, pointSymbol);
+            tempPoint.add(graphic);
+            //window.setTimeout(function(){tempPoint.clear()}, 350);
+  
+            var features = [];
+            features.push(graphic);
+            var featureSet = new FeatureSet();
+            featureSet.features = features;
+            console.log(features);
+            console.log(featureSet);
+            //featureSet.features = [{"geometryType":"esriGeometryPoint","features":[{"geometry":{"x":-8237607.094814458,"y":5208840.6878848085,"spatialReference":{"wkid":102100,"latestWkid":3857}}}],"sr":{"wkid":102100,"latestWkid":3857}}];
+  
+            var params = {
+              "InputPoints": featureSet,
+              "SnapDistance": "5000",
+              "SnapDistanceUnits": "Meters",
+              "SourceDatabase": "FINEST",
+              "Generalize": "True"
+            };
+            gp.submitJob(params, Callback, function(error) {
+              //console.log("error", error, params);
+              //window.alert("Sorry, we do not have data for this region at your requested resolution");
+            });
+          }
+  
+          function Callback(jobInfo) {
+            gp.getResultData(jobInfo.jobId, "WatershedArea", drawWatershed);
+            gp.getResultData(jobInfo.jobId, "SnappedPoints", drawSnappedPoint);
+          }
+  
+          function drawWatershed(results) {
+            console.log(results);
+            var features = results.value.features;
+            for (var f = 0, fl = features.length; f < fl; f++) {
+              var feature = features[f];
+              feature.setSymbol(polySymbol);
+              watersheds.add(feature);
+            }
+          }
+  
+          function drawSnappedPoint(results) {
+            console.log(results);
+            tempPoint.clear();
+            var features = results.value.features;
+            for (var f = 0, fl = features.length; f < fl; f++) {
+              var feature = features[f];
+              feature.setSymbol(pointSymbol);
+              map.graphics.add(feature);
+            }
+          }
+        });
       });
-    } else {
-      // in active create new polyline
-      active = true;
-      polyline = L.polyline([]).addTo(map);
-    }
-  });
+  </script>
 
-  map.on('mousemove', function(e){
-    if(!active) {
-      return false;
-    }
-    polyline.addLatLng(e.latlng);
-  });
-</script>
-
-</body>
+  </head>
+  <body class="claro">
+    <div id="map"></div>
+    <div id="info" class="esriSimpleSlider">
+      Click on a stream to delineate its watershed. <br>
+      <a href="http://www.arcgis.com/home/item.html?id=8e48f6209d5c4be98ebbf90502f41077" target="Ref">More...</a>
+    </div>
+  </body>
 </html>
