@@ -1,5 +1,11 @@
 # Bard Micro-Hydro Power Potential Web Mapping Application
 
+*under development*
+
+A simple map-based application for estimating the power potential of micro-hydropower installations.
+
+Geo-stack built with Leaflet and Esri.
+
 # Development
 
 ## Quick Start
