@@ -1,4 +1,4 @@
-# Bard Micro-Hydro Power Potential Web Mapping Application
+# Bard Micro-Hydropower Estimator
 
 *under development*
 
@@ -10,24 +10,26 @@ Geo-stack built with Leaflet and Esri.
 
 ## Quick Start
 
+The server-side application is built with Python Flask.
+
 1. Clone the repo
 
 ```
 git clone https://github.com/...
-cd fishfryform
+cd bard-hydropower
 ```
 
 2. Initialize and activate a Python virtualenv:
 
 ```
-$ virtualenv env
-$ env/Scripts/activate found at env/bin/activate
+$ python venv env
+$ env\Scripts\activate
 ```
 
 3. Install the dependencies with Python Pip:
 
 ```
-$ pip install -r requirements.txt (fails)
+$ pip install -r requirements.txt
 ```
 
 5. Run the development server:
