@@ -10,7 +10,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = True
 
 # Secret key for session management.
-SECRET_KEY = 'i\xf8\x95\xc2\x0e\xfc8\x04\xbd\x07\xbeLA*\x14\x8f\xeb##T\x01-\xd8\xff'
+SECRET_KEY = ''
 
 # Session lifetime (matches lifetime of Esri tokens)
 # PERMANENT_SESSION_LIFETIME = timedelta(seconds=3600)

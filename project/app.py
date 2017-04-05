@@ -71,8 +71,8 @@ def get_token():
         (Spatial Analytix AGOL organization credentials required)
     """
     params = {
-        'client_id': "Rl33Ikhm8yr4xlz4",
-        'client_secret': "6f298cc008464a718f30366ecd85e5cb",
+        'client_id': "",
+        'client_secret': "",
         'grant_type': "client_credentials"
     }
     # make 5 attempts to get a token...
