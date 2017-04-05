@@ -1,0 +1,16 @@
+*.pyc
+.DS_Store
+*.psd
+
+# virtualenv directories
+env/
+venv/
+ENV/
+
+# extra project directories
+extras/
+
+# komodo project stuff
+.komodotools
+*.komodoproject
+project/test.db

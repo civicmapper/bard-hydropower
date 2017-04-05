@@ -1,0 +1,33 @@
+{% extends 'layouts/leaflet.html' %}
+{% block title %}Hydro Power Calculator{% endblock %}
+{% block content %}
+
+  <div id="container">
+  
+    <div id="map"></div>
+  
+  </div>
+  
+  <!--JQUERY-->
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js"></script>
+  <!--LEAFLET-->
+  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+  <!--ESRI-LEAFLET-->
+  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+  <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
+  <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+  <!--D3-->
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <!--APPLICATION-->
+  <script type="text/javascript" src="/static/js/plugins.js"></script>
+  <script>
+    // ArcGIS token passed from Flask to javascript (rendered by Jinja2)
+    var arcgis_token = {{ arcgis_token|tojson }};
+    console.log(arcgis_token);
+  </script>
+  <script type="text/javascript" src="/static/js/map.js" defer></script>
+  
+
+{% endblock %}
