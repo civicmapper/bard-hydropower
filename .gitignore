@@ -1,4 +1,4 @@
-config.py
+/project/config.py
 
 *.pyc
 .DS_Store
