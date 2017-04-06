@@ -71,11 +71,11 @@ def get_token():
         (Spatial Analytix AGOL organization credentials required)
     """
     params = {
-        'client_id': "",
-        'client_secret': "",
+        'client_id': config['ESRI_APP_CLIENT_ID'],
+        'client_secret': config['ESRI_APP_CLIENT_SECRET'],
         'grant_type': "client_credentials"
     }
-    # make 5 attempts to get a token...
+    # attempt to get a token...
     #attempts = 0
     #while (attempts < 5):
         #try:
