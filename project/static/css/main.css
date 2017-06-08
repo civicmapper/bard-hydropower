@@ -43,31 +43,7 @@ html, body, #container {
 }
 
 body {
-  padding-top: 50px;
-}
-
-input[type="radio"], input[type="checkbox"] {
-  margin: 0;
-}
-
-#sidebar {
-  display: block;
-  width: 75%;
-  height: 100%;
-  max-width: 100%;
-  float: left;
-}
-
-@media (min-width:768px) and (max-width:991px) {
-  #sidebar {
-    width: 40%;
-  }
-}
-
-@media (min-width:992px) {
-  #sidebar {
-    width: 20%;
-  }
+  padding-top: 40px;
 }
 
 #map {
@@ -94,46 +70,12 @@ input[type="radio"], input[type="checkbox"] {
   box-shadow: none;
 }
 
-#sidebar-hide-btn {
-  margin-top: -2px;
-}
-
 #aboutTabsContent {
   padding-top: 10px;
 }
 
 .progress-bar-full {
   width: 100%;
-}
-
-.white {
-  color: #FFFFFF;
-}
-/*
-.panel-heading{
-   width: 250px;
-}
-.panel-body{
-  width: 250px;
-}
-*/
-.feature-row {
-  cursor: pointer;
-  width: 250px;
-}
-
-.sidebar-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.sidebar-table {
-  position: absolute;
-  width: 100%;
-  top: 103px;
-  bottom: 0px;
-  overflow: auto;
 }
 
 .leaflet-control-layers {
@@ -147,16 +89,6 @@ input[type="radio"], input[type="checkbox"] {
 
 .leaflet-control-layers-list input[type="radio"], input[type="checkbox"] {
   margin: 2px;
-}
-
-.table {
-  margin-bottom: 0px;
-}
-
-.navbar .navbar-brand {
-  /*font-weight: bold;*/
-  font-size: 25px;
-  color: #FFFFFF;
 }
 
 .navbar-collapse.in {
@@ -176,7 +108,7 @@ input[type="radio"], input[type="checkbox"] {
   margin-left: 25px;
 }
 
-.statusInfo, .analyzeControl, .zoomRequest {
+.drawInfo {
   padding: 6px 8px;
   background: white;
   background: rgba(255,255,255,1);
@@ -185,12 +117,11 @@ input[type="radio"], input[type="checkbox"] {
   text-align: right;
 }
 
-.statusInfo, .analyzeControl, .zoomRequest h4 {
+.drawInfo h4 {
   margin: 0 0 5px;
   color: #777;
   text-align: right;
 }
-
 
 /**
  * Leaflet Elevation styles
