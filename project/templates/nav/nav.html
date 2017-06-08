@@ -1,5 +1,5 @@
     <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -7,23 +7,17 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{{ url_for('map') }}">Micro-Hydro Power Calculator</a>
+          <a class="navbar-brand" href="{{ url_for('map') }}">
+            <span>Micro-Hydropower Calculator</span>
+          </a>
         </div>
         <div class="collapse navbar-collapse">
-          <!--ul class="nav navbar-nav">
-            <li {% if request.endpoint == 'map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">Hydro Power Calculator</a></li>
-            <li {% if request.endpoint == 'help' %} class="active" {% endif %}><a href="{{ url_for('help') }}">Help</a></li>
-          </ul-->
           <ul class="nav navbar-nav pull-right">
-            <!--li><a id="analyze" href="#">Calculate</a></li-->
-            <!--
-            {% if not session.logged_in %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            {% else %}
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% endif %}           
-            <li><a href="http://www.civicmapper.com">CivicMapper</a></li>
-            -->
+            <li>
+              <a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn">
+                 <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;About
+              </a>
+            </li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
