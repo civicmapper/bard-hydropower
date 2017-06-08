@@ -2,10 +2,56 @@
 {% block title %}Hydro Power Calculator{% endblock %}
 {% block content %}
 
+	<!--div id="loading">
+		<div class="loading-indicator">
+			<div class="progress progress-striped active">
+				<div class="progress-bar progress-bar-full"></div>
+			</div>
+		</div>
+	</div-->
+  
+	<div class="modal" id="aboutModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h3 class="modal-title">Bard Micro-Hydropower Calculator</h3>
+				</div>
+				<div class="modal-body">
+					<ul class="nav nav-tabs nav-justified" id="aboutTabs">
+						<li class="active"><a href="#about" data-toggle="tab">
+							<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</a>
+						</li>
+						<li><a href="#help" data-toggle="tab">
+							<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
+						</li>
+						<li><a href="#methods" data-toggle="tab">
+							<span class="glyphicon glyphicon-book" aria-hidden="true"></span> How It Works</a>
+						</li>
+
+					</ul>
+					<div class="tab-content" id="aboutTabsContent">
+						<div id="about" class="tab-pane active in">
+							<p>About the project, terms of use, etc</p>
+						</div>		
+						<div id="help" class="tab-pane">
+							<p>How to use the tool</p>
+						</div>
+						<div id="methods" class="tab-pane">
+							<p>How the tools works</p>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+  
+
   <div id="container">
-  
     <div id="map"></div>
-  
   </div>
   
   <!--JQUERY-->
@@ -18,6 +64,8 @@
   <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
   <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
   <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+  <!--LEAFLET-PLUGINS-->
+  <script src="/static/js/libs/Leaflet.Control.Custom/Leaflet.Control.Custom.js"></script>
   <!--D3-->
   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <!--APPLICATION-->
