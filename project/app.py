@@ -71,27 +71,17 @@ def get_token():
         (Spatial Analytix AGOL organization credentials required)
     """
     params = {
-        'client_id': config['ESRI_APP_CLIENT_ID'],
-        'client_secret': config['ESRI_APP_CLIENT_SECRET'],
+        'client_id': app.config['ESRI_APP_CLIENT_ID'],
+        'client_secret': app.config['ESRI_APP_CLIENT_SECRET'],
         'grant_type': "client_credentials"
     }
-    # attempt to get a token...
-    #attempts = 0
-    #while (attempts < 5):
-        #try:
     request = requests.get(
         'https://www.arcgis.com/sharing/oauth2/token',
         params=params
     )
-            #if request['error']:
-                #attempts +=1
-            #else:
     token = request.json()
+    print("token acquired: {0}".format(token))
     return token
-        #except:
-            #attempts +=1
-    #else:
-    #return None
 
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
@@ -112,13 +102,17 @@ def home():
 @app.route('/map/')
 #@login_required
 def map():
+    t = get_token()
+    session['arcgis_token'] = t['access_token']
+    return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
+    '''
     if 'arcgis_token' not in session:
         t = get_token()
         session['arcgis_token'] = t['access_token']
         return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
     else:
         return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
-    
+    '''
 
 ## data table view
 @app.route('/help/')
