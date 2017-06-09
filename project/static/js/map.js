@@ -42,21 +42,31 @@ function oauth(callback) {
 
 $(document).on("ready", function() {
   $('.analysis-status').hide();
-  $('#clear-button-item').hide();
+  $('#msg-statuses').hide();
+  $('#msg-text').hide();
+  $('#analyze').prop("disabled", true);
+  //$('#clear-button-item').hide();
 });
 
-function resetAnalysis() {
+/**
+ * reset the analysis window. optional param dictates if drawing info is
+ * also removed.
+ */
+function resetAnalysis(clearLayers) {
+  $('#analyze-button-item').html(analyzeButton);
   $('#analyze').prop("disabled", true);
-  $('.analysis-status').hide();
   $('.analysis-status').empty();
-  $('#clear-button-item').hide();
-  drawnItems.clearLayers();
-  drawInfo.update();
+  $('#msg-statuses').hide();
+  $('#msg-text').empty().hide();
+  if (clearLayers) {
+    drawnItems.clearLayers();
+    drawInfo.update();
+  }
 }
 
 $(document).on("click", "#clearCalcs", function() {
   console.log("clearing results");
-  resetAnalysis();
+  resetAnalysis(true);
 });
 
 $("#about-btn").click(function() {
@@ -143,17 +153,17 @@ drawInfo.addTo(map);
 function makeAlert(msg, alertType) {
   var defaultMsg = null;
   if (alertType == 'info') {
-    defaultMsg = 'Calculating&nbsp;<img src="/static/img/loading2.gif"/>';
+    defaultMsg = 'Calculating&nbsp;&nbsp;<img src="/static/img/loading2.gif"/>';
   } else if  (alertType == 'success') {
     defaultMsg = 'Complete!';
   } else if (alertType == 'danger') {
-    defaultMsg = "There was an error with the analysis";
+    defaultMsg = "There was an error with the analysis.";
   } else {
-    defaultMsg = "Something went wrong";
+    defaultMsg = "Something went wrong. Check the browser console for details.";
     alertType = 'warning';
   }
-  var div1 = '<div class="alert alert-' + alertType + '" role="alert">';
-  var div2 = '</div>';
+  var div1 = '<div class="alert alert-' + alertType + '" role="alert"><small>';
+  var div2 = '</small></div>';
   if (msg) {
     return  div1 + msg + div2 ;
   } else {
@@ -162,7 +172,7 @@ function makeAlert(msg, alertType) {
   
 }
 
-var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit" disabled>Calculate</button></div>';
+var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit">Calculate</button></div>';
 var clearButton = '<div><button id="clearCalcs" class="btn btn-primary btn-block" type="submit">Clear Results</button></div>';
 
 /**
@@ -178,26 +188,24 @@ var analyzeControl = L.control.custom({
     position: 'topright',
     content:
       '<li class="list-group-item" id="analyze-button-item">' + analyzeButton + '</li>' +
-      '<li class="list-group-item analysis-status" id="msg-status"></li>' + 
-      '<li class="list-group-item analysis-status" id="msg-text"></li>' +
-      '<li class="list-group-item" id="clear-button-item">' + clearButton + '</li>',
+      '<li class="list-group-item" id="msg-statuses">' +
+        '<div id="msg-status" class="analysis-status"></div>' +
+        '<div id="msg-status-elevprofile" class="analysis-status"></div>' +
+        '<div id="msg-status-watershed" class="analysis-status"></div>' +
+        '<div id="msg-status-power" class="analysis-status"></div>' +
+      '</li>' +
+      '<li class="list-group-item" id="msg-text"></li>',
+      //'<li class="list-group-item" id="clear-button-item">' + clearButton + '</li>',
     classes: 'list-group',
     id: "analyze-control",
     style: {
+        width: '300px',
         margin: '10px',
         padding: '0px 0 0 0'
         //cursor: 'pointer',
     }
 })
 .addTo(map);
-
-/**
- * manage the status messages
- */
-function clearAndReplaceStatus(newStatusElementID) {
-  $('.analysis-status').hide();
-  $(newStatusElementID).show();
-}
 
 /*****************************************************************************
  * DRAWING
@@ -405,12 +413,14 @@ var runGP = function () {
       // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
       elevProfileTask.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
       // update status
-      console.log("Elevation initialized. Submitting Request...");
+      msg = "Determining elevation profile...";
+      console.log(msg);
+      $('#msg-status-elevprofile').html(makeAlert(msg, 'info'));
       // run the task
       elevProfileTask.run(function(error, result, response) {
         if (error) {
           msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
-          $('#msg-status').html(makeAlert(msg, 'danger'));
+          $('#msg-status-elevprofile').html(makeAlert(msg, 'danger'));
           console.log(error.details);
           e.resolve(error);
         } else {
@@ -418,7 +428,7 @@ var runGP = function () {
           msg = "Elevation Profile: Complete";
           console.log(msg);
           console.log(result);
-          
+          $('#msg-status-elevprofile').html(makeAlert(msg, 'success'));          
           // resolve callback
           e.resolve(result);
         }
@@ -451,8 +461,9 @@ var runGP = function () {
       //var outputSnappedPoints;
       //watershedTask.setOutputParam("SnappedPoints");
       //watershedTask.gpAsyncResultParam("SnappedPoints", outputSnappedPoints);
-      console.log("Watershed initialized. Submitting Request...");
-      $('#analyze').prop("disabled", false);
+      msg = "Delineating the upstream contributing area...";
+      console.log(msg);
+      $('#msg-status-watershed').html(makeAlert(msg, 'info'));
       
       watershedTask.run(function(error, result, response) {
         //console.log(response);
@@ -462,12 +473,13 @@ var runGP = function () {
           console.log(msg);
           console.log(error);
           // update alert
-          $('#msg-status').append(makeAlert(msg, 'danger'));
+          $('#msg-status-watershed').html(makeAlert(msg, 'danger'));
           // resolve callback
           w.resolve(error);
         } else {
           // messages
-          msg = "Watershed: Complete";
+          msg = "Watershed Delineation: Complete";
+          $('#msg-status-watershed').html(makeAlert(msg, 'success'));
           console.log(msg);
           console.log(result);
           // resolve callback
@@ -495,7 +507,9 @@ var runGP = function () {
 };
 
 var analyzeGPResults = function(elevProfileResult,watershedResult) {
-  console.log("Analyzing GP Results...");
+  var msg = "Calculating Power Potential...";
+  console.log(msg);
+  $('#msg-status-power').html(makeAlert(msg, 'info'));
   console.log(elevProfileResult);
   console.log(watershedResult);
   
@@ -509,7 +523,7 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
  
   // get the area value, which is buried in the service result object
   var area = watershedResult.WatershedArea.features[0].properties.AreaSqKm;
-  $('#msg-text').append('<h4>Area</h4><p>' + _round(area,2) + ' km^2</p>');
+  $('#msg-text').append('<h3><small>Area:</small>&nbsp;' + _round(area,2) + '&nbsp;<small>km^2</small></h3>');
   
   //get the line from the result object
   var line = elevProfileResult.OutputProfile.features[0];
@@ -522,7 +536,7 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var head = lastZ - firstZ;
   // check result. It must be a positive number
 
-  $('#msg-text').append('<h4>Head</h4><p>' + _round(head,2) + ' m</p>');
+  $('#msg-text').append('<h3><small>Head:</small>&nbsp;' + _round(head,2) + '&nbsp;<small>meters</small></h3>');
 
 
   // calculate power
@@ -537,29 +551,35 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var power = _round(p, 2);
 
   if (head < 0) {
-     $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'danger'));
+     $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'warning'));
   } else {
-    $('#msg-status').html(makeAlert(null,'success'));  
+    //$('#msg-status').html(makeAlert(null,'success'));
+    $('#msg-status').hide();
   }
   
-  $('#msg-text').append('<h3>Power Potential:</h3><h4>' + power + ' kW/year</h4>');
-  $('#clear-button-item').show();
-  $('#analyze').prop("disabled", true);
+  $('#msg-text').append('<h2><small>Power:</small>&nbsp;' + power + '&nbsp;<small>kW/year</small></h2>');
+  $('#msg-status-power').html(makeAlert("Power Generation Est.: Complete", 'success'));
+  $('#analyze-button-item').html(clearButton);
+  $('#msg-text').show();
 };
 
 /*******************************************************************************
  * Analyze Button - Action
  */
 
-$('#analyze').click(function() {  
+$(document).on("click", '#analyze', function() {
   
   // reset the messages
+  resetAnalysis(false);
+  /*
   $('#analyze').prop("disabled", true);
+  $('#msg-statuses').hide();
   $('.analysis-status').hide();
   $('.analysis-status').empty();
-  $('#clear-button-item').hide();
+  */
   // set the new status to 
   $('#msg-status').html(makeAlert(null,'info'));
+  $('#msg-statuses').show();
   $('.analysis-status').show();
   
   // print geometries to console
