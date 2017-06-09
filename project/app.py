@@ -95,8 +95,9 @@ def get_token():
 @app.route('/index/')
 @app.route('/')
 def home():
-    t = get_token()
-    return render_template('pages/home.html')
+    #t = get_token()
+    #return render_template('pages/home.html')
+    return redirect(url_for('map'), code=302)
 
 ## map view
 @app.route('/map/')
@@ -118,7 +119,8 @@ def map():
 @app.route('/help/')
 #@login_required
 def help():
-    return render_template('pages/help.html')
+    return redirect(url_for('map'), code=302)
+    #return render_template('pages/help.html')
 
 
 # ---------------------------------------------------
