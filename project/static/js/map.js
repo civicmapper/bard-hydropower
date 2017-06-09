@@ -42,6 +42,21 @@ function oauth(callback) {
 
 $(document).on("ready", function() {
   $('.analysis-status').hide();
+  $('#clear-button-item').hide();
+});
+
+function resetAnalysis() {
+  $('#analyze').prop("disabled", true);
+  $('.analysis-status').hide();
+  $('.analysis-status').empty();
+  $('#clear-button-item').hide();
+  drawnItems.clearLayers();
+  drawInfo.update();
+}
+
+$(document).on("click", "#clearCalcs", function() {
+  console.log("clearing results");
+  resetAnalysis();
 });
 
 $("#about-btn").click(function() {
@@ -50,14 +65,13 @@ $("#about-btn").click(function() {
 	return false;
 });
 
-
 /*******************************************************************************
  * create map with basemap and supplemental layers
  */
 var map = L.map('map').setView([42.0170202, -73.9144284], 18);
 
-//L.esri.basemapLayer('Imagery').addTo(map);
-//L.esri.Vector.basemap('Hybrid').addTo(map);
+L.esri.basemapLayer('Imagery').addTo(map);
+L.esri.Vector.basemap('Hybrid').addTo(map);
 
 var layer_streams = L.esri.featureLayer({
   url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7",
@@ -126,8 +140,6 @@ drawInfo.onAdd = function(map) {
 drawInfo.addTo(map);
 
 
-var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit" disabled>Calculate</button></div>';
-
 function makeAlert(msg, alertType) {
   var defaultMsg = null;
   if (alertType == 'info') {
@@ -149,6 +161,10 @@ function makeAlert(msg, alertType) {
   }    
   
 }
+
+var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit" disabled>Calculate</button></div>';
+var clearButton = '<div><button id="clearCalcs" class="btn btn-primary btn-block" type="submit">Clear Results</button></div>';
+
 /**
  * Analysis Control
  * Contains button and subsequent results outputs from the tool.
@@ -163,13 +179,14 @@ var analyzeControl = L.control.custom({
     content:
       '<li class="list-group-item" id="analyze-button-item">' + analyzeButton + '</li>' +
       '<li class="list-group-item analysis-status" id="msg-status"></li>' + 
-      '<li class="list-group-item analysis-status" id="msg-text"></li>',
+      '<li class="list-group-item analysis-status" id="msg-text"></li>' +
+      '<li class="list-group-item" id="clear-button-item">' + clearButton + '</li>',
     classes: 'list-group',
     id: "analyze-control",
     style: {
         margin: '10px',
-        padding: '0px 0 0 0',
-        cursor: 'pointer',
+        padding: '0px 0 0 0'
+        //cursor: 'pointer',
     }
 })
 .addTo(map);
@@ -359,129 +376,175 @@ HydroPowerClass.prototype.buildProfileGraphic = function() {
 
 /**
  * instantiate the hydropower object
- */
-var hp = HydroPowerClass();
+ */  
+hp = HydroPowerClass();
 
 /**
  * run the two GP tasks at once
  */
-var runGP = function (hp) {
-  
-  var elevProfileStatus = $.Deferred();
-  var elevProfileService = L.esri.GP.service({
-    url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
-    useCors: true,
-    token: arcgis_token
-  });
-  var elevProfileTask = elevProfileService.createTask(); 
-  
-  var watershedStatus = $.Deferred();
-  var watershedService = L.esri.GP.service({
-    url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
-    useCors: true,
-    token: arcgis_token
-  });
-  var watershedTask = watershedService.createTask();
-  
+var runGP = function () {
+  var e = $.Deferred();
+  var w = $.Deferred();
+
   /**
    * run the Elevation Profile service
    */
-  elevProfileTask.on('initialized', function() {
-    // set input parameters
-    elevProfileTask.setParam("DEMResolution ", "FINEST");
-    elevProfileTask.setParam("ProfileIdField", "OID");
-    elevProfileTask.setParam("MaximumSampleDistance", 50000);
-    elevProfileTask.setParam("returnZ", true);
-    // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-    elevProfileTask.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
-    // update status
-    hp.status.profile = "Elevation initialized. Submitting Request...";
-    console.log(hp.status.profile);
-    // run the task
-    elevProfileTask.run(function(error, result, response) {
-      if (error) {
-        hp.status.profile = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
-        $('#msg-status').html(makeAlert(hp.status.profile, 'danger'));
-        console.log(error.details);
-        elevProfileStatus.resolve();
-      } else {
-        // messages
-        hp.status.profile = "Elevation Profile: Complete";
-        console.log(hp.status.profile);
-        console.log(result);
-        // update the class
-        hp.profile = result;
-        // resolve callback
-        elevProfileStatus.resolve();
-      }
+  //function runElevProfileGP() {
+    var elevProfileService = L.esri.GP.service({
+      url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
+      useCors: true,
+      token: arcgis_token
     });
-  });
+    var elevProfileTask = elevProfileService.createTask(); 
+    elevProfileTask.on('initialized', function() {
+      // set input parameters
+      elevProfileTask.setParam("DEMResolution ", "FINEST");
+      elevProfileTask.setParam("ProfileIdField", "OID");
+      elevProfileTask.setParam("MaximumSampleDistance", 50000);
+      elevProfileTask.setParam("returnZ", true);
+      // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
+      elevProfileTask.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
+      // update status
+      console.log("Elevation initialized. Submitting Request...");
+      // run the task
+      elevProfileTask.run(function(error, result, response) {
+        if (error) {
+          msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
+          $('#msg-status').html(makeAlert(msg, 'danger'));
+          console.log(error.details);
+          e.resolve(error);
+        } else {
+          // messages
+          msg = "Elevation Profile: Complete";
+          console.log(msg);
+          console.log(result);
+          
+          // resolve callback
+          e.resolve(result);
+        }
+      });
+    });
+  //}
 
   /**
    * run the Watershed service
-   */    
-  watershedTask.on('initialized', function() {
-    // InputPoints must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-    watershedTask.setParam("InputPoints", drawnPoint.toGeoJSON());
-    watershedTask.setParam("SourceDatabase", "FINEST");
-    watershedTask.setParam("PointIDField", "OID");
-    watershedTask.setParam("SnapDistance", 500);
-    watershedTask.setParam("Generalize", true);
-    watershedTask.setParam("ReturnSnappedPoints", false);
-    // output parameters (required for an async GP service)
-    var outputWatershedArea, outputSnappedPoints;
-    watershedTask.setOutputParam("WatershedArea");
-    //watershedTask.setOutputParam("SnappedPoints");
-    watershedTask.gpAsyncResultParam("WatershedArea", outputWatershedArea);
-    //watershedTask.gpAsyncResultParam("SnappedPoints", outputSnappedPoints);
-    hp.status.watershed = "Watershed initialized. Submitting Request...";
-    console.log(hp.status.watershed);
-    $('#analyze').prop("disabled", false);
-    
-    watershedTask.run(function(error, result, response) {
-      //console.log(response);
-      if (error) {
-        // messages
-        hp.status.watershed = "Watershed: " + error.message + "(code:" + error.code + ")";
-        console.log(hp.status.watershed);
-        console.log(error);
-        // update alert
-        $('#msg-status').append(makeAlert(hp.status.watershed, 'danger'));
-        // resolve callback
-        watershedStatus.resolve();
-      } else {
-        // messages
-        hp.status.watershed = "Watershed: Complete";
-        console.log(hp.status.watershed);
-        console.log(result);
-        // update the class
-        hp.watershed = result;
-        // resolve callback
-        watershedStatus.resolve();
-      }
+   */
+  //function runWatershedGP () {
+    var watershedService = L.esri.GP.service({
+      url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
+      useCors: true,
+      token: arcgis_token
     });
-  });  
-  // return the deferral
-  return $.Deferred(function (def) {
-    $.when(elevProfileStatus, watershedStatus).done(function () {
-      def.resolve();
+    var watershedTask = watershedService.createTask();
+    watershedTask.on('initialized', function() {
+      // InputPoints must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
+      watershedTask.setParam("InputPoints", drawnPoint.toGeoJSON());
+      watershedTask.setParam("SourceDatabase", "FINEST");
+      watershedTask.setParam("PointIDField", "OID");
+      watershedTask.setParam("SnapDistance", 500);
+      watershedTask.setParam("Generalize", true);
+      watershedTask.setParam("ReturnSnappedPoints", false);
+      // output parameters (required for an async GP service)
+      var outputWatershedArea;
+      watershedTask.setOutputParam("WatershedArea");
+      watershedTask.gpAsyncResultParam("WatershedArea", outputWatershedArea);
+      //var outputSnappedPoints;
+      //watershedTask.setOutputParam("SnappedPoints");
+      //watershedTask.gpAsyncResultParam("SnappedPoints", outputSnappedPoints);
+      console.log("Watershed initialized. Submitting Request...");
+      $('#analyze').prop("disabled", false);
+      
+      watershedTask.run(function(error, result, response) {
+        //console.log(response);
+        if (error) {
+          // messages
+          msg = "Watershed: " + error.message + "(code:" + error.code + ")";
+          console.log(msg);
+          console.log(error);
+          // update alert
+          $('#msg-status').append(makeAlert(msg, 'danger'));
+          // resolve callback
+          w.resolve(error);
+        } else {
+          // messages
+          msg = "Watershed: Complete";
+          console.log(msg);
+          console.log(result);
+          // resolve callback
+          w.resolve(result);
+        }
+      });
+    
+    });
+  //}
+  
+  /* when runGP runs, it first hits $.Deferred. The first argument is a function
+   * that executes before anything else. That argument is a $.when function,
+   * which runs the two functions defined above. When done, the results
+   * are passed into a callback function that resolves the whole thing and
+   * returns the two results objects from runGP
+   */
+  var x = $.Deferred(function (def) {
+    // elevProfileResult, watershedResult
+    $.when(e, w).done(function (eR,wR) {
+      def.resolve(eR,wR);
     });
   });
-  
+  return x;
+
 };
 
-var analyzeGPResults = function() {
-  //post process the GP service results with these two methods:
-  hp.getArea();
+var analyzeGPResults = function(elevProfileResult,watershedResult) {
+  console.log("Analyzing GP Results...");
+  console.log(elevProfileResult);
+  console.log(watershedResult);
+  
+  /*post process the GP service results with these two methods:
+  hp.profile = elevProfileResult;
   hp.calcHead();
-  // add the results to our message area
-  $('#msg-text').append('<h4>Area</h4><p>' + hp.area + ' km^2</p>');
-  $('#msg-text').append('<h4>Head</h4><p>' + hp.head + ' m</p>');
-  // use stored data to run calculation
+  hp.watershed = watershedResult;
+  hp.getArea();
   hp.calcPower(null,null);
-  $('#msg-text').append('<h3>kW</h3><p>' + hp.power + ' m</p>');
-  $('#msg-status').html(makeAlert(null,'success'));
-  $('#analyze').prop("disabled", false);
+  */
+ 
+  // get the area value, which is buried in the service result object
+  var area = watershedResult.WatershedArea.features[0].properties.AreaSqKm;
+  $('#msg-text').append('<h4>Area</h4><p>' + _round(area,2) + ' km^2</p>');
+  
+  //get the line from the result object
+  var line = elevProfileResult.OutputProfile.features[0];
+  // get the coords from the line
+  var coords = line.geometry.coordinates;
+  // get the z values from the first and last coordinate
+  var firstZ = coords[0][2];
+  var lastZ = coords[coords.length - 1][2];
+  // save the difference
+  var head = lastZ - firstZ;
+  // check result. It must be a positive number
+
+  $('#msg-text').append('<h4>Head</h4><p>' + _round(head,2) + ' m</p>');
+
+
+  // calculate power
+  var Qavail = (area * 1.6);
+  //where x is a range from 0.1 to 0.5 with default value of 0.3 (edited)
+  var x = 0.3;
+  var Qenv = (area * x);
+  var Quseable = Qavail - Qenv;
+  //Power in kW; where e is a variable with default value 0.7 (edited)
+  var e = 0.7;
+  var p = Quseable * head * (0.084) * e;
+  var power = _round(p, 2);
+
+  if (head < 0) {
+     $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'danger'));
+  } else {
+    $('#msg-status').html(makeAlert(null,'success'));  
+  }
+  
+  $('#msg-text').append('<h3>Power Potential:</h3><h4>' + power + ' kW/year</h4>');
+  $('#clear-button-item').show();
+  $('#analyze').prop("disabled", true);
 };
 
 /*******************************************************************************
@@ -489,17 +552,17 @@ var analyzeGPResults = function() {
  */
 
 $('#analyze').click(function() {  
-  /**
-   * reset the messages
-   */
-  $('.analysis-status').show();
-  $('#msg-text').html();
-  // set tthe status to 
-  $('#msg-status').html(makeAlert(null,'info'));
   
-  /**
-   * print geometries to console
-   */
+  // reset the messages
+  $('#analyze').prop("disabled", true);
+  $('.analysis-status').hide();
+  $('.analysis-status').empty();
+  $('#clear-button-item').hide();
+  // set the new status to 
+  $('#msg-status').html(makeAlert(null,'info'));
+  $('.analysis-status').show();
+  
+  // print geometries to console
   console.log(drawnPolyline.toGeoJSON());
   console.log(drawnPoint.toGeoJSON());
   
