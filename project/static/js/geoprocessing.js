@@ -148,12 +148,12 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var firstZ = coords[0][2];
   var lastZ = coords[coords.length - 1][2];
   // save the difference
-  var head = lastZ - firstZ;
-  // check result. It must be a positive number
+  var head =  Math.abs(lastZ - firstZ);
+  
 
   $('#msg-text').append('<h3><small>Head:</small>&nbsp;' + _round(head,2) + '&nbsp;<small>meters</small></h3>');
 
-
+  /*
   // calculate power
   var Qavail = (area * 1.6);
   //where x is a range from 0.1 to 0.5 with default value of 0.3 (edited)
@@ -164,7 +164,31 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var e = 0.7;
   var p = Quseable * head * (0.084) * e;
   var power = _round(p, 2);
-
+  */
+  var envflow = 0, efficiency = 0;
+  calcRequestURL = Flask.url_for("api", {
+    "area": area, "head": head, "envflow": envflow, "efficiency": efficiency
+  });
+  
+  $.get({
+    url: calcRequestURL,
+    success: function(data) {  
+      if (head < 0) {
+         $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'warning'));
+      } else {
+        //$('#msg-status').html(makeAlert(null,'success'));
+        $('#msg-status').hide();
+      }
+      
+      $('#msg-text').append('<h2><small>Power:</small>&nbsp;' + data.result.power + '&nbsp;<small>kW/year</small></h2>');
+      $('#msg-status-power').html(makeAlert("Power Generation Est.: Complete", 'success'));
+      $('#analyze-button-item').html(clearButton);
+      $('#msg-text').show();    
+    }
+  });
+  
+  /*
+   //check result. It must be a positive number
   if (head < 0) {
      $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'warning'));
   } else {
@@ -176,4 +200,5 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   $('#msg-status-power').html(makeAlert("Power Generation Est.: Complete", 'success'));
   $('#analyze-button-item').html(clearButton);
   $('#msg-text').show();
+  */
 };

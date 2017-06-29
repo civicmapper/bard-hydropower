@@ -78,6 +78,7 @@
 	 <script src="https://cdn.jsdelivr.net/leaflet.esri.webmap/0.4.0/esri-leaflet-webmap.js"></script>
 	 
 	<!--APPLICATION-->
+	{{ JSGlue.include() }}
 	<script>
 		// ArcGIS token passed from Flask to javascript (rendered by Jinja2)
 		var arcgis_token = {{ arcgis_token|tojson }};
