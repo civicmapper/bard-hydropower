@@ -3,66 +3,53 @@
 #----------------------------------------------------------------------------#
 
 # standard library imports
+
 import os
 import logging
 from logging import Formatter, FileHandler
 from functools import wraps
 import requests
 import json
-from datetime import datetime
-from dateutil.parser import parse
-from dateutil import tz
-import uuid
-
-
-#import pprint
-#pp = pprint.PrettyPrinter(indent=2)
 
 # dependencies
-from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, current_user, login_required
-from flask.ext.bcrypt import Bcrypt
-from sqlalchemy.exc import IntegrityError
 
+from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
+from flask_assets import Environment, Bundle
 import pdb
 
 # config
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
+assets = Environment(app)
 
-# in-app imports
-from project.forms import ForgotForm, LoginForm, RegisterForm
-import project.models
+# asset bundling
+
+bundle_js = Bundle(
+    'js/plugins.js',
+    'js/utils.js',
+    'js/map.js',
+    'js/layout.js',
+    'js/calcControl.js',
+    'js/hydropower.js',
+    'js/geoprocessing.js',
+    filters='jsmin',
+    output='bundle.js')
+assets.register('bundle_js', bundle_js)
+
+bundle_css = Bundle(
+    'css/layout.main.css',
+    'css/main.css',
+    'css/main.responsive.css',
+    filters='cssutils',
+    output='bundle.css')
+assets.register('bundle_css', bundle_css)
+
 
 #----------------------------------------------------------------------------#
 # Helper Functions & Wrappers
 #----------------------------------------------------------------------------#
 
-# load login manager
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-# Login required decorator
-
-def login_required(test):
-    @wraps(test)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return test(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
-
-@login_manager.user_loader
-def user_loader(user_id):
-    """Given *user_id*, return the associated User object.
-    @param unicode user_id: user_id (email) user to retrieve.
-    """
-    return models.User.query.get(user_id)
 
 def get_token():
     """requests and returns an ArcGIS Token for the pre-registered application.
@@ -121,79 +108,6 @@ def map():
 def help():
     return redirect(url_for('map'), code=302)
     #return render_template('pages/help.html')
-
-
-# ---------------------------------------------------
-# pages for authentication
-
-## login
-@app.route('/login/', methods=['GET','POST'])
-def login():
-    error = None
-    form = LoginForm(request.form)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            user = models.User.query.filter_by(email=request.form['email']).first()
-            #user = user_loader(request.form['email'])
-            if user is not None and bcrypt.check_password_hash(user.password, request.form['password']):
-                session['logged_in'] = True
-                session['user_id'] = user.email
-                session['role'] = user.role
-                flash('Welcome!','success')
-                return redirect(url_for('home'))
-            else:
-                error = 'Invalid credentials. Please try again.'
-                flash(error, 'warning')
-        else:
-            error = 'User and password not provided. Please try again.'
-            flash(error, 'warning')
-    return render_template('forms/login.html', form=form)
-
-
-@app.route('/register/', methods=['GET','POST'])
-def register():
-    error = None
-    form = RegisterForm(request.form)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            new_user = User(
-                form.email.data,
-                bcrypt.generate_password_hash(form.password.data)
-            )
-            try:
-                db.session.add(new_user)
-                db.session.commit()
-                flash('Thanks for registering. Please login.')
-                return redirect(url_for('login'))
-            except IntegrityError:
-                error = 'That username / email already exists.'
-                return render_template('register.html', form=form, error=error)
-    return render_template('forms/register.html', form=form, error=error)
-
-@app.route('/forgot/')
-def forgot():
-    form = ForgotForm(request.form)
-    return render_template('includes/forgot.html', form=form)
-
-
-
-# ------------------------------------------------
-# application logic (no page rendered)
-
-## Logout - ends session for user, redirects to login
-@app.route('/logout/')
-def logout():
-    session.pop('logged_in', None)
-    session.pop('user_id', None)
-    session.pop('role', None)
-    flash('You are logged out.')
-    return redirect(url_for('home'))
-
-## DATA
-@app.route('/data/<path:path>')
-@login_required
-def send_data(path):
-    return send_from_directory('data', path)
 
 
 # ------------------------------------------------

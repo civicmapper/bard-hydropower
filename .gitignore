@@ -9,8 +9,10 @@ env/
 venv/
 ENV/
 
-# extra project directories
-extras/
+# webassets
+project/static/.webassets-cache/
+project/static/bundle.js
+project/static/bundle.css
 
 # komodo project stuff
 .komodotools
