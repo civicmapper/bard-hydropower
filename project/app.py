@@ -12,9 +12,9 @@ import requests
 import json
 
 # dependencies
-
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
 from flask_assets import Environment, Bundle
+from flask_jsglue import JSGlue
 import pdb
 
 # config
@@ -22,6 +22,7 @@ import pdb
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 assets = Environment(app)
+jsglue = JSGlue(app)
 
 # asset bundling
 
@@ -44,7 +45,6 @@ bundle_css = Bundle(
     filters='cssutils',
     output='bundle.css')
 assets.register('bundle_css', bundle_css)
-
 
 #----------------------------------------------------------------------------#
 # Helper Functions & Wrappers
@@ -88,7 +88,6 @@ def home():
 
 ## map view
 @app.route('/map/')
-#@login_required
 def map():
     t = get_token()
     session['arcgis_token'] = t['access_token']
@@ -104,10 +103,78 @@ def map():
 
 ## data table view
 @app.route('/help/')
-#@login_required
 def help():
     return redirect(url_for('map'), code=302)
     #return render_template('pages/help.html')
+
+## Calculator API
+@app.route('/hydropower/calculator/api')
+def api():
+    """
+    area: area of the watershed. required
+    head: difference between high elevation and low elevation relative to dam/weir. required
+    envflow: environmental flow requirement. default is 0.3, range options from 0.1-0.5. optional
+    efficiency: efficiency default is 0.7. optional.
+    """
+
+    response = {"messages" : []}
+    result = {}
+    
+    try:
+        area = float(request.args.get('area'))
+        head = float(request.args.get('head'))
+        envflow = float(request.args.get('envflow'))
+        efficiency = float(request.args.get('efficiency'))
+    except:
+        response['messages'].append('Input parameters could not be parsed.')
+        status = 400
+    
+    if ((area and head)):
+        result['head'] = head
+        result['area'] = area
+        #calculate power
+        result['q-available'] = area * 1.6
+        #where envflow is a range from 0.1 to 0.5 with default value of 0.3
+        if envflow:
+            result['envflow'] = envflow
+        else:
+            result['envflow'] = 0.3
+        result['q-env'] = (result['area'] * result['envflow'])
+        result['q-useable'] = result['q-available'] - result['q-env']
+        #Power in kW; where e is a variable with default value 0.7 
+        if efficiency:
+            result['efficiency'] = efficiency
+        else:
+            result['efficiency'] = 0.7
+        p = result['q-useable'] * result['head'] * (0.084) * result['efficiency']
+        result['power'] = round(p, 2)
+        
+        response["status"] = "success"
+        
+        if head <= 0:
+            response["status"] = "warning"
+            response["messages"].append("Head provided was <= 0. The result will be nonsense.")
+        if area <= 0:
+            response["status"] = "warning"
+            response["messages"].append("Area provided was <= 0. The result will be nonsense.")
+            
+        response["messages"].append("The calculation completed successfully.")
+        response["result"] = result
+        status = 200
+
+    else:
+        response["status"] = "error"
+        response["messages"].append("required parameters were not provided")
+        status = 400
+
+        
+    # ---------------------------------------------------------------
+    # handle the response
+    # build the response
+    r = make_response(jsonify(response), status)
+    # add header to enable CORS
+    r.headers['Access-Control-Allow-Origin'] = '*'
+    return make_response(r)
 
 
 # ------------------------------------------------
