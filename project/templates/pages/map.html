@@ -28,7 +28,7 @@
 						<li><a href="#methods" data-toggle="tab">
 							<span class="glyphicon glyphicon-book" aria-hidden="true"></span> How It Works</a>
 						</li>
-
+	
 					</ul>
 					<div class="tab-content" id="aboutTabsContent">
 						<div id="about" class="tab-pane active in">
@@ -50,32 +50,29 @@
 	</div><!-- /.modal -->
   
 
-  <div id="container">
-    <div id="map"></div>
-  </div>
+	<div id="container">
+	  <div id="map"></div>
+	</div>
   
-  <!--JQUERY-->
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js"></script>
-  <!--LEAFLET-->
-  <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
-  <!--ESRI-LEAFLET-->
-  <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
-  <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
-  <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
-  <!--LEAFLET-PLUGINS-->
-  <script src="/static/js/libs/Leaflet.Control.Custom/Leaflet.Control.Custom.js"></script>
-  <!--D3-->
-  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <!--APPLICATION-->
-  <script type="text/javascript" src="/static/js/plugins.js"></script>
-  <script>
-    // ArcGIS token passed from Flask to javascript (rendered by Jinja2)
-    var arcgis_token = {{ arcgis_token|tojson }};
-    console.log(arcgis_token);
-  </script>
-  <script type="text/javascript" src="/static/js/map.js" defer></script>
-  
-
+	<!--UI-->
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<!--D3-->
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<!--LEAFLET-->
+	<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+	<script src="{{ url_for('static', filename='libs/leaflet.control.custom/Leaflet.Control.Custom.js') }}"></script>
+	<!--ESRI-LEAFLET-->
+	<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+	<script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
+	<script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+	<!--APPLICATION-->
+	<script>
+		// ArcGIS token passed from Flask to javascript (rendered by Jinja2)
+		var arcgis_token = {{ arcgis_token|tojson }};
+		console.log(arcgis_token);
+	</script>
+	<script type="text/javascript" src="/static/js/map.js" defer></script>
+	<script type="text/javascript" src="/static/js/plugins.js" defer></script>
 {% endblock %}

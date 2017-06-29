@@ -9,21 +9,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- /meta -->
 
-<!-- styles -->
-<link type="text/css" rel="stylesheet" href="/static/css/theme-bootstrap.min.css">
-<link type="text/css" rel="stylesheet" href="/static/css/layout.main.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/main.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/main.responsive.css" />
-<!-- /styles -->
-
-<!-- Leaflet -->
+<!-- Bootstrap -->
+<link href="{{ url_for('static', filename='libs/bootstrap/theme-bootstrap.min.css') }}" type="text/css" rel="stylesheet" >
+<!-- Leaflet (external)-->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+<!-- Application -->
+<link href="{{ url_for('static', filename='css/layout.main.css') }}" type="text/css" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/main.css') }}" type="text/css" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/main.responsive.css') }}" type="text/css" rel="stylesheet"/>
 
-<!-- scripts -->
-<script src="/static/js/libs/modernizr-2.8.2.min.js"></script>
-<!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
-<!-- /scripts -->
+<!-- legacy browser support -->
+<script src="{{ url_for('static', filename='libs/modernizr/modernizr-2.8.2.min.js') }}"></script>
+<!--[if lt IE 9]><script src="{{ url_for('static', filename='libs/respond/respond-1.4.2.min.js') }}"></script><![endif]-->
+<!-- /legacy browser support -->
 
 </head>
 <body>
