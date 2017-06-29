@@ -73,6 +73,9 @@
 		var arcgis_token = {{ arcgis_token|tojson }};
 		console.log(arcgis_token);
 	</script>
-	<script type="text/javascript" src="/static/js/map.js" defer></script>
-	<script type="text/javascript" src="/static/js/plugins.js" defer></script>
+	{% assets "bundle_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+	{% endassets %}
+	<!--script type="text/javascript" src="/static/js/map.js" defer></script>
+	<script type="text/javascript" src="/static/js/plugins.js" defer></script-->
 {% endblock %}

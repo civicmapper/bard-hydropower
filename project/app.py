@@ -20,6 +20,8 @@ import uuid
 
 # dependencies
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
+from flask_assets import Environment, Bundle
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask.ext.bcrypt import Bcrypt
@@ -30,12 +32,35 @@ import pdb
 # config
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+assets = Environment(app)
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 # in-app imports
 from project.forms import ForgotForm, LoginForm, RegisterForm
 import project.models
+
+bundle_js = Bundle(
+    'js/plugins.js',
+    'js/utils.js',
+    'js/map.js',
+    'js/layout.js',
+    'js/calcControl.js',
+    'js/hydropower.js',
+    'js/geoprocessing.js',
+    filters='jsmin',
+    output='bundle.js')
+assets.register('bundle_js', bundle_js)
+
+bundle_css = Bundle(
+    'css/layout.main.css',
+    'css/main.css',
+    'css/main.responsive.css',
+    filters='cssutils',
+    output='bundle.css')
+assets.register('bundle_css', bundle_css)
+
 
 #----------------------------------------------------------------------------#
 # Helper Functions & Wrappers
@@ -121,7 +146,6 @@ def map():
 def help():
     return redirect(url_for('map'), code=302)
     #return render_template('pages/help.html')
-
 
 # ---------------------------------------------------
 # pages for authentication
