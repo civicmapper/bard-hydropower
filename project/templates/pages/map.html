@@ -64,9 +64,19 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
 	<script src="{{ url_for('static', filename='libs/leaflet.control.custom/Leaflet.Control.Custom.js') }}"></script>
 	<!--ESRI-LEAFLET-->
-	<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+	<script src="https://unpkg.com/esri-leaflet@2.0.8"></script>
 	<script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
 	<script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+
+	<!-- ESRI-LEAFLET-WEBMAP-->
+	<script src="https://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+	<script src="https://cdn.rawgit.com/Leaflet/Leaflet.heat/gh-pages/dist/leaflet-heat.js"></script>
+	<script src="https://cdn.jsdelivr.net/leaflet.esri.heatmap-feature-layer/2.0.0-beta.1/esri-leaflet-heatmap-feature-layer.js"></script>
+	 <script src="http://cdn.jsdelivr.net/leaflet.esri.renderers/2.0.2/esri-leaflet-renderers.js"></script>
+	 <script src="https://muxlab.github.io/Leaflet.VectorIcon/L.VectorIcon.js"></script>
+	 <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+	 <script src="https://cdn.jsdelivr.net/leaflet.esri.webmap/0.4.0/esri-leaflet-webmap.js"></script>
+	 
 	<!--APPLICATION-->
 	<script>
 		// ArcGIS token passed from Flask to javascript (rendered by Jinja2)
