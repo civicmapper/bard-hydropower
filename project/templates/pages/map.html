@@ -48,8 +48,78 @@
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
-  
 
+	<div class="modal" id="paramsModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h3 class="modal-title">Calculation Parameters</h3>
+				</div><!-- /.modal-header -->
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12"><h4>Head</h4></div>
+						<div class="col-sm-6">
+							<div class="input-group">
+							  <input type="text" class="form-control" aria-describedby="head-form" placeholder="Required">
+							  <span class="input-group-addon" id="head-form">Meters</span>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							Required. Specify here, or draw on the map to determine the head for your location of interest.
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12"><h4>Area</h4></div>
+						<div class="col-sm-6">
+							<div class="input-group">
+							  <input type="text" class="form-control" aria-describedby="area-form" placeholder="Required">
+							  <span class="input-group-addon" id="area-form">Sq. Km.</span>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							Required. Specify here, or draw on the map to determine the contributing area for your location of interest.
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12"><h4>Efficiency Constant</h4></div>
+						<div class="col-sm-6">
+							<div class="input-group">
+							  <input type="text" class="form-control" aria-describedby="eff-form" placeholder="default: 0.7" value=0.7>
+							  <span class="input-group-addon" id="eff-form">float</span>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							Description here...
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12"><h4>Environmental Flow Constant</h4></div>
+						<div class="col-sm-6">
+							<div class="input-group">
+							  <input type="text" class="form-control" aria-describedby="env-form" placeholder="default: 0.3" value=0.3>
+							  <span class="input-group-addon" id="env-form">float</span>
+							</div>		
+						</div>
+						<div class="col-sm-6">
+							Description here...
+						</div>
+					</div>
+				</div><!-- /.modal-body -->
+				<div class="modal-footer">
+					<div class="row">
+						<div class="col-sm-9">
+							<button id="analyze-from-params" class="btn btn-primary btn-block analyze" type="submit">Calculate</button>
+						</div>
+						<div class="col-sm-3">
+							<button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+  
 	<div id="container">
 	  <div id="map"></div>
 	</div>

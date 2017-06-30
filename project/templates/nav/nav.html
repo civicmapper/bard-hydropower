@@ -7,18 +7,25 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{{ url_for('map') }}">
+          <a class="navbar-brand" href="#" id="about-btn">
             <span>Micro-Hydropower Calculator</span>
           </a>
         </div>
         <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav pull-right">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <li id="parameters-button-item"><div><button id="params-btn" class="btn btn-primary btn-block" type="submit">Parameters</button></div></li>
+              <li id="analyze-button-item"><div><button id="analyze" class="btn btn-primary btn-block analyze" type="submit">Calculate</button></div></li>
+              <li id="results-button-item"><div><button id="results-btn" class="btn btn-primary btn-block analyze" type="submit">Results</button></div></li>
+            </li>
+          </ul>
+          <!--ul class="nav navbar-nav navbar-right">
             <li>
               <a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn">
                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;About
               </a>
             </li>
-          </ul>
+          </ul-->
         </div><!--/.nav-collapse -->
       </div>
     </div>

@@ -10,7 +10,15 @@
 var map = L.map('map', {
   maxZoom : 22
 })
-  .setView([42.0170202, -73.9144284], 22);
+  .setView([42.0170202, -73.9144284], 18);
+
+var layer_streams = L.esri.featureLayer({
+  url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7",
+}).addTo(map);
+
+var layer_dams = L.esri.featureLayer({
+  url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/1",
+}).addTo(map);
   
 /**
   * add a vector map overlay for labeling (vector tiles are not supported
@@ -20,11 +28,12 @@ L.esri.Vector.basemap('Hybrid').addTo(map);
 */
 
 //L.esri.basemapLayer('Imagery').addTo(map);
+/*
 var webmap = L.esri.webMap('c7bad780627d4175abc7174278f69308', {map: map});
 
 /**
  * do some things with the layers loads into the webmap object when it's loaded.
- */
+ *
 webmap.on('load', function() {
    // store a list of layers from the webmap
     var overlayMaps = {};
@@ -45,6 +54,7 @@ webmap.on('load', function() {
 });
 
 console.log(map.getPanes());
+*/
 
 /*******************************************************************************
  * DRAWING ELEMENTS
@@ -84,16 +94,17 @@ map.addControl(new L.Control.Draw({
  * drawInfo Control - instructions for drawing
  */
 var drawInfo = L.control({
-  position: 'topleft'
+  position: 'topright'
 });
 
 // method that we will use to update the control based on feature properties passed
 drawInfo.update = function(title, props) {
-  this._div.innerHTML = (title ? '<h4>' + title + '</h4>' : 'Draw a Line') + (props ? '<strong>' + props + '</strong>' : '');
+  var msgStart = '<p class="small">To begin, draw a line from a<br>point downstream to a point<br> upstream of where you would <br>locate a micro-hydro installation.<p>';
+  this._div.innerHTML = (title ? '<p>' + title + '</p>' : msgStart) + (props ? '<p>' + props + '</p>' : '');
 };
 // method used to append to the control based on feature properties passed
 drawInfo.append = function(title, props) {
-  this._div.innerHTML += (title ? '<h4>' + title + '</h4>' : 'Draw a Line') + (props ? '<strong>' + props + '</strong>' : '');
+  this._div.innerHTML += (title ? '<p>' + title + '</p>' : msgStart) + (props ? '<p>' + props + '</p>' : '');
 };
 
 drawInfo.onAdd = function(map) {
@@ -118,12 +129,12 @@ var getPopupContent = function(layer) {
     var latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs(),
       distance = 0;
     if (latlngs.length < 2) {
-      return "Distance: N/A";
+      return "N/A";
     } else {
       for (var i = 0; i < latlngs.length - 1; i++) {
         distance += latlngs[i].distanceTo(latlngs[i + 1]);
       }
-      return "Distance: " + _round(distance, 2) + " m";
+      return _round(distance, 2) + " m";
     }
   }
   return null;
@@ -138,7 +149,7 @@ map.on(L.Draw.Event.CREATED, function(event) {
   // update popup/info window content
   var content = getPopupContent(layer);
   if (content !== null) {
-    drawInfo.update('Length', content);
+    drawInfo.update('Length: ' + content, "<p>Complete the calculation by <br> with the 'calculate' button.</p>");
   }
   // render the drawn layer
   drawnItems.addLayer(layer);
@@ -162,7 +173,7 @@ map.on(L.Draw.Event.EDITED, function(event) {
     // update popup/info window content
     content = getPopupContent(layer);
     if (content !== null) {
-      drawInfo.update('Length', content);
+      drawInfo.update('Length: ' + content, "Complete the calculation by clicking an option above.");
       //layer.setPopupContent(content);
     } else {
       drawInfo.update('', '');

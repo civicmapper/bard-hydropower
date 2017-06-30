@@ -11,7 +11,7 @@ $(document).on("ready", function() {
   $('.analysis-status').hide();
   $('#msg-statuses').hide();
   $('#msg-text').hide();
-  $('#analyze').prop("disabled", true);
+  $('.analyze').prop("disabled", true);
   //$('#clear-button-item').hide();
 });
 
@@ -21,7 +21,7 @@ $(document).on("ready", function() {
  */
 function resetAnalysis(clearLayers) {
   $('#analyze-button-item').html(analyzeButton);
-  $('#analyze').prop("disabled", true);
+  $('.analyze').prop("disabled", true);
   $('.analysis-status').empty();
   $('#msg-statuses').hide();
   $('#msg-text').empty().hide();
@@ -57,8 +57,8 @@ function makeAlert(msg, alertType) {
   }    
 }
 
-var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit">Calculate</button></div>';
-var clearButton = '<div><button id="clearCalcs" class="btn btn-primary btn-block" type="submit">Clear Results</button></div>';
+var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block analyze" type="submit">Calculate</button></div>';
+var clearButton = '<div><button id="clearCalcs" class="btn btn-primary btn-block analyze" type="submit">Clear Results</button></div>';
 
 /**
  * Analysis Control
@@ -90,7 +90,7 @@ var analyzeControl = L.control.custom({
         //cursor: 'pointer',
     }
 })
-.addTo(map);
+//.addTo(map);
 
 /*******************************************************************************
  * Analyze Button - Action

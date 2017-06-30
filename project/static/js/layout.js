@@ -9,3 +9,9 @@ $("#about-btn").click(function() {
 	$(".navbar-collapse.in").collapse("hide");
 	return false;
 });
+
+$("#params-btn").click(function() {
+	$("#paramsModal").modal("show");
+	$(".navbar-collapse.in").collapse("hide");
+	return false;
+});
