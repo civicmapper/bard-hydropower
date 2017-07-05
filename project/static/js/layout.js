@@ -10,8 +10,7 @@ $("#about-btn").click(function() {
 	return false;
 });
 
-$("#params-btn").click(function() {
-	$("#paramsModal").modal("show");
-	$(".navbar-collapse.in").collapse("hide");
-	return false;
+$(document).on("load", function() {
+  console.log("document loaded");
+	$("#loading").hide();
 });

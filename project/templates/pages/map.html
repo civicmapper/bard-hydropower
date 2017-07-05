@@ -57,52 +57,103 @@
 					<h3 class="modal-title">Calculation Parameters</h3>
 				</div><!-- /.modal-header -->
 				<div class="modal-body">
-					<div class="row">
-						<div class="col-sm-12"><h4>Head</h4></div>
-						<div class="col-sm-6">
+					<form class="form-horizontal">
+						
+					  <div class="form-group">
+						<label class="control-label col-sm-3" for="head-form-field">Head</label>
+						<div class="col-sm-4">
 							<div class="input-group">
-							  <input type="text" class="form-control" aria-describedby="head-form" placeholder="Required">
-							  <span class="input-group-addon" id="head-form">Meters</span>
+							  <input id="head-form-field" type="text" class="form-control params-form" aria-describedby="head-form-units" placeholder="Required">
+							  <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
 							</div>
 						</div>
+						<div class="col-sm-5">
+							<p class="small">Required. Specify here, or draw on the map to determine the head for your location of interest.</p>
+						</div>
+					  </div>
+					  
+					  <div class="form-group">
+						<label class="control-label col-sm-3" for="area-form-field">Area</label>
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <input id="area-form-field" type="text" class="form-control params-form" aria-describedby="area-form-units" placeholder="Required">
+							  <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<p class="small">Required. Specify here, or draw on the map to determine the contributing area for your location of interest.</p>
+						</div>
+					  </div>
+
+					  <div class="form-group">
+						<label class="control-label col-sm-3" for="eff-form-field">Efficiency Constant</label>
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <input id="eff-form-field" type="text" class="form-control params-form" aria-describedby="eff-form-units" placeholder="default: 0.7" value=0.7>
+							  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<p class="small">Description here...</p>
+						</div>
+					  </div>
+					  
+					  <div class="form-group">
+						<label class="control-label col-sm-3" for="env-form-field">Environmental Flow Constant</label>
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <input id="env-form-field" type="text" class="form-control params-form" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
+							  <span class="input-group-addon" id="env-form-units"></small>float</small></span>
+							</div>
+						</div>
+						<div class="col-sm-5">
+							<p class="small">Description here...</p>
+						</div>
+					  </div>
+					</form>
+				</div><!-- /.modal-body -->
+				<div class="modal-footer">
+					<div class="row">
+						<div class="col-sm-9">
+							<!--button id="analyze-from-params" class="btn btn-primary btn-block analyze" type="submit">Calculate</button-->
+						</div>
+						<div class="col-sm-3">
+							<button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+  
+	<div class="modal" id="resultsModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h3 class="modal-title">Results</h3>
+				</div><!-- /.modal-header -->
+				<div class="modal-body">
+					<div class="row">
 						<div class="col-sm-6">
-							Required. Specify here, or draw on the map to determine the head for your location of interest.
+							<h4>Analysis Parameters</h4>
+							<div id="results-params" class="well">analysis parameters here</div>
+						</div>
+						<div class="col-sm-6">
+							<h4>Estimated Power Potential</h4>
+							<div id="results-output" class="well">estimated power here</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-12"><h4>Area</h4></div>
-						<div class="col-sm-6">
-							<div class="input-group">
-							  <input type="text" class="form-control" aria-describedby="area-form" placeholder="Required">
-							  <span class="input-group-addon" id="area-form">Sq. Km.</span>
-							</div>
-						</div>
-						<div class="col-sm-6">
-							Required. Specify here, or draw on the map to determine the contributing area for your location of interest.
+						<div class="col-sm-12">
+							<h4>Elevation Profile</h4>
+							<div class="well">>>> interactive elevation profile visualization here <<<</div>
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-12"><h4>Efficiency Constant</h4></div>
-						<div class="col-sm-6">
-							<div class="input-group">
-							  <input type="text" class="form-control" aria-describedby="eff-form" placeholder="default: 0.7" value=0.7>
-							  <span class="input-group-addon" id="eff-form">float</span>
-							</div>
-						</div>
-						<div class="col-sm-6">
-							Description here...
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12"><h4>Environmental Flow Constant</h4></div>
-						<div class="col-sm-6">
-							<div class="input-group">
-							  <input type="text" class="form-control" aria-describedby="env-form" placeholder="default: 0.3" value=0.3>
-							  <span class="input-group-addon" id="env-form">float</span>
-							</div>		
-						</div>
-						<div class="col-sm-6">
-							Description here...
+						<div class="col-sm-12">
+							<h4>Contributing Area </h4>
+							<div class="well">>>> simple map of contributing area here <<<</div>
 						</div>
 					</div>
 				</div><!-- /.modal-body -->
@@ -119,7 +170,7 @@
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
-  
+	
 	<div id="container">
 	  <div id="map"></div>
 	</div>

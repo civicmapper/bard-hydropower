@@ -121,6 +121,29 @@ var runGP = function () {
 
 };
 
+var calculatePower = function(head,area,envflow,efficiency) {
+  calcRequestURL = Flask.url_for("api", {
+    "area": area, "head": head, "envflow": envflow, "efficiency": efficiency
+  });
+  
+  $.get({
+    url: calcRequestURL,
+    success: function(data) {  
+      if (head < 0) {
+         $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'warning'));
+      } else {
+        //$('#msg-status').html(makeAlert(null,'success'));
+        $('#msg-status').hide();
+      }
+      
+      $('#msg-text').append('<h2><small>Power:</small>&nbsp;' + data.result.power + '&nbsp;<small>kW/year</small></h2>');
+      $('#msg-status-power').html(makeAlert("Power Generation Est.: Complete", 'success'));
+      $('#analyze-button-item').html(clearButton);
+      $('#msg-text').show();    
+    }
+  });
+}
+
 var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var msg = "Calculating Power Potential...";
   console.log(msg);
@@ -165,6 +188,7 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   var p = Quseable * head * (0.084) * e;
   var power = _round(p, 2);
   */
+  calculatePower(head,area,envflow,efficiency);
   var envflow = 0, efficiency = 0;
   calcRequestURL = Flask.url_for("api", {
     "area": area, "head": head, "envflow": envflow, "efficiency": efficiency
@@ -172,7 +196,7 @@ var analyzeGPResults = function(elevProfileResult,watershedResult) {
   
   $.get({
     url: calcRequestURL,
-    success: function(data) {  
+    success: function(data) {
       if (head < 0) {
          $('#msg-status').html(makeAlert("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.", 'warning'));
       } else {
