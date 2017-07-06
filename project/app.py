@@ -29,10 +29,10 @@ jsglue = JSGlue(app)
 bundle_js = Bundle(
     'js/plugins.js',
     'js/utils.js',
-    'js/map.js',
     'js/layout.js',
-    'js/calcControl.js',
+    'js/map.js',
     'js/hydropower.js',
+    'js/calcControl.js',
     'js/geoprocessing.js',
     filters='jsmin',
     output='bundle.js')
