@@ -6,13 +6,13 @@
  * requires map.js to be loaded first.
  */
 
-
 /**
  * Document On-Ready Action
  * Set the buttons and messages to initial state.
  */
 $(document).on("ready", function() {
   // hide the status stuff on load
+  $('#analyze-control').hide();
   $('.analysis-status').hide();
   $('#msg-statuses').hide();
   $('#msg-text').hide();
@@ -22,24 +22,33 @@ $(document).on("ready", function() {
 });
 
 /**
- * Parameter status
+ * reset parameter status
+ */
+var resetParamStatus = function(selector) {
+  $(selector).closest('div', 'form-group').removeClass("has-success");
+  $(selector).closest('div', 'form-group').removeClass("has-warning");
+  $(selector).closest('div', 'form-group').removeClass("has-error");
+};
+
+/**
+ * set parameter status
  */
 var setParamStatus = function(selector, status) {
-  $(selector).closest('div', 'form-group').removeClass("has-success");
-  $(selector).closest('div', 'form-group').removeClass("has-error");
-  if (status) {
+  resetParamStatus(selector);
+  if (status === true) {
     $(selector).closest('div', 'form-group').addClass("has-success");
     return true;
   } else if (status === false || isNaN(status)) {
     $(selector).closest('div', 'form-group').addClass("has-error");
     return false;
-  } 
+  } else if (status === "warning") {
+    $(selector).closest('div', 'form-group').addClass("has-warning");
+  }
 };
 
 /**
  * Parameter checker function
  */
-
 var checkParamStatus = function() {
   var checks = [];
   $('.params-form').each(function(i) {
@@ -50,21 +59,33 @@ var checkParamStatus = function() {
         check = (parsed >= 0);
         checks.push(check);
         setParamStatus("#" + this.id, check);
+        if (check) {
+          hp.head = parsed;
+        }
       }
       if (this.id == 'area-form-field') {
         check = (parsed >= 0);
         checks.push(check);
         setParamStatus("#" + this.id, check);
+        if (check) {
+          hp.area = parsed;
+        }
       }
       if (this.id == 'eff-form-field') {
         check = (parsed >= 0 || parsed <= 1);
         checks.push(check);
         setParamStatus("#" + this.id, check);
+        if (check) {
+          hp.efficiency = parsed;
+        }
       }
       if (this.id == 'env-form-field') {
-        check = (parsed >= 0 || parsed <= 1);
+        check = (parsed >= 0.1 || parsed <= 0.5);
         checks.push(check);
         setParamStatus("#" + this.id, check);
+        if (check) {
+          hp.envflow = parsed;
+        }
       }
     } else {
       setParamStatus("#" + this.id, parsed);
@@ -92,6 +113,7 @@ $('.params-form').change(function(e){
   } else {
     $('.analyze').prop("disabled", true);
   }
+  console.log(hp);
 });
 
 /**
@@ -99,7 +121,7 @@ $('.params-form').change(function(e){
  * reset the state of buttons, results window, infoWindow.
  * optional param dictates if drawing info is also removed.
  */
-function resetAnalysis(clearLayers, clearResults) {
+function resetAnalysis(clearLayers, clearResults, clearParams) {
   // reset the analyze button(s) to initial state
   $('#analyze-button-item').html(analyzeButton);
   $('.analyze').prop("disabled", true);
@@ -120,12 +142,18 @@ function resetAnalysis(clearLayers, clearResults) {
     drawnItems.clearLayers();
     drawInfo.update();
   }
-   
+  if (clearResults) {
+    
+  }
+  if (clearParams) {
+    
+  }
 }
 
-
-
-function makeAlert(msg, alertType) {
+/**
+ * shorthand function for generating status messages
+ */
+var makeAlert = function(msg, alertType) {
   var defaultMsg = null;
   if (alertType == 'info') {
     defaultMsg = 'Calculating&nbsp;&nbsp;<img src="/static/img/loading2.gif"/>';
@@ -148,6 +176,7 @@ function makeAlert(msg, alertType) {
 
 var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block analyze" type="submit">Calculate</button></div>';
 var clearButton = '<div><button id="clear-btn" class="btn btn-primary btn-block analyze" type="submit">Clear Results</button></div>';
+var resultsButton = '<div><button id="results-btn" class="btn btn-primary btn-block" type="submit">Results</button></div>';
 
 /**
  * Analysis Control
@@ -159,17 +188,15 @@ var clearButton = '<div><button id="clear-btn" class="btn btn-primary btn-block 
  *  - shows results
  */
 var analyzeControl = L.control.custom({
-    position: 'topright',
+    position: 'bottomright',
     content:
-      '<li class="list-group-item" id="analyze-button-item">' + analyzeButton + '</li>' +
       '<li class="list-group-item" id="msg-statuses">' +
         '<div id="msg-status" class="analysis-status"></div>' +
         '<div id="msg-status-elevprofile" class="analysis-status"></div>' +
         '<div id="msg-status-watershed" class="analysis-status"></div>' +
         '<div id="msg-status-power" class="analysis-status"></div>' +
       '</li>' +
-      '<li class="list-group-item" id="msg-text"></li>',
-      //'<li class="list-group-item" id="clear-button-item">' + clearButton + '</li>',
+      '<li class="list-group-item" id="results-button-item">' + resultsButton + '</li>',
     classes: 'list-group',
     id: "analyze-control",
     style: {
@@ -178,8 +205,7 @@ var analyzeControl = L.control.custom({
         padding: '0px 0 0 0'
         //cursor: 'pointer',
     }
-})
-//.addTo(map);
+}).addTo(map);
 
 /*******************************************************************************
  * DRAWING ELEMENTS
@@ -335,15 +361,37 @@ $("#params-btn").click(function() {
 
 /**
  * Analyze Button (On-Click)
- * 
- * If head and area are already entered in the params form, skip the GP,
- * and simply calculate power.
- * 
  */
 $(document).on("click", '.analyze', function() {
   
-  // reset the messages
-  resetAnalysis(false);
+  //Reset any previous analysis.
+  resetAnalysis(false, false);
+  
+  // checkParamStatus gets the params, validates them, and writes to the class
+  checkParamStatus();
+  
+  if (drawnPolyline.isEmpty() && !hp.head && !hp.area) {
+    console.log("no drawing, no head, no area");
+    //buttons disabled.
+    alert("You must provide all inputs."); 
+  console.log("yes drawing, but yes/no head, yes/no area");
+  } else if (!drawnPolyline.isEmpty() && (!hp.head && !hp.area)) {
+    // use the drawn polygon
+    console.log(drawnPolyline.toGeoJSON());
+    console.log(drawnPoint.toGeoJSON());
+    //run the geoprocessing tasks,
+    //run profile and watershed depending on params
+    //and then analyze the results when done
+    runGP().done(analyzeGPResults);
+  console.log("no drawing, yes head and yes area");
+  } else if (drawnPolyline.isEmpty() && (hp.head && hp.area)) {
+    //(skip GP)
+    //calculate power
+    hp_calculatePower();
+  } else {
+    alert("You must provide all inputs."); 
+  }
+  
   /*
   $('#analyze').prop("disabled", true);
   $('#msg-statuses').hide();
@@ -356,17 +404,7 @@ $(document).on("click", '.analyze', function() {
   $('.analysis-status').show();
   */
   
-  // print geometries to console
-  if (!drawnPolyline.isEmpty()) {
-    console.log(drawnPolyline.toGeoJSON());
-    console.log(drawnPoint.toGeoJSON());
-    /**
-     * run the geoprocessing tasks, and then analyze the results when done
-     */
-    runGP(hp).done(analyzeGPResults);
-  } else {
-    
-  }
+
 });
 
 /**
