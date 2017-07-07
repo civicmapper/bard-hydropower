@@ -125,6 +125,7 @@ def api():
         head = float(request.args.get('head'))
         envflow = float(request.args.get('envflow'))
         efficiency = float(request.args.get('efficiency'))
+        rate = float(request.args.get('rate'))
     except:
         response['messages'].append('Input parameters could not be parsed.')
         status = 400
@@ -141,13 +142,23 @@ def api():
             result['envflow'] = 0.3
         result['q-env'] = (result['area'] * result['envflow'])
         result['q-useable'] = result['q-available'] - result['q-env']
-        #Power in kW; where e is a variable with default value 0.7 
+        #where efficiency is a variable with default value 0.7 
         if efficiency:
             result['efficiency'] = efficiency
         else:
             result['efficiency'] = 0.7
+        #where rate has a default of $0.10
+        if rate:
+            result['rate'] = rate
+        else:
+            result['rate'] = 0.1
+        
+        #Power in kW
         p = result['q-useable'] * result['head'] * (0.084) * result['efficiency']
         result['power'] = round(p, 2)
+        
+        #cost = rate * hours per year * kilowatts
+        c = result['rate'] * 8766 * p
         
         response["status"] = "success"
         
