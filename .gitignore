@@ -1,5 +1,7 @@
 /project/config.py
 
+node_modules/
+
 *.pyc
 .DS_Store
 *.psd
