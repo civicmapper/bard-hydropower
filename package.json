@@ -1,0 +1,27 @@
+{
+  "name": "bard-hydropower",
+  "version": "0.2.0",
+  "description": "*under development*",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/civicmapper/bard-hydropower.git"
+  },
+  "author": "CivicMapper",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/civicmapper/bard-hydropower/issues"
+  },
+  "homepage": "https://github.com/civicmapper/bard-hydropower#readme",
+  "dependencies": {
+    "d3": "^4.10.0",
+    "esri-leaflet": "^2.1.1",
+    "esri-leaflet-vector": "^1.0.7",
+    "jquery": "^2.1.4",
+    "leaflet": "^1.2.0",
+    "leaflet-sidebar": "^0.2.0"
+  }
+}
