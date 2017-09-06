@@ -29,11 +29,11 @@ jsglue = JSGlue(app)
 bundle_js = Bundle(
     'js/plugins.js',
     'js/utils.js',
-    'js/layout.js',
     'js/map.js',
     'js/hydropower.js',
     'js/calcControl.js',
-    'js/geoprocessing.js',
+    'js/geoControl.js',
+    'js/ready.js',
     filters='jsmin',
     output='bundle.js')
 assets.register('bundle_js', bundle_js)
@@ -101,7 +101,10 @@ def map():
         return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
     '''
 
-## data table view
+@app.route('/calc/')
+def calc():
+    return render_template('pages/calc.html')
+## help
 @app.route('/help/')
 def help():
     return redirect(url_for('map'), code=302)

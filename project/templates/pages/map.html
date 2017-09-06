@@ -54,37 +54,12 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h3 class="modal-title">Calculation Parameters</h3>
+					<h4 class="modal-title">Calculation Parameters</h4>
 				</div><!-- /.modal-header -->
 				<div class="modal-body">
+
 					<form class="form-horizontal">
 						
-					  <div class="form-group">
-						<label class="control-label col-sm-3" for="head-form-field">Head</label>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input id="head-form-field" type="text" class="form-control params-form" aria-describedby="head-form-units" placeholder="Required">
-							  <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
-							</div>
-						</div>
-						<div class="col-sm-5">
-							<p class="small">Required. Specify here, or draw on the map to determine the head for your location of interest.</p>
-						</div>
-					  </div>
-					  
-					  <div class="form-group">
-						<label class="control-label col-sm-3" for="area-form-field">Area</label>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input id="area-form-field" type="text" class="form-control params-form" aria-describedby="area-form-units" placeholder="Required">
-							  <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
-							</div>
-						</div>
-						<div class="col-sm-5">
-							<p class="small">Required. Specify here, or draw on the map to determine the contributing area for your location of interest.</p>
-						</div>
-					  </div>
-
 					  <div class="form-group">
 						<label class="control-label col-sm-3" for="eff-form-field">Efficiency Constant</label>
 						<div class="col-sm-4">
@@ -103,24 +78,63 @@
 						<div class="col-sm-4">
 							<div class="input-group">
 							  <input id="env-form-field" type="text" class="form-control params-form" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
-							  <span class="input-group-addon" id="env-form-units"></small>float</small></span>
+							  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
 							</div>
 						</div>
 						<div class="col-sm-5">
 							<p class="small">Description here...</p>
 						</div>
 					  </div>
+				
+					  <div class="form-group">
+						<label class="control-label col-sm-3" for="rate-form-field">Cost/KwH</label>
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <span class="input-group-addon" id="rate-form-units"><small>$</small></span>
+							  <input id="rate-form-field" type="text" class="form-control params-form" aria-describedby="rate-form-units" placeholder="default: 0.10" value=0.10>
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<p class="small">Assumption of cost per kilowatt hour</p>
+						</div>
+					  </div>
+					  
+					  <hr>
+						
+					  <div class="form-group">
+						<label class="control-label col-sm-1" for="head-form-field">Head</label>
+						<div class="col-sm-2">
+							<input id="head-form-check" type="checkbox" class="params-head" data-toggle="toggle">
+						</div>
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <input disabled id="head-form-field" type="text" class="form-control params-head params-form" aria-describedby="head-form-units" placeholder="Required">
+							  <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
+							</div>
+						</div>
+
+						<div class="col-sm-4">
+							<p class="small">Head (elevation difference); specify here or use the map to determine automatically</p>
+						</div>
+					  </div>
+					  
+					  <div class="form-group">
+						<label class="control-label col-sm-1" for="area-form-field">Area</label>
+						<div class="col-sm-2">
+							<input id="area-form-check" type="checkbox" class="params-area" data-toggle="toggle">
+						</div>			
+						<div class="col-sm-4">
+							<div class="input-group">
+							  <input disabled id="area-form-field" type="text" class="form-control params-area params-form" aria-describedby="area-form-units" placeholder="Required">
+							  <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<p class="small">Contributing area; specify here or use the map to determine automatically.</p>
+						</div>
+					  </div>
+					  
 					</form>
-				</div><!-- /.modal-body -->
-				<div class="modal-footer">
-					<div class="row">
-						<div class="col-sm-9">
-							<!--button id="analyze-from-params" class="btn btn-primary btn-block analyze" type="submit">Calculate</button-->
-						</div>
-						<div class="col-sm-3">
-							<button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
-						</div>
-					</div>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
@@ -172,31 +186,72 @@
 	</div><!-- /.modal -->
 	
 	<div id="container">
-	  <div id="map"></div>
+		<!--
+		<div id="sidebar" class="sidebar collapsed">
+
+			<div class="sidebar-tabs">
+				<ul role="tablist">
+					<li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+					<li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
+					<li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
+					<li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank"><i class="fa fa-github"></i></a></li>
+				</ul>
+				<ul role="tablist">
+					<li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+				</ul>
+			</div>
+			<div class="sidebar-content">
+				<div class="sidebar-pane" id="home">
+					<h1 class="sidebar-header">
+						Micro-Hydropower Calculator
+						<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+					</h1>
+	
+					<p>A responsive sidebar for mapping libraries like <a href="http://leafletjs.com/">Leaflet</a> or <a href="http://openlayers.org/">OpenLayers</a>.</p>
+	
+				</div>
+	
+				<div class="sidebar-pane" id="profile">
+					<h1 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+				</div>
+	
+				<div class="sidebar-pane" id="messages">
+					<h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+				</div>
+	
+				<div class="sidebar-pane" id="settings">
+					<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+				</div>
+			</div>
+		</div>-->
+	  <div id="map" class="sidebar-map"></div>
 	</div>
   
 	<!--UI-->
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="{{ url_for('static', filename='libs/bootstrap-toggle/bootstrap-toggle.min.js') }}"></script>
 	<!--D3-->
 	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<!--LEAFLET-->
 	<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
 	<script src="{{ url_for('static', filename='libs/leaflet.control.custom/Leaflet.Control.Custom.js') }}"></script>
+	<!--<script src="{{ url_for('static', filename='libs/leaflet-sidebar-v2/L.Control.Sidebar.js') }}"></script>-->
 	<!--ESRI-LEAFLET-->
 	<script src="https://unpkg.com/esri-leaflet@2.0.8"></script>
 	<script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
 	<script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
 
-	<!-- ESRI-LEAFLET-WEBMAP-->
+	<!-- ESRI-LEAFLET-WEBMAP
 	<script src="https://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
 	<script src="https://cdn.rawgit.com/Leaflet/Leaflet.heat/gh-pages/dist/leaflet-heat.js"></script>
 	<script src="https://cdn.jsdelivr.net/leaflet.esri.heatmap-feature-layer/2.0.0-beta.1/esri-leaflet-heatmap-feature-layer.js"></script>
-	 <script src="http://cdn.jsdelivr.net/leaflet.esri.renderers/2.0.2/esri-leaflet-renderers.js"></script>
-	 <script src="https://muxlab.github.io/Leaflet.VectorIcon/L.VectorIcon.js"></script>
-	 <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
-	 <script src="https://cdn.jsdelivr.net/leaflet.esri.webmap/0.4.0/esri-leaflet-webmap.js"></script>
+	<script src="http://cdn.jsdelivr.net/leaflet.esri.renderers/2.0.2/esri-leaflet-renderers.js"></script>
+	<script src="https://muxlab.github.io/Leaflet.VectorIcon/L.VectorIcon.js"></script>
+	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+	<script src="https://cdn.jsdelivr.net/leaflet.esri.webmap/0.4.0/esri-leaflet-webmap.js"></script>
+	 -->
 	 
 	<!--APPLICATION-->
 	{{ JSGlue.include() }}

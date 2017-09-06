@@ -1,7 +1,7 @@
 /**
  * map.js
  *
- * set up the Leaflet map. includes layers and drawing functions
+ * Sets up the basic Leaflet map and loads relevant contextual layers
  */
 
 /*******************************************************************************
@@ -11,6 +11,8 @@ var map = L.map('map', {
   maxZoom : 22
 })
   .setView([42.0170202, -73.9144284], 18);
+  
+//var sidebar = L.control.sidebar('sidebar').addTo(map);
 
 var layer_streams = L.esri.featureLayer({
   url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7",
@@ -55,4 +57,3 @@ webmap.on('load', function() {
 
 console.log(map.getPanes());
 */
-
