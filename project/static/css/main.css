@@ -36,7 +36,7 @@ a {
 /* Main elements end */
 
 /** -------------------------------------------------- 
- * Various other styles
+ * bootstrap + leaflet
  */
 
 html, body, #container {
@@ -55,13 +55,38 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.6);
 }
 
+/* SIDEBAR */
+
+#sidebar {
+  display: block;
+  width: 40%;
+  height: 100%;
+  max-width: 100%;
+  float: left;
+  overflow: auto
+}
+
+.sidebar-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 5px 15px 15px 15px
+}
+
+#sidebar-hide-btn {
+  margin-top: -2px;
+}
+
 #loading {
   position: absolute;
-  width: 220px;
-  height: 19px;
+  width: 50%;
+  height: 40px;
   top: 50%;
-  left: 50%;
-  margin: -10px 0 0 -110px;
+  left: 25%;
+  transform: translateY(-50%); /* using the CSS3 Transform technique */
+  /*margin: -10px 0 0 -110px;*/
+  padding-top: 10px;
+  margin-bottom: 10px;
   z-index: 20001;
 }
 
@@ -75,10 +100,6 @@ body {
 
 #aboutTabsContent {
   padding-top: 10px;
-}
-
-.progress-bar-full {
-  width: 100%;
 }
 
 .leaflet-control-layers {
@@ -111,32 +132,10 @@ body {
   margin-left: 25px;
 }
 
-/* SIDEBAR */
-
-#sidebar {
-  width: 25%;
+.param-instructions {
+  margin-top: 9px;
 }
-
-.sidebar-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
+.alert-none {
+  background-color: rgb(231, 231, 231);
+  color: rgb(75, 75, 75);
 }
-#sidebar-hide-btn {
-  margin-top: -2px;
-}
-
-/*.drawInfo {
-  padding: 6px 8px;
-  background: white;
-  background: rgba(255,255,255,1);
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  border-radius: 5px;
-  text-align: right;
-}
-
-.drawInfo h4 {
-  margin: 0 0 5px;
-  color: #777;
-  text-align: right;
-}*/

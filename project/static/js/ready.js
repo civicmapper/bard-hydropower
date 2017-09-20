@@ -14,10 +14,14 @@ $(document).on("ready", function() {
 		$(".navbar-collapse.in").collapse("hide");
 		return false;
 	});
+	
+	$('.btn-goToParams').click(function(){
+		$('#tabStep1').trigger('click');
+	});
   
   // build the message control init
-  messageControl.init(map);
-  messageControl.onDrawStart();
+  //messageControl.init(map);
+  //messageControl.onDrawStart();
   
   // set up the buttons
   buttonControl.init();

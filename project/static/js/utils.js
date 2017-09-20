@@ -4,7 +4,10 @@
 
 /**
  * shorthand function for generating status messages in a Bootstrap alert.
- * Provides some default messages.
+ * Provides some default messages. if elementID is spec'd, will automatically
+ * put the alert in place; otherwise returns alert's html as string.
+ * Uses a custom "alert-none" css class for a non-alert element that fills the
+ * space of an alert.
  */
 function makeAlert(msg, alertType, elementID) {
   
@@ -14,17 +17,19 @@ function makeAlert(msg, alertType, elementID) {
   } else if  (alertType == 'success') {
     defaultMsg = 'Success!';
   } else if (alertType == 'warning') {
-    defaultMsg = "Something didn't work quite as expected.";
+    defaultMsg = "There is something you need to attend to.";
   } else if (alertType == 'danger') {
     defaultMsg = "There was an error.";
+  } else if (alertType == 'none') {
+    defaultMsg = "";
   } else {
-    defaultMsg = "(Something went wrong generating this alert)";
-    alertType = 'error';
+    defaultMsg = "";
+    alertType = 'none';
   }
   
   var alert = "";
-  var div1 = '<div class="alert alert-' + alertType + '" role="alert"><small>';
-  var div2 = '</small></div>';
+  var div1 = '<div class="alert alert-' + alertType + '" role="alert">';
+  var div2 = '</div>';
   if (msg) {
     alert =  div1 + msg + div2 ;
   } else {
@@ -33,7 +38,7 @@ function makeAlert(msg, alertType, elementID) {
   
   if (elementID) {
     // if it the element exists
-    var liElem = $('#' + where);
+    var liElem = $('#' + elementID);
     if (liElem.length > 0) {
       // insert the alert there
       liElem.html(alert);
@@ -41,7 +46,7 @@ function makeAlert(msg, alertType, elementID) {
       return false;
     }
   } else {
-    // otherwise, just return the alert
+    // otherwise, just return the alert html as a string
     return alert;
   }
   

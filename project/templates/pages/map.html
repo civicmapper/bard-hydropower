@@ -3,10 +3,19 @@
 {% block content %}
 
 	<!--div id="loading">
-		<div class="loading-indicator">
-			<div class="progress progress-striped active">
-				<div class="progress-bar progress-bar-full"></div>
-			</div>
+		<div class="progress">
+		  <div class="progress-bar progress-bar-success" style="width: 40%">
+			<span class="sr-only">35% Complete (success)</span>
+			Watershed: Complete
+		  </div>
+		  <div class="progress-bar progress-bar-info progress-bar-striped" style="width: 40%">
+			<span class="sr-only">20% Complete (warning)</span>
+			Elevation Profile: in progress
+		  </div>
+		  <div class="progress-bar progress-bar-warning" style="width: 20%">
+			<span class="sr-only">10% Complete (danger)</span>
+			Suitability: waiting
+		  </div>
 		</div>
 	</div-->
   
@@ -49,97 +58,7 @@
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
-	<div class="modal" id="paramsModal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title">Calculation Parameters</h4>
-				</div><!-- /.modal-header -->
-				<div class="modal-body">
-
-					<form class="form-horizontal">
-						
-					  <div class="form-group">
-						<label class="control-label col-sm-3" for="eff-form-field">Efficiency Constant</label>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input id="eff-form-field" type="text" class="form-control params-form" aria-describedby="eff-form-units" placeholder="default: 0.7" value=0.7>
-							  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
-							</div>
-						</div>
-						<div class="col-sm-5">
-							<p class="small">Description here...</p>
-						</div>
-					  </div>
-					  
-					  <div class="form-group">
-						<label class="control-label col-sm-3" for="env-form-field">Environmental Flow Constant</label>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input id="env-form-field" type="text" class="form-control params-form" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
-							  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
-							</div>
-						</div>
-						<div class="col-sm-5">
-							<p class="small">Description here...</p>
-						</div>
-					  </div>
-				
-					  <div class="form-group">
-						<label class="control-label col-sm-3" for="rate-form-field">Cost/KwH</label>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <span class="input-group-addon" id="rate-form-units"><small>$</small></span>
-							  <input id="rate-form-field" type="text" class="form-control params-form" aria-describedby="rate-form-units" placeholder="default: 0.10" value=0.10>
-							</div>
-						</div>
-						<div class="col-sm-4">
-							<p class="small">Assumption of cost per kilowatt hour</p>
-						</div>
-					  </div>
-					  
-					  <hr>
-						
-					  <div class="form-group">
-						<label class="control-label col-sm-1" for="head-form-field">Head</label>
-						<div class="col-sm-2">
-							<input id="head-form-check" type="checkbox" class="params-head" data-toggle="toggle">
-						</div>
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input disabled id="head-form-field" type="text" class="form-control params-head params-form" aria-describedby="head-form-units" placeholder="Required">
-							  <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
-							</div>
-						</div>
-
-						<div class="col-sm-4">
-							<p class="small">Head (elevation difference); specify here or use the map to determine automatically</p>
-						</div>
-					  </div>
-					  
-					  <div class="form-group">
-						<label class="control-label col-sm-1" for="area-form-field">Area</label>
-						<div class="col-sm-2">
-							<input id="area-form-check" type="checkbox" class="params-area" data-toggle="toggle">
-						</div>			
-						<div class="col-sm-4">
-							<div class="input-group">
-							  <input disabled id="area-form-field" type="text" class="form-control params-area params-form" aria-describedby="area-form-units" placeholder="Required">
-							  <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
-							</div>
-						</div>
-						<div class="col-sm-4">
-							<p class="small">Contributing area; specify here or use the map to determine automatically.</p>
-						</div>
-					  </div>
-					  
-					</form>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
-  
+	
 	<div class="modal" id="resultsModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
@@ -148,28 +67,28 @@
 					<h3 class="modal-title">Results</h3>
 				</div><!-- /.modal-header -->
 				<div class="modal-body">
-					<div class="row">
-						<div class="col-sm-6">
-							<h4>Analysis Parameters</h4>
-							<div id="results-params" class="well">analysis parameters here</div>
-						</div>
-						<div class="col-sm-6">
-							<h4>Estimated Power Potential</h4>
-							<div id="results-output" class="well">estimated power here</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-							<h4>Elevation Profile</h4>
-							<div class="well">>>> interactive elevation profile visualization here <<<</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-							<h4>Contributing Area </h4>
-							<div class="well">>>> simple map of contributing area here <<<</div>
-						</div>
-					</div>
+					<!--<div class="row">-->
+					<!--	<div class="col-sm-6">-->
+					<!--		<h4>Analysis Parameters</h4>-->
+					<!--		<div id="results-params" class="well">analysis parameters here</div>-->
+					<!--	</div>-->
+					<!--	<div class="col-sm-6">-->
+					<!--		<h4>Estimated Power Potential</h4>-->
+					<!--		<div id="results-output" class="well">estimated power here</div>-->
+					<!--	</div>-->
+					<!--</div>-->
+					<!--<div class="row">-->
+					<!--	<div class="col-sm-12">-->
+					<!--		<h4>Elevation Profile</h4>-->
+					<!--		<div class="well">>>> interactive elevation profile visualization here <<<</div>-->
+					<!--	</div>-->
+					<!--</div>-->
+					<!--<div class="row">-->
+					<!--	<div class="col-sm-12">-->
+					<!--		<h4>Contributing Area </h4>-->
+					<!--		<div class="well">>>> simple map of contributing area here <<<</div>-->
+					<!--	</div>-->
+					<!--</div>-->
 				</div><!-- /.modal-body -->
 				<div class="modal-footer">
 					<div class="row">
@@ -186,45 +105,166 @@
 	</div><!-- /.modal -->
 	
 	<div id="container">
-		<!--
-		<div id="sidebar" class="sidebar collapsed">
-
-			<div class="sidebar-tabs">
-				<ul role="tablist">
-					<li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
-					<li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
-					<li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
-					<li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank"><i class="fa fa-github"></i></a></li>
+		<div id="sidebar">
+			<div class="sidebar-wrapper">
+				<ul class="nav nav-tabs nav-justified" id="stepControl">
+					<li class="active"><a id="tabStep0" href="#step0" data-toggle="tab">Overview</a>
+					</li>
+					<li><a id="tabStep1" href="#step1" data-toggle="tab">1. Parameters</a>
+					</li>
+					<li><a id="tabStep2" href="#step2" data-toggle="tab">2. Results</a>
+					</li>	
 				</ul>
-				<ul role="tablist">
-					<li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
-				</ul>
+				<div class="tab-content" id="aboutTabsContent">
+					<div id="step0" class="tab-pane active in">
+						<div class="row">
+							<div class="col-sm-12">										
+								<p>Estimate the power generation potential of micro-hydroelectric turbine installations.</p>
+								<ol>
+									<li><strong>Parameters.</strong> Determine the Area and Head of the potential site using the map or entering it manually.  Input calculation coefficients and other assumptions used to make the estimate.</li>
+									<li><strong>Results.</strong> Explore the analysis results.</li>
+								</ol>
+								<a id="btn-getStarted" class="btn btn-default btn-block btn-goToParams" role="button" href="#step1">Get Started <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+					<div id="step1" class="tab-pane">
+						<div class="row">
+							<div class="col-sm-12">
+								<form class="form-horizontal">
+								<!-- HEAD & AREA -->
+								  <div class="row">
+									<div class="col-sm-3">
+										<h4>Head & Area</h4>
+									</div>
+									<div class="col-sm-9">
+										<p class="small param-instructions">To begin, draw a line from a point downstream to a point upstream of where you would locate a micro-hydro installation.</p>
+										<p class="small">Alternatively, specify Head or Area manually below; indicate with the switch whether you want to use the map or entered value for the calculation.</p>
+									</div>									
+								  </div>
+								  <br>
+								  
+								  <div class="form-group">
+									<label class="control-label col-sm-2" for="head-form-field">Head</label>
+									<div class="col-sm-3">
+										<input id="head-form-check" type="checkbox" data-on="Form&nbsp;" data-off="Map" class="params params-head" data-toggle="toggle">
+									</div>
+									<div class="col-sm-7">
+										<div class="input-group">
+										  <input disabled id="head-form-field" type="text" class="form-control params params-head optional-form" aria-describedby="head-form-units" placeholder="Required">
+										  <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
+										</div>
+									</div>
+								  </div>
+								  
+								  <div class="form-group">
+									<label class="control-label col-sm-2" for="area-form-field">Area</label>
+									<div class="col-sm-3">
+										<input id="area-form-check" type="checkbox" data-on="Form&nbsp;" data-off="Map" class="params params-area" data-toggle="toggle">
+									</div>			
+									<div class="col-sm-7">
+										<div class="input-group">
+										  <input disabled id="area-form-field" type="text" class="form-control params params-area optional-form" aria-describedby="area-form-units" placeholder="Required">
+										  <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
+										</div>
+									</div>
+								  </div>
+								  <hr>
+								  <!-- CONSTANTS  -->
+								  <div class="row">
+									<div class="col-sm-3">
+										<h4>Constants</h4>
+									</div>
+									<div class="col-sm-9">
+										<p class="small param-instructions">Adjust the parameters below, or leave at provided defaults.</p>
+									</div>									
+								  </div>
+								  
+								  <div class="form-group">
+									<label class="control-label col-sm-5" for="eff-form-field">Efficiency Constant</label>
+									<div class="col-sm-7">
+										<div class="input-group">
+										  <input id="eff-form-field" type="text" class="form-control params" aria-describedby="eff-form-units" placeholder="default: 0.7" value=0.7>
+										  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
+										</div>
+									</div>
+								  </div>
+								  
+								  <div class="form-group">
+									<label class="control-label col-sm-5" for="env-form-field">Environmental Flow Constant</label>
+									<div class="col-sm-7">
+										<div class="input-group">
+										  <input id="env-form-field" type="text" class="form-control params" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
+										  <span class="input-group-addon" id="eff-form-units"><small>float</small></span>
+										</div>
+									</div>
+								  </div>
+							
+								  <div class="form-group">
+									<label class="control-label col-sm-5" for="rate-form-field">Cost/KwH</label>
+									<div class="col-sm-7">
+										<div class="input-group">
+										  <span class="input-group-addon" id="rate-form-units"><small>$</small></span>
+										  <input id="rate-form-field" type="text" class="form-control params" aria-describedby="rate-form-units" placeholder="default: 0.10" value=0.10>
+										</div>
+									</div>
+								  </div>								  
+								</form>
+							</div>
+						</div>
+						<hr>
+						<!-- CALCULATE BUTTON -->
+						<div class="row">
+							<div class="col-sm-12">
+								<span id="params-msg-status"></span>
+								<button id="params-analyze-btn" class="btn btn-primary btn-block analyze-btn" type="submit">Calculate</button>
+							</div>
+						</div>
+						<br>
+						<div class="row">
+							<div class="col-sm-12">
+							</div>
+						</div>
+					</div>
+					<div id="step2" class="tab-pane">
+						<div class="row">
+							<div class="col-sm-12">
+								<h4>Location Overview + Contributing Area</h4>
+								<div class="well">>>> simple diagrammatic map of microhydro location and contributing area here <<<</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12">
+								<h4>Elevation Profile</h4>
+								<div class="well">>>> interactive elevation profile visualization here <<<</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<h4>Analysis Parameters</h4>
+								<div id="results-params" class="well">analysis parameters here<br>...<br>...<br>...<br>...<br>...</div>
+							</div>
+							<div class="col-sm-6">
+								<h4>Estimated Power Potential</h4>
+								<div id="results-power" class="well">estimated power here</div>
+								<h4>Estimated Power Potential</h4>
+								<div id="results-cost" class="well">estimated $$$ here</div>
+							</div>
+						</div>
+						<hr>
+						<div class="row">
+							<div class="col-sm-7">
+								<button class="btn btn-primary btn-block btn-goToParams" type="submit">Adjust Parameters <i class="fa fa-cogs"></i></i></button>
+							</div>
+							<div class="col-sm-5">
+								<button id="reset-btn" class="btn btn-default btn-block reset-btn" type="submit">Start Over <i class="fa fa-rotate-left"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="sidebar-content">
-				<div class="sidebar-pane" id="home">
-					<h1 class="sidebar-header">
-						Micro-Hydropower Calculator
-						<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
-					</h1>
-	
-					<p>A responsive sidebar for mapping libraries like <a href="http://leafletjs.com/">Leaflet</a> or <a href="http://openlayers.org/">OpenLayers</a>.</p>
-	
-				</div>
-	
-				<div class="sidebar-pane" id="profile">
-					<h1 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-				</div>
-	
-				<div class="sidebar-pane" id="messages">
-					<h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-				</div>
-	
-				<div class="sidebar-pane" id="settings">
-					<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-				</div>
-			</div>
-		</div>-->
-	  <div id="map" class="sidebar-map"></div>
+		</div>
+	  <div id="map"></div>
 	</div>
   
 	<!--UI-->

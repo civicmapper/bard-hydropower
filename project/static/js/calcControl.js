@@ -40,8 +40,8 @@ var buttonControl = {
       $('.results-btn').prop("disabled", true);
     },
     activate: function() {
-      this.elem.html(this.html.active);
-      this.elem.prop("disabled", false);
+      $('.results-btn').html(this.html.active);
+      $('.results-btn').prop("disabled", false);
     }
   },
   // analyze button
@@ -110,7 +110,6 @@ var buttonControl = {
  * Message Control - shows instructions and status of analysis.
  */
 var messageControl =  {
-  elem: $('#messageControl'),
   messages : {
     instructions : {
       id: 'msg-instructions',
@@ -137,25 +136,6 @@ var messageControl =  {
       li: '<li id="results-button-shortcut" class="message-item list-group-item">' + buttonControl.results.html.resting + '</li>'
     }
   },
-  init: function(leafletMap) {
-    // build the L.control.custom object
-    var control = L.control.custom({
-      id: "messageControl",
-      classes: 'panel panel-primary',
-      content: '<div class="panel-heading">Instructions</div><ul class="list-group">' + this.messages.instructions.li + this.messages.elevprofile.li + this.messages.watershed.li + this.messages.power.li + '</ul><div class="panel-footer"></div>', 
-      style: {
-          width: '300px',
-          //margin: '10px',
-          //padding: '0px 0 0 0'
-          //cursor: 'pointer',
-      },
-      position: 'topright',
-    });
-    // add it to the map,
-    control.addTo(leafletMap);
-    // then set it its initial visibility and content state
-    this.reset();
-  },
   onDrawStart: function() {
     var txt = '<p class="small">To begin, draw a line from a point downstream to a point upstream of where you would locate a micro-hydro installation.<p><p class="small">Alternatively, open the <strong>Parameters</strong> button above and enter your analysis parameters manually.<p>';
     $('#msg-instructions').html(txt);
@@ -170,7 +150,26 @@ var messageControl =  {
     
     this.onDrawStart();
     $('#msg-instructions').show();
-  },
+  }
+  //init: function(leafletMap) {
+  //  // build the L.control.custom object
+  //  var control = L.control.custom({
+  //    id: "messageControl",
+  //    classes: 'panel panel-primary',
+  //    content: '<div class="panel-heading">Instructions</div><ul class="list-group">' + this.messages.instructions.li + this.messages.elevprofile.li + this.messages.watershed.li + this.messages.power.li + '</ul><div class="panel-footer"></div>', 
+  //    style: {
+  //        width: '300px',
+  //        //margin: '10px',
+  //        //padding: '0px 0 0 0'
+  //        //cursor: 'pointer',
+  //    },
+  //    position: 'topright',
+  //  });
+  //  // add it to the map,
+  //  control.addTo(leafletMap);
+  //  // then set it its initial visibility and content state
+  //  this.reset();
+  //}
 };
 
 /**
@@ -179,32 +178,37 @@ var messageControl =  {
  */
 paramControl = {
   forms : {
-    head: {id:'head-form-field'},
-    area: {id:'area-form-field'},
-    envflow: {id:'env-form-field'},
-    efficiency: {id:'eff-form-field'},
-    rate: {id:'rate-form-field'}
+    head: {id:'#head-form-field'},
+    area: {id:'#area-form-field'},
+    envflow: {id:'#env-form-field'},
+    efficiency: {id:'#eff-form-field'},
+    rate: {id:'#rate-form-field'}
   },
 	init : function() {
-    // add listeners to detect changes to the params
-    this.paramOnChange();
+    
 		// Customize the switches
-		$('input[type="checkbox"][class^="params-"]').bootstrapToggle({
-			on: 'User',
-			off: 'Map'
-		});
-    // listener for debugging 
-    $('input[type="checkbox"][class^="params-"]').change(function(e) {
-      console.log($('input[type="text"][class=".' + e.target.className + '"]'));
-    });
+    console.log($('input[type="checkbox"].params'));
+		$('input[type="checkbox"].params').bootstrapToggle({
+			on: '<i class="fa fa-arrow-right"></i>',
+			off: 'Map',
+      onstyle: 'default',
+      offstyle: 'primary'
+		}); 
+
+    // add listeners to detect changes to the params
+    this.ableOptionalParam();
+    this.paramOnChange();
+    this.readyToCalc();
+
 	},
 	// Get inputs from the parameters form
 	getParams: function() {
-		hp.params.head= parseFloat($('#'+this.forms.head.id).val());
-		hp.params.area = parseFloat($('#'+this.forms.area.id).val());
-		hp.params.envflow = parseFloat($('#'+this.forms.envflow.id).val());
-		hp.params.efficiency = parseFloat($('#'+this.forms.efficiency.id).val());
-    hp.params.rate = parseFloat($('#'+this.forms.rate.id).val());
+		hp.params.head= parseFloat($(this.forms.head.id).val());
+		hp.params.area = parseFloat($(this.forms.area.id).val());
+		hp.params.envflow = parseFloat($(this.forms.envflow.id).val());
+		hp.params.efficiency = parseFloat($(this.forms.efficiency.id).val());
+    hp.params.rate = parseFloat($(this.forms.rate.id).val());
+    console.log("parameters:",hp.params);
 	},
 	/**
 	 * Parameter checker function
@@ -216,29 +220,28 @@ paramControl = {
     var validation = hp.validateParams();
     // set the status feedback
     $.each(validation.params, function(k,v){
-      var s = '#'+paramControl.forms[k].id;
-      //if ($(s).hasClass("optional"))
+      var s = paramControl.forms[k].id;
+      // if the param is optional and has assoc checkbox...
+      if ($(s).hasClass("optional-form")) {
+        // find the checkbox associated with the form explicit DOM tree search
+        var c= $(s).parent().parent().siblings().find('input[type="checkbox"]');
+        //console.log(c.attr('id'), c.is(":checked"));
+        // and if it is specifically checked for use
+        if (c.is(":checked")) {
+          // set the status accordingly
+          paramControl.setParamStatus(s, v);
+        } else {
+          // otherwise, skip it
+        }
+      } else {
+        // set the status feedback highlight on the form
+        paramControl.setParamStatus(s, v);
+      }
       
-      paramControl.setParamStatus(s, v);
     });
     // return validation result
     return validation.status;
 	},	
-	/**
-	 * Parameter Listener/Validation: If any one changes, check the rest for
-	 * completeness. If all have valid content, then enable the calculate button.
-	 */
-	paramOnChange : function() {
-		$('.params-form').change(function(e){
-			var checked = paramControl.checkParams();
-			if (checked) {
-				$('.analyze').prop("disabled", false);
-			} else {
-				$('.analyze').prop("disabled", true);
-			}
-			console.log(e, hp);
-		});
-	},
 	/**
 	 * reset status for any given parameter
 	 */
@@ -261,7 +264,58 @@ paramControl = {
 		} else if (status === "warning") {
 			$(selector).closest('div', 'form-group').addClass("has-warning");
 		}
-	}
+	},
+  /**
+   * listener for enabling/disabling form field w/ associate checkbox
+   */
+  ableOptionalParam : function() {
+   $('input[type="checkbox"].params').change(function(e) {
+      // finds the form associated with the checkbox. explicit DOM tree search
+      var form = $(this).closest(".form-group").find('input[type="text"]');
+      if($(this).prop('checked')) {
+        form.prop('disabled', false);
+      } else {
+        form.prop('disabled', true);
+        paramControl.resetParamStatus('#'+form.attr("id"));
+      }
+    });
+  },
+  /**
+   * performs validation and controls availability of calculate button
+   */
+  readyToCalc: function() {
+			var checked = paramControl.checkParams();
+      // true from checkParams means it's all good, enable calculation
+			if (checked) {
+				$('.analyze').prop("disabled", false);
+			} else {
+				$('.analyze').prop("disabled", true);
+			}
+  },
+	/**
+	 * Parameter Listener; runs Validation/enables calc button
+	 */
+	paramOnChange: function() {
+		$('.params').change( function(e) {
+      paramControl.readyToCalc();
+    });
+	},
+  /**
+   * parameter validation messaging.
+   */
+  paramMessages: {
+    id: '#params-msg-status',
+    init: function() {
+      $(this.id).hide();
+    },
+    addMsg : function(msg, alertType) {
+      makeAlert(msg, alertType, this.id);
+      $(this.id).fadeIn();
+    },
+    clearMsg : function() {
+      $(this.id).fadeOut();
+    }
+  }
 };
 
 
@@ -347,17 +401,3 @@ function calculationController() {
   }
 
 }
-
-/***********************************************************************
- * Document On-Load Listener
- * Set the buttons and messages to initial state.
- */
-$(document).on("ready", function() {
-  
-  // build the message control init
-  //messageControl.init(map);
-  //messageControl.onDrawStart();
-  // set up the buttons
-  buttonControl.init();
-  
-});
