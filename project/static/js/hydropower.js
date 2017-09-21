@@ -52,7 +52,8 @@ var hp = {
 		var firstZ = coords[0][2];
 		var lastZ = coords[coords.length - 1][2];
 		// save the difference
-		this.params.head = lastZ - firstZ;
+		var t = lastZ - firstZ;
+		this.params.head = _round(t,2);
 		// check result. It must be a positive number
 		//if (this.params.head < 0) {
 		//	this.status.profile("The head calculation returned a negative value. Make sure the line was drawn downstream&rarr;upstream.");
@@ -65,7 +66,8 @@ var hp = {
 	getArea: function() {
 		console.log("Getting area...");
 		// area (as square clicks) is buried in the result object. get it.
-		this.params.area = this.watershed.WatershedArea.features[0].properties.AreaSqKm;
+		var t = this.watershed.WatershedArea.features[0].properties.AreaSqKm;
+		this.params.area = _round(t,2);
 		console.log("Area:", this.params.area, "sq. km.");
 	},
     
@@ -74,8 +76,8 @@ var hp = {
 		// validate all input params and record result
 		this._validate.head = (this.params.head > 0);
 		this._validate.area = (this.params.area > 0);
-		this._validate.efficiency = (this.params.efficiency >= 0 || this.params.efficiency <= 1);
-		this._validate.envflow = (this.params.envflow >= 0.1 || this.params.envflow <= 0.5);
+		this._validate.efficiency = (this.params.efficiency >= 0 && this.params.efficiency <= 1);
+		this._validate.envflow = (this.params.envflow >= 0.1 && this.params.envflow <= 0.5);
 		if (this.params.rate) {this._validate.rate = true;} else {this._validate.rate = false;}
 		
 		// return whether or not all params are valid
@@ -101,11 +103,9 @@ var hp = {
 		if (rate) {this.params.rate = rate;}
 		// validate the parameters
 		var check = this.validateParams();
-		console.log("check",check);
 		// calculate power if params are valid
 		if (check.status) {
 			// Calculate power from stored parameters
-			console.log(this);
 			this._int.qAvailable = this.params.area * 1.6;
 			this._int.qEnv = (this.params.area * this.params.envflow);
 			this._int.qUseable = this._int.qAvailable - this._int.qEnv;
@@ -113,7 +113,7 @@ var hp = {
 			// Power in kW
 			var p = this._int.qUseable * this.params.head * (0.084) * this.params.efficiency;
 			// Cost = rate * hours per year * kilowatts
-			var c = this.params.rate * 8766 * this.results.power;
+			var c = this.params.rate * 8766 * p;
 			console.log("power calcs", p,c);
 			this.results.power = p;
 			this.results.cost = c;

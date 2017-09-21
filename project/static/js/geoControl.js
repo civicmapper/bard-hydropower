@@ -16,6 +16,8 @@ var drawnItems = L.featureGroup().addTo(map);
 var drawnPolyline = L.polyline([]);
 // point input used for watershed analysis
 var drawnPoint = L.marker();
+// results layer for the watershed analysis
+var watershedArea = L.featureGroup();
 
 // implement the drawing control functionality
 map.addControl(new L.Control.Draw({
@@ -89,7 +91,7 @@ var drawControl= {
       drawControl.getPointsForGP(event.layer);
       // enable the analyze button
       buttonControl.analyze.enable();
-      messageControl.onDrawComplete();
+      //messageControl.onDrawComplete();
     });
     // map listener for drawing edits
     map.on(L.Draw.Event.EDITED, function(event) {
@@ -103,7 +105,7 @@ var drawControl= {
       });
       // enable the analyze button
       buttonControl.analyze.enable();
-      messageControl.onDrawComplete();
+      //messageControl.onDrawComplete();
     });
     // map listener for drawing deletion
     map.on('draw:deleted', function (e) {
@@ -151,8 +153,8 @@ function runGP(runWatershed, runProfile) {
       // update status
       var msg = "Determining elevation profile...";
       console.log(msg);
-      messageControl.messages.elevprofile.addMsg(msg, 'info');
-      $('#'+messageControl.messages.elevprofile.id).show();
+      //messageControl.messages.elevprofile.addMsg(msg, 'info');
+      //$('#'+messageControl.messages.elevprofile.id).show();
       // run the task
       elevProfileTask.run(function(error, result, response) {
         if (error) {
@@ -200,8 +202,8 @@ function runGP(runWatershed, runProfile) {
 
       msg = "Delineating the upstream contributing area...";
       console.log(msg);
-      messageControl.messages.watershed.addMsg(msg, 'info');
-      $('#'+messageControl.messages.watershed.id).show();
+      //messageControl.messages.watershed.addMsg(msg, 'info');
+      //$('#'+messageControl.messages.watershed.id).show();
       watershedTask.run(function(error, result, response) {
         // show the message window
         if (error) {
@@ -209,7 +211,7 @@ function runGP(runWatershed, runProfile) {
           msg = "Watershed: " + error.message + "(code:" + error.code + ")";
           console.log(msg);
           console.log(error);
-          messageControl.messages.watershed.addMsg(msg, 'danger');
+          //messageControl.messages.watershed.addMsg(msg, 'danger');
           // resolve callback
           w.resolve(error);
         } else {
@@ -217,7 +219,7 @@ function runGP(runWatershed, runProfile) {
           msg = "Watershed Delineation: Complete";
           console.log(msg);
           console.log(result);
-          messageControl.messages.watershed.addMsg(msg, 'success');
+          //messageControl.messages.watershed.addMsg(msg, 'success');
           // resolve callback
           w.resolve(result);
         }
@@ -241,68 +243,9 @@ function runGP(runWatershed, runProfile) {
 
 
 /**
- * runGP callback: takes results, sends messages, initiates final calcs
- */
-function analyzeGPResults(elevProfileResult,watershedResult) {
-  
-  // calculate head
-  if (elevProfileResult) {
-    console.log(elevProfileResult);
-    hp.profile = elevProfileResult;
-    hp.calcHead();
-  }
-  messageControl.messages.elevprofile.addMsg('<small>Head: </small>' + _round(hp.params.head,2) + '&nbsp;<small>meters</small>','success');
-  
-  // calculate area
-  if (watershedResult) {
-    console.log(watershedResult);
-    hp.watershed = watershedResult;
-    hp.getArea();
-  }
-  messageControl.messages.watershed.addMsg('<small>Area: </small>' + _round(hp.params.area, 2) + '&nbsp;<small>km^2</small>','success');
-  
-  // display status
-  messageControl.messages.power.addMsg("Calculating Power Potential...");
-  // calculate power
-  var success = hp.calculatePower();
-  // hit callbacks
-  if (success) {
-    analyzeSuccess();
-  } else {
-    analyzeFail();
-  }
-}
-
-function analyzeSuccess() {
-  // some messages for debugging
-  console.log("Success", hp);
-  console.log("Estimated power:", hp.results.power, "kW");
-  console.log("Estimated cost ($):", hp.results.cost);
-  // messages for the user
-  var msg = '<small>Power:</small>&nbsp;' + _round(hp.results.power,2) + '&nbsp;<small>kW/year</small><br><small>Cost:</small>&nbsp;' + _round(hp.results.cost,2) + '&nbsp;<small>$/KwH</small>';
-  messageControl.messages.power.addMsg(msg, 'success');
-  $('#'+messageControl.messages.power.id).show();
-  
-  // generate the result visuals in the results modal
-  mapWatershed(map);
-  //buildProfileGraphic(map); // TO-DO
-  
-  // activate the results button
-  // reset the calculator button
-  buttonControl.analyze.setComplete();
-  buttonControl.results.activate();
-}
-
-function analyzeFail() {
-  console.log("Fail", hp);
-  messageControl.messages.power.addMsg("There was an error completing the hydropower calculation.", 'error');
-}
-
-/**
 * Add the watershed layer to the map
 */
 function mapWatershed(map) {
-  var watershedArea = L.featureGroup();
   map.addLayer(watershedArea);
   watershedArea.addLayer(L.geoJSON(hp.watershed.WatershedArea));
 }
