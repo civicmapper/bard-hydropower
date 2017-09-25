@@ -93,7 +93,7 @@ var buttonControl = {
     onClick: function(){
       $('.reset-btn').click(function() {
         resetAnalysis(true, true, true);
-        $('.reset-btn').prop("disabled", true);
+        //$('.reset-btn').prop("disabled", true);
         paramControl.readyToCalc();
         $('#tabStep1').trigger('click');
       });
@@ -111,22 +111,82 @@ var buttonControl = {
   }
 };
 
+function checkOptionalForm(id) {
+  if ($(id).hasClass("optional-form")) {
+    // find the checkbox associated with the form (explicit DOM tree search)
+    var c= $(id).parent().parent().siblings().find('input[type="checkbox"]');
+    // and if it is specifically checked for use
+    return c.is(":checked");
+  } else {
+    // otherwise, we know the form must be in use (i.e., it's not optional)
+    return true;
+  }
+}
+
 /**
  * paramControl: buttons and controls for managing the parameters modal
  *
  */
 paramControl = {
   forms : {
-    head: {id:'#head-form-field'},
-    area: {id:'#area-form-field'},
-    envflow: {id:'#env-form-field'},
-    efficiency: {id:'#eff-form-field'},
-    rate: {id:'#rate-form-field'}
+    head: {
+      id:'#head-form-field',
+      set:function(val) {hp.params.head=val;},
+      /**
+       * gets the value from the form, if so spec'd, and pushes it to the hp obj
+       */
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.head.id);
+        if (isChecked) {
+          // get from the form if associated checkbox checked
+          hp.params.head = parseFloat($(paramControl.forms.head.id).val());
+        } else {
+          // get from the object if associated checkbox checked
+          hp.calcHead();
+        }
+        return isChecked;
+      }
+    },
+    area: {
+      id:'#area-form-field',
+      set:function(val) {hp.params.area=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.area.id);
+        if (isChecked) {
+          hp.params.area = parseFloat($(paramControl.forms.area.id).val());
+        } else {
+          hp.getArea();
+        }
+        return isChecked;
+      }
+    },
+    envflow: {
+      id:'#env-form-field',
+      set:function(val) {hp.params.envflow=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.envflow.id);
+        return isChecked;
+      }
+    },
+    efficiency: {
+      id:'#eff-form-field',
+      set:function(val) {hp.params.efficiency=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.efficiency.id);
+        return isChecked;
+      }
+    },
+    rate: {
+      id:'#rate-form-field',
+      set:function(val) {hp.params.rate=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.rate.id);
+        return isChecked;
+      }
+    }
   },
 	init : function() {
-    
 		// Initialize the custom switches and forms
-    
     // switches
 		$('input[type="checkbox"].params').bootstrapToggle({
 			on: '<i class="fa fa-arrow-right"></i>',
@@ -153,9 +213,9 @@ paramControl = {
     this.readyToCalc();
 
 	},
-	// Get inputs from the parameters form
+	// Get inputs from the parameters form and puts them in the 
 	getParams: function() {
-		hp.params.head = parseFloat($(this.forms.head.id).val());
+    hp.params.head = parseFloat($(this.forms.head.id).val());
 		hp.params.area = parseFloat($(this.forms.area.id).val());
 		hp.params.envflow = parseFloat($(this.forms.envflow.id).val());
 		hp.params.efficiency = parseFloat($(this.forms.efficiency.id).val());
@@ -174,35 +234,51 @@ paramControl = {
     $(this.forms.rate.id).val(hp.params.rate);
   },
 	/**
-	 * Parameter checker function
+	 * Parameter checker function. This:
+	 *   - gets the values from the form and stores them to the hp object
+	 *   - runs the hp validation function
+	 *   - uses the results of the validation function to provide validation
+	 *     visuals on the form fields (green/good, red/bad)
+	 *   - for optional-form classes (those with switches), determines what
+	 *     value to use (if any)
 	 */
 	checkParams: function() {
     // load params from form to hp object
-    this.getParams();
+    //this.getParams();
     // run validation
     var validation = hp.validateParams();
-    console.log(validation);
+    console.log("Validation 1", validation);
     // set the status feedback
-    $.each(validation.params, function(k,v){
+    $.each(validation.params, function(k,v) {
+      // get the id
       var s = paramControl.forms[k].id;
       // if the param is optional and has assoc checkbox...
-      if ($(s).hasClass("optional-form")) {
-        // find the checkbox associated with the form explicit DOM tree search
-        var c= $(s).parent().parent().siblings().find('input[type="checkbox"]');
-        //console.log(c.attr('id'), c.is(":checked"));
-        // and if it is specifically checked for use
-        if (c.is(":checked")) {
-          // set the status accordingly
-          paramControl.setParamStatus(s, v);
-        } else {
-          // otherwise, skip it
-        }
-      } else {
-        // set the status feedback highlight on the form
+      var checked = paramControl.forms[k].get(s);
+      if (checked) {
         paramControl.setParamStatus(s, v);
       }
       
+      //if ($(s).hasClass("optional-form")) {
+      //  // find the checkbox associated with the form explicit DOM tree search
+      //  var c= $(s).parent().parent().siblings().find('input[type="checkbox"]');
+      //  //console.log(c.attr('id'), c.is(":checked"));
+      //  // and if it is specifically checked for use
+      //  if (c.is(":checked")) {
+      //    // set the status accordingly
+      //    paramControl.setParamStatus(s, v);
+      //    //...and we'll use the value acquired from the form by getParams
+      //    // and validated by hp.validateParams
+      //  } else {
+      //    // if it is unchecked (i.e., use map-derived values)
+      //    // 
+      //  }
+      //} else {
+      //  // set the status feedback highlight on the form
+      //  paramControl.setParamStatus(s, v);
+      //}
     });
+    validation = hp.validateParams();
+    console.log("Validation 2", validation);
     // return validation result
     return validation.status;
 	},	
@@ -384,14 +460,17 @@ function calculationController() {
   // checkParams gets the params, validates them, and writes to the class
   paramControl.checkParams();
   
+  var headSwitch = $(paramControl.forms.head.id);
+  var areaSwitch = $(paramControl.forms.head.id);
+  
   if (drawnPolyline.isEmpty() && !hp.params.head && !hp.params.area) {
     console.log("no drawing, no head, no area");
     alert("You must provide all inputs."); 
   } else if (!drawnPolyline.isEmpty() && (!hp.params.head || !hp.params.area)) {
     console.log("yes drawing and (yes/no head or yes/no area)");
     // use the drawn polygon
-    console.log(drawnPolyline.toGeoJSON());
-    console.log(drawnPoint.toGeoJSON());
+    //console.log(drawnPolyline.toGeoJSON());
+    //console.log(drawnPoint.toGeoJSON());
     //run the geoprocessing tasks,
     //run profile and watershed depending on what params are provided
     //and then analyze the results when done

@@ -27,7 +27,9 @@ var hp = {
 	//// intermediate power calculations
 	_int : {},
 
-	// calculation results  
+	/**
+	 * calculation results
+	 */
 	results: {
 		//// power from the calcPower method
 		power: null,
@@ -40,9 +42,12 @@ var hp = {
 	//	"watershed": null,
 	//	"power": null
 	//},
-    
-	// calculate head from the ESRI Elevation Profile service result object
+	
+	/**
+	 * calculate head from the ESRI Elevation Profile service result object
+	 */
 	calcHead: function() {
+		if (this.profile.OutputProfile) {
 		console.log("Calculating head...");
 		//get the line from the result object
 		var line = this.profile.OutputProfile.features[0];
@@ -60,18 +65,29 @@ var hp = {
 		//}
 		// (consider saving result as ABS value)
 		console.log("Head:", this.params.head, "meters");
+		} else {
+			console.log("Head has not yet been determined.");
+		}
 	},
     
-	// Extract the area value from the ESRI Watershed service result object
+	/**
+	 * Extract the area value from the ESRI Watershed service result object
+	 */
 	getArea: function() {
-		console.log("Getting area...");
-		// area (as square clicks) is buried in the result object. get it.
-		var t = this.watershed.WatershedArea.features[0].properties.AreaSqKm;
-		this.params.area = _round(t,2);
-		console.log("Area:", this.params.area, "sq. km.");
+		if (this.watershed.WatershedArea) {
+			console.log("Getting area...");
+			// area (as square clicks) is buried in the result object. get it.
+			var t = this.watershed.WatershedArea.features[0].properties.AreaSqKm;
+			this.params.area = _round(t,2);
+			console.log("Area:", this.params.area, "sq. km.");
+		} else {
+			console.log("Area has not been determined yet.");
+		}
 	},
     
-	// ensure inputs are within correct value ranges
+	/**
+	 * ensure inputs are within correct value ranges
+	 */
 	validateParams: function() {
 		// validate all input params and record result
 		this._validate.head = (this.params.head > 0);
