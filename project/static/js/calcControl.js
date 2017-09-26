@@ -1,128 +1,560 @@
 /**
  * calcControls.js
  *
- * controls for the hydropower calculator.
+ * buttons and controls for managing the hydropower calculator.
  *
- * requires map. load after map.js
+ * Includes the drawing workflow.
+ *
+ * requires map.js to be loaded first.
  */
-
-
-$(document).on("ready", function() {
-  $('.analysis-status').hide();
-  $('#msg-statuses').hide();
-  $('#msg-text').hide();
-  $('#analyze').prop("disabled", true);
-  //$('#clear-button-item').hide();
-});
 
 /**
- * reset the analysis window. optional param dictates if drawing info is
- * also removed.
+ * BUTTONS
  */
-function resetAnalysis(clearLayers) {
-  $('#analyze-button-item').html(analyzeButton);
-  $('#analyze').prop("disabled", true);
-  $('.analysis-status').empty();
-  $('#msg-statuses').hide();
-  $('#msg-text').empty().hide();
+var buttonControl = {
+  // opens the parameters modal
+  params: {
+    elem: $('#params-btn'),
+    html: {
+      resting: ""
+    },
+    onClick: function(){$('.params-btn').click(function() {
+        $("#paramsModal").modal("show");
+        $(".navbar-collapse.in").collapse("hide");
+        return false;
+    });}
+  },
+  results: {
+    elem: function() {return $('.results-btn');},
+    html: {
+      resting: 'Results',
+      active: 'Results <i class="fa fa-check"></i>'
+    },
+    onClick: function(){$('.results-btn').click(function(){
+      $("#resultsModal").modal("show");
+      $(".navbar-collapse.in").collapse("hide");
+      return false;
+    });},
+    reset: function() {
+      $('.results-btn').html(this.html.resting);
+      $('.results-btn').prop("disabled", true);
+      
+    },
+    activate: function() {
+      $('.results-btn').html(this.html.active);
+      $('.results-btn').prop("disabled", false);
+    }
+  },
+  // analyze button
+  analyze: {
+    elem: function() {return $('.analyze-btn');},
+    html: {
+      resting: 'Calculate',
+      active: 'Calculating...<i class="fa fa-cog fa-spin fa-fw"></i>'
+    },
+    /**
+     * call when correct params are in place
+     */
+    enable: function() {
+      $('.analyze-btn').prop("disabled", false);
+    },
+    /**
+     * call when the calculation is in progress
+     */
+    setActive: function() {
+      $('.analyze-btn').html(this.html.active);
+    },
+    /**
+     * call when the calculation is complete
+     */
+    setComplete: function() {
+      $('.analyze-btn').html(this.html.resting);
+    },
+    /**
+     * reset the button to initial state
+     */
+    reset: function() {
+      $('.analyze-btn').html(this.html.resting);
+      $('.analyze-btn').prop("disabled", true);
+    },
+    /**
+     * click event for the button
+     */
+    onClick: function(){$('.analyze-btn').click(function() {
+      // unleash the calculationController 
+      calculationController();
+      // give this button an active look to it
+      buttonControl.analyze.setActive();
+    });}
+  },
+  // reset button
+  reset: {
+    elem: function() {return $('.reset-btn');},
+    onClick: function(){
+      $('.reset-btn').click(function() {
+        resetAnalysis(true, true, true);
+        //$('.reset-btn').prop("disabled", true);
+        paramControl.readyToCalc();
+        $('#tabStep1').trigger('click');
+      });
+    }
+  },
+  init : function() {
+    // set buttons to initial states
+    this.analyze.reset();
+    this.results.reset();
+    // attach on those click events
+    this.params.onClick();
+    this.analyze.onClick();
+    this.results.onClick();
+    this.reset.onClick();
+  }
+};
+
+function checkOptionalForm(id) {
+  if ($(id).hasClass("optional-form")) {
+    // find the checkbox associated with the form (explicit DOM tree search)
+    var c= $(id).parent().parent().siblings().find('input[type="checkbox"]');
+    // and if it is specifically checked for use
+    return c.is(":checked");
+  } else {
+    // otherwise, we know the form must be in use (i.e., it's not optional)
+    return true;
+  }
+}
+
+/**
+ * paramControl: buttons and controls for managing the parameters modal
+ *
+ */
+paramControl = {
+  forms : {
+    head: {
+      id:'#head-form-field',
+      set:function(val) {hp.params.head=val;},
+      /**
+       * gets the value from the form, if so spec'd, and pushes it to the hp obj
+       */
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.head.id);
+        if (isChecked) {
+          // get from the form if associated checkbox checked
+          hp.params.head = parseFloat($(paramControl.forms.head.id).val());
+        } else {
+          // get from the object if associated checkbox checked
+          hp.calcHead();
+        }
+        return isChecked;
+      }
+    },
+    area: {
+      id:'#area-form-field',
+      set:function(val) {hp.params.area=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.area.id);
+        if (isChecked) {
+          hp.params.area = parseFloat($(paramControl.forms.area.id).val());
+        } else {
+          hp.getArea();
+        }
+        return isChecked;
+      }
+    },
+    envflow: {
+      id:'#env-form-field',
+      set:function(val) {hp.params.envflow=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.envflow.id);
+        return isChecked;
+      }
+    },
+    efficiency: {
+      id:'#eff-form-field',
+      set:function(val) {hp.params.efficiency=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.efficiency.id);
+        return isChecked;
+      }
+    },
+    rate: {
+      id:'#rate-form-field',
+      set:function(val) {hp.params.rate=val;},
+      get:function() {
+        var isChecked = checkOptionalForm(paramControl.forms.rate.id);
+        return isChecked;
+      }
+    }
+  },
+	init : function() {
+		// Initialize the custom switches and forms
+    // switches
+		$('input[type="checkbox"].params').bootstrapToggle({
+			on: '<i class="fa fa-arrow-right"></i>',
+			off: 'Map',
+      onstyle: 'default',
+      offstyle: 'primary'
+		});
+    // sliders
+    $('.param-slider').slider({
+      formatter: function(value) {
+        return value;
+      }
+    });
+    $("#env-param-slider").on("slide", function(slideEvt) {
+      $("#env-form-field").val(slideEvt.value);
+    });
+    $("#eff-param-slider").on("slide", function(slideEvt) {
+      $("#eff-form-field").val(slideEvt.value);
+    });
+
+    // add listeners to detect changes to the params
+    this.ableOptionalParam();
+    this.paramOnChange();
+    this.readyToCalc();
+
+	},
+	// Get inputs from the parameters form and puts them in the 
+	getParams: function() {
+    hp.params.head = parseFloat($(this.forms.head.id).val());
+		hp.params.area = parseFloat($(this.forms.area.id).val());
+		hp.params.envflow = parseFloat($(this.forms.envflow.id).val());
+		hp.params.efficiency = parseFloat($(this.forms.efficiency.id).val());
+    hp.params.rate = parseFloat($(this.forms.rate.id).val());
+	},
+  resetParams: function() {
+    hp.params.head = 0;
+    $(this.forms.head.id).val(hp.params.head);
+		hp.params.area = 0;
+    $(this.forms.area.id).val(hp.params.area);
+		hp.params.envflow = 0.3;
+    $(this.forms.envflow.id).val(hp.params.envflow);
+    hp.params.efficiency = 0.5;
+		$(this.forms.efficiency.id).val(hp.params.efficiency);
+    hp.params.rate = 0.1;
+    $(this.forms.rate.id).val(hp.params.rate);
+  },
+	/**
+	 * Parameter checker function. This:
+	 *   - gets the values from the form and stores them to the hp object
+	 *   - runs the hp validation function
+	 *   - uses the results of the validation function to provide validation
+	 *     visuals on the form fields (green/good, red/bad)
+	 *   - for optional-form classes (those with switches), determines what
+	 *     value to use (if any)
+	 */
+	checkParams: function() {
+    // load params from form to hp object
+    //this.getParams();
+    // run validation
+    var validation = hp.validateParams();
+    console.log("Validation 1", validation);
+    // set the status feedback
+    $.each(validation.params, function(k,v) {
+      // get the id
+      var s = paramControl.forms[k].id;
+      // if the param is optional and has assoc checkbox...
+      var checked = paramControl.forms[k].get(s);
+      if (checked) {
+        paramControl.setParamStatus(s, v);
+      }
+      
+      //if ($(s).hasClass("optional-form")) {
+      //  // find the checkbox associated with the form explicit DOM tree search
+      //  var c= $(s).parent().parent().siblings().find('input[type="checkbox"]');
+      //  //console.log(c.attr('id'), c.is(":checked"));
+      //  // and if it is specifically checked for use
+      //  if (c.is(":checked")) {
+      //    // set the status accordingly
+      //    paramControl.setParamStatus(s, v);
+      //    //...and we'll use the value acquired from the form by getParams
+      //    // and validated by hp.validateParams
+      //  } else {
+      //    // if it is unchecked (i.e., use map-derived values)
+      //    // 
+      //  }
+      //} else {
+      //  // set the status feedback highlight on the form
+      //  paramControl.setParamStatus(s, v);
+      //}
+    });
+    validation = hp.validateParams();
+    console.log("Validation 2", validation);
+    // return validation result
+    return validation.status;
+	},	
+	/**
+	 * reset status for any given parameter
+	 */
+	resetParamStatus : function(selector) {
+		$(selector).closest('div', 'form-group').removeClass("has-success");
+		$(selector).closest('div', 'form-group').removeClass("has-warning");
+		$(selector).closest('div', 'form-group').removeClass("has-error");
+	},
+	/**
+	 * set status for any given parameter
+	 */
+	setParamStatus: function(selector, status) {
+		this.resetParamStatus(selector);
+		if (status === true) {
+			$(selector).closest('div', 'form-group').addClass("has-success");
+			return true;
+		} else if (status === false || isNaN(status)) {
+			$(selector).closest('div', 'form-group').addClass("has-error");
+			return false;
+		} else if (status === "warning") {
+			$(selector).closest('div', 'form-group').addClass("has-warning");
+		}
+	},
+  /**
+   * listener for enabling/disabling form field w/ associate checkbox
+   */
+  ableOptionalParam : function() {
+   $('input[type="checkbox"].params').change(function(e) {
+      // finds the form associated with the checkbox. explicit DOM tree search
+      var form = $(this).closest(".form-group").find('input[type="text"]');
+      if($(this).prop('checked')) {
+        form.prop('disabled', false);
+      } else {
+        form.prop('disabled', true);
+        paramControl.resetParamStatus('#'+form.attr("id"));
+      }
+    });
+  },
+  /**
+   * performs validation and controls availability of calculate button
+   */
+  readyToCalc: function() {
+			var checked = paramControl.checkParams();
+      // true from checkParams means it's all good, enable calculation
+			if (checked) {
+				$('.analyze-btn').prop("disabled", false);
+			} else {
+				$('.analyze-btn').prop("disabled", true);
+			}
+  },
+	/**
+	 * Parameter Listener; runs Validation/enables calc button
+	 */
+	paramOnChange: function() {
+		$('.params').change( function(e) {
+      paramControl.readyToCalc();
+    });
+	},
+  /**
+   * parameter validation messaging.
+   */
+  paramMessages: {
+    id: '#params-msg-status',
+    init: function() {
+      $(this.id).hide();
+    },
+    addMsg : function(msg, alertType) {
+      makeAlert(msg, alertType, this.id);
+      $(this.id).fadeIn();
+    },
+    clearMsg : function() {
+      $(this.id).fadeOut();
+    }
+  }
+};
+
+
+/**
+ * Results Control - shows results of the analysis
+ */
+var resultsControl =  {
+  head: {element:'.results-head'},
+  area: {element:'.results-area'},
+  envflow: {element:'.results-env'},
+  efficiency: {element:'.results-eff'},
+  rate: {element:'.results-rate'},
+  power: {element:'.results-power'},
+  cost: {element:'.results-cost'},
+  profile: {
+    element:'#profile-viz',
+    /**
+     * build profile graphic in the results window (using chart.js or something like that)
+     */
+    buildProfileGraphic:function () {
+    },
+  },
+  watershed: {
+    element:'#watershed-viz',
+    /**
+     * build watershed viz in the results window 
+     */
+    map : null,
+    buildViz: function() {
+      this.resultsMap = L.map('watershed-viz');
+      var watershedArea = L.featureGroup();
+      this.resultsMap.addLayer(watershedArea);
+      watershedArea.addLayer(L.geoJSON(hp.watershed.WatershedArea));
+    },
+  },
+  /**
+   * Get results from the hp object and put them where they need to go.
+   */
+  show: function() {
+    $(this.power.element).html(_round(hp.results.power,2));
+    $(this.cost.element).html(_round(hp.results.cost,2));
+    $(this.head.element).html(hp.params.head);
+    $(this.area.element).html(hp.params.area);
+    $(this.efficiency.element).html(hp.params.efficiency);
+    $(this.envflow.element).html(hp.params.envflow);
+    $(this.rate.element).html(hp.params.rate);
+  },
+  reset: function() {
+    $('.results').empty();
+  }
+};
+/**
+ * Reset Everything
+ * reset the state of buttons, results window, infoWindow.
+ * optional param dictates if drawing info is also removed.
+ */
+function resetAnalysis(clearLayers, clearResults, clearParams) {
+  
+  // reset the analyze and results buttons to their initial state
+  buttonControl.analyze.reset();
+  buttonControl.results.reset();
+  
+  // clear layers
   if (clearLayers) {
     drawnItems.clearLayers();
-    drawInfo.update();
+    watershedArea.clearLayers();
+  }
+  // empty results modal and reset the hydropower object contents
+  if (clearResults) {
+    resultsControl.reset();
+  }
+  if (clearParams) {
+    paramControl.resetParams();
+    paramControl.checkParams();
+    // reset the params to defaults
   }
 }
 
-$(document).on("click", "#clearCalcs", function() {
-  console.log("clearing results");
-  resetAnalysis(true);
-});
-
-function makeAlert(msg, alertType) {
-  var defaultMsg = null;
-  if (alertType == 'info') {
-    defaultMsg = 'Calculating&nbsp;&nbsp;<img src="/static/img/loading2.gif"/>';
-  } else if  (alertType == 'success') {
-    defaultMsg = 'Complete!';
-  } else if (alertType == 'danger') {
-    defaultMsg = "There was an error with the analysis.";
-  } else {
-    defaultMsg = "Something went wrong. Check the browser console for details.";
-    alertType = 'warning';
-  }
-  var div1 = '<div class="alert alert-' + alertType + '" role="alert"><small>';
-  var div2 = '</small></div>';
-  if (msg) {
-    return  div1 + msg + div2 ;
-  } else {
-    return div1 + defaultMsg + div2;
-  }    
-}
-
-var analyzeButton = '<div><button id="analyze" class="btn btn-primary btn-block" type="submit">Calculate</button></div>';
-var clearButton = '<div><button id="clearCalcs" class="btn btn-primary btn-block" type="submit">Clear Results</button></div>';
 
 /**
- * Analysis Control
- * Contains button and subsequent results outputs from the tool.
- * Initially, only the button is present, but as the tool is run, the control
- * grows:
- *  - shows calculation status
- *  - shows complete or error alert
- *  - shows results
+ * Hydropower Calculation function: controller that coordinates calls between
+ * paramModal, runGP, messagePanel, drawing layer, and hp to run the hydropower
+ * calculation. Determines if the right parameters are in the right places
+ * 
  */
-var analyzeControl = L.control.custom({
-    position: 'topright',
-    content:
-      '<li class="list-group-item" id="analyze-button-item">' + analyzeButton + '</li>' +
-      '<li class="list-group-item" id="msg-statuses">' +
-        '<div id="msg-status" class="analysis-status"></div>' +
-        '<div id="msg-status-elevprofile" class="analysis-status"></div>' +
-        '<div id="msg-status-watershed" class="analysis-status"></div>' +
-        '<div id="msg-status-power" class="analysis-status"></div>' +
-      '</li>' +
-      '<li class="list-group-item" id="msg-text"></li>',
-      //'<li class="list-group-item" id="clear-button-item">' + clearButton + '</li>',
-    classes: 'list-group',
-    id: "analyze-control",
-    style: {
-        width: '300px',
-        margin: '10px',
-        padding: '0px 0 0 0'
-        //cursor: 'pointer',
+function calculationController() {
+  
+  // if just adjusting, and GP already performed, don't do it again.
+  // check the map/form switch to see where parameters come from
+  // hp object to store head area w/ separate form vs. map
+  
+  // (some logging for debugging)
+  console.log("Polyline not drawn:", drawnPolyline.isEmpty());
+  console.log("Polyline drawn:", !drawnPolyline.isEmpty());
+  console.log("Head calculated:", hp.head);
+  console.log("Area calculated:", hp.area);
+  console.log("Neither head nor area have been calculated:", (!hp.head || !hp.area));
+  
+  //Reset previous analysis state and remove results
+  resetAnalysis(false, false, true);
+  
+  // checkParams gets the params, validates them, and writes to the class
+  paramControl.checkParams();
+  
+  var headSwitch = $(paramControl.forms.head.id);
+  var areaSwitch = $(paramControl.forms.head.id);
+  
+  if (drawnPolyline.isEmpty() && !hp.params.head && !hp.params.area) {
+    console.log("no drawing, no head, no area");
+    alert("You must provide all inputs."); 
+  } else if (!drawnPolyline.isEmpty() && (!hp.params.head || !hp.params.area)) {
+    console.log("yes drawing and (yes/no head or yes/no area)");
+    // use the drawn polygon
+    //console.log(drawnPolyline.toGeoJSON());
+    //console.log(drawnPoint.toGeoJSON());
+    //run the geoprocessing tasks,
+    //run profile and watershed depending on what params are provided
+    //and then analyze the results when done
+    runGP().done(analyzeGPResults);
+  } else if (drawnPolyline.isEmpty() && (hp.params.head && hp.params.area)) {
+    console.log("no drawing, yes head and yes area");
+    //calculate power
+    var success = hp.calculatePower();
+    // hit callbacks
+    if (success) {
+      analyzeSuccess();
+    } else {
+      analyzeFail();
     }
-})
-.addTo(map);
+  } else if  (!drawnPolyline.isEmpty() && (hp.params.head && hp.params.area)) {
+    console.log("yes drawing and (yes head and yes area) - using drawing");
+    // use the drawn polygon 
+    console.log(drawnPolyline.toGeoJSON());
+    console.log(drawnPoint.toGeoJSON());
+    //run the geoprocessing tasks,
+    //run profile and watershed depending on what params are provided
+    //and then analyze the results when done
+    runGP().done(analyzeGPResults);
+  } else {
+    alert("You must provide all inputs."); 
+  }
 
-/*******************************************************************************
- * Analyze Button - Action
+}
+
+/**
+ * runGP callback: takes results, sends messages, initiates final calcs
  */
+function analyzeGPResults(elevProfileResult,watershedResult) {
+  
+  // calculate head
+  if (elevProfileResult) {
+    console.log(elevProfileResult);
+    hp.profile = elevProfileResult;
+    hp.calcHead();
+    $(paramControl.forms.head.id).val(hp.params.head);
+  }
+  
+  // calculate area
+  if (watershedResult) {
+    console.log(watershedResult);
+    hp.watershed = watershedResult;
+    hp.getArea();
+    $(paramControl.forms.area.id).val(hp.params.area);
+  }
 
-$(document).on("click", '#analyze', function() {
-  
-  // reset the messages
-  resetAnalysis(false);
-  /*
-  $('#analyze').prop("disabled", true);
-  $('#msg-statuses').hide();
-  $('.analysis-status').hide();
-  $('.analysis-status').empty();
-  */
-  // set the new status to 
-  $('#msg-status').html(makeAlert(null,'info'));
-  $('#msg-statuses').show();
-  $('.analysis-status').show();
-  
-  // print geometries to console
-  console.log(drawnPolyline.toGeoJSON());
-  console.log(drawnPoint.toGeoJSON());
-  
-  /**
-   * run the geoprocessing tasks, and then analyze the results when done
-   */
-  runGP(hp).done(analyzeGPResults);
-      
-});
+  // display status
+  //resultsControl.messages.power.addMsg("Calculating Power Potential...");
+  // calculate power
+  var success = hp.calculatePower();
+  // hit callbacks
+  if (success) {
+    analyzeSuccess();
+  } else {
+    analyzeFail();
+  }
+}
 
-$(document).on("load", function() {
-  console.log("document loaded");
-	$("#loading").hide();
-});
+function analyzeSuccess() {
+  // some messages for debugging
+  console.log("Success", hp);
+  console.log("Estimated power:", hp.results.power, "kW");
+  console.log("Estimated cost ($):", hp.results.cost);
+  // messages for the user
+  var msg = '<small>Power:</small>&nbsp;' + _round(hp.results.power,2) + '&nbsp;<small>kW/year</small><br><small>Cost:</small>&nbsp;' + _round(hp.results.cost,2) + '&nbsp;<small>$/KwH</small>';
+  
+  resultsControl.show();
+  
+  // generate the result visuals in the results modal
+  mapWatershed(map);
+  //buildProfileGraphic(map); // TO-DO
+  
+  // activate the results button
+  // reset the calculator button
+  buttonControl.analyze.setComplete();
+  buttonControl.results.activate();
+  $('#tabStep2').trigger('click');
+}
+
+function analyzeFail() {
+  console.log("Fail", hp);
+  //resultsControl.messages.addMsg("There was an error completing the hydropower calculation.", 'error');
+}
