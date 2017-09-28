@@ -30,9 +30,8 @@ bundle_js = Bundle(
     'js/plugins.js',
     'js/utils.js',
     'js/map.js',
-    'js/hydropower.js',
-    'js/calcControl.js',
     'js/geoControl.js',
+    'js/calcControl.js',
     'js/ready.js',
     filters='jsmin',
     output='bundle.js')

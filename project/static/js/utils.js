@@ -28,10 +28,12 @@ function makeAlert(msg, alertType, elementID) {
   }
   
   var alert = "";
+  var close = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
   var div1 = '<div class="alert alert-' + alertType + '" role="alert">';
   var div2 = '</div>';
   if (msg) {
-    alert =  div1 + msg + div2 ;
+    console.log(msg);
+    alert =  div1 + close + msg + div2 ;
   } else {
     alert =  div1 + defaultMsg + div2;
   }
