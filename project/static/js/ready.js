@@ -34,6 +34,7 @@ $(document).on("ready", function() {
 	
 	
 	console.log("document is ready");
+	console.log("*****************************");
 });
 
 /**

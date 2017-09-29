@@ -18,6 +18,7 @@ var drawnPolyline = L.polyline([]);
 var drawnPoint = L.marker();
 // results layer for the watershed analysis
 var watershedArea = L.featureGroup();
+map.addLayer(watershedArea);
 
 // implement the drawing control functionality
 map.addControl(new L.Control.Draw({
@@ -78,7 +79,7 @@ var drawControl= {
       var latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs();
       drawnPolyline.setLatLngs(latlngs);
       drawnPoint.setLatLng(L.latLng(latlngs[latlngs.length - 1]));
-      // run the
+      // run the GP
       gpControl.gpElevProfile(drawnPolyline);
       gpControl.gpWatershed(drawnPoint);
   },
@@ -138,7 +139,6 @@ var gpControl = {
    * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
    */
   gpElevProfile: function (drawnPolyline) {
-    setHead = this.setHead();
     var elevProfileService = L.esri.GP.service({
       url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
       useCors: true,
@@ -171,13 +171,13 @@ var gpControl = {
           console.log(msg, result);
           //paramsControl.notifications.addMsg(msg,'success');
           // save the result
-          setHead(result);
+          gpControl.setHead(result.OutputProfile);
+          paramControl.onGPComplete();
         }
       });
     });
   },
   gpWatershed: function(drawnPoint) {
-    setArea = this.setArea;
     var watershedService = L.esri.GP.service({
       url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
       useCors: true,
@@ -217,75 +217,73 @@ var gpControl = {
           console.log(msg, result);
           //paramsControl.notifications.addMsg(msg,'success');
           // save the result
-          setArea(result);
-          
+          gpControl.setArea(result.WatershedArea);
+          paramControl.onGPComplete();
         }
       });
     });
   },
   /**
-   * given output from ESRI Elevation Profile service, store it and calculate
-   * head
+   * Given output from ESRI Elevation Profile service, store it and calculate
+   * head. Called upon successful execution of GP.
    */
   setHead: function(gpOutputProfile) {
     this.raw.profile = gpOutputProfile;
     // use the helper function to calc head from the Esri results
     var h = this._calcHead(this.raw.profile);
     // set the value (performs validation)
-    this.params.head.setValue(_round(h,2));
-    return this.params.head.value;
+    Hydropower.params.head.setValue(_round(h,2));
+    return Hydropower.params.head.value;
   },
   /**
-   * given output from ESRI Watershed service, store it and extract area
+   * Given output from ESRI Watershed service, store it and extract area.
+   * Called upon successful execution of GP.
    */
   setArea: function(gpOutputWatershed) {
     this.raw.watershed = gpOutputWatershed;
     // use the helper function to get area from the Esri results
     var w = this._getArea(this.raw.watershed);
     // set the value (performs validation)
-    this.params.area.setValue(_round(w,2));
-    return this.params.area.value;
+    Hydropower.params.area.setValue(_round(w,2));
+    return Hydropower.params.area.value;
   },
   /**
    * customer getter function for Head
    */
   getHead: function(i) {
     var h = this._calcHead(this.raw.profile);
-    // set the value (performs validation)
-    i.setValue(_round(h,2));
-    return i.value;
+    console.log("using custom getter: getHead");
+    if (h) {
+      // set the value (performs validation)
+      i.setValue(_round(h,2));
+      console.log(h, i.value);
+      return i.value;
+    } else {
+      return false;
+    }
   },
   /**
    * customer getter function for Area
    */
   getArea: function(i) {
     // use the helper function to get area from the Esri results
-    var w = this._getArea(this.raw.watershed);
-    // set the value (performs validation)
-    i.setValue(_round(w,2));
-    return i.value;
-  },
-  /**
-   * generate a visualization of the elevation profile results
-   */
-  vizHead: function(element) {
-    console.log(element);
-  },
-  /**
-   * generate a visualization of the watershed delineation
-   */
-  vizArea: function(element) {
-    var resultsMap = L.map(element);
-    var watershedArea = L.featureGroup();
-    resultsMap.addLayer(watershedArea);
-    watershedArea.addLayer(L.geoJSON(this.raw.watershed.WatershedArea));
+    var a = this._getArea(this.raw.watershed);
+    console.log("using custom getter: getArea");
+    if (a) {
+      // set the value (performs validation)
+      i.setValue(_round(a,2));
+      console.log(a, i.value);
+      return i.value;
+    } else {
+      return false;
+    }
   },
   /**
    * calculate head from the ESRI Elevation Profile service result object
    */
   _calcHead: function(gpOutputProfile) {
     if (!$.isEmptyObject(gpOutputProfile)) {
-      console.log("Calculating head...");
+      console.log("Calculating head from", gpOutputProfile);
       // get the first line from the result object
       var line = gpOutputProfile.features[0];
       // get the coords from the line
@@ -299,7 +297,8 @@ var gpControl = {
       console.log("Head:", h, "meters");
       return h;
     } else {
-      return null;
+      console.log("no elevation profile has been created");
+      return false;
     }
   },
   /**
@@ -307,129 +306,30 @@ var gpControl = {
    */
   _getArea: function(gpOutputWatershed) {
     if (!$.isEmptyObject(gpOutputWatershed)) {
-      console.log("Getting area...");
+      console.log("Getting area from", gpOutputWatershed);
       // area (as square clicks) is buried in the result object. get it.
       var a = _round(gpOutputWatershed.features[0].properties.AreaSqKm, 2);
       console.log("Area:", a, "sq. km.");
       return a;
     } else {
-      return null;
+      console.log("no watershed has been delineated");
+      return false;
+    }
+  },
+  /**
+   * generate a visualization of the elevation profile results
+   */
+  vizHead: function(element) {
+    console.log(element);
+  },
+  /**
+   * generate a visualization of the watershed delineation
+   */
+  vizArea: function(map) {
+    if (!$.isEmptyObject(this.raw.watershed)) {
+      //var watershedArea = L.featureGroup();
+      map.addLayer(watershedArea);
+      watershedArea.addLayer(L.geoJSON(this.raw.watershed.WatershedArea));
     }
   }
 };
-
-/**
- * run the two GP tasks at once
- */
-function runGP() {
-  var e = $.Deferred();
-  var w = $.Deferred();
-  var msg;
-  /**
-   * run the Elevation Profile service
-   * if runProfile is False, then skip GP, return null
-   */
-    var elevProfileService = L.esri.GP.service({
-      url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
-      useCors: true,
-      token: arcgis_token
-    });
-    var elevProfileTask = elevProfileService.createTask(); 
-    elevProfileTask.on('initialized', function() {
-      // set input parameters
-      elevProfileTask.setParam("DEMResolution ", "FINEST");
-      elevProfileTask.setParam("ProfileIdField", "OID");
-      elevProfileTask.setParam("MaximumSampleDistance", 50000);
-      elevProfileTask.setParam("returnZ", true);
-      // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-      elevProfileTask.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
-      // update status
-      var msg = "Determining elevation profile...";
-      console.log(msg);
-      //messageControl.messages.elevprofile.addMsg(msg, 'info');
-      //$('#'+messageControl.messages.elevprofile.id).show();
-      // run the task
-      elevProfileTask.run(function(error, result, response) {
-        if (error) {
-          msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
-          $('#msg-status-elevprofile').html(makeAlert(msg, 'danger'));
-          console.log(error.details);
-          e.resolve(error);
-        } else {
-          // messages
-          msg = "Elevation Profile: Complete";
-          console.log(msg);
-          console.log(result);
-          $('#msg-status-elevprofile').html(makeAlert(msg, 'success'));
-          // resolve callback
-          e.resolve(result);
-        }
-      });
-    });
-  
-  /**
-   * run the Watershed service
-   * if runWatershed is False, then skip GP
-   */
-    var watershedService = L.esri.GP.service({
-      url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
-      useCors: true,
-      token: arcgis_token
-    });
-    var watershedTask = watershedService.createTask();
-    watershedTask.on('initialized', function() {
-      // InputPoints must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-      watershedTask.setParam("InputPoints", drawnPoint.toGeoJSON());
-      watershedTask.setParam("SourceDatabase", "FINEST");
-      watershedTask.setParam("PointIDField", "OID");
-      watershedTask.setParam("SnapDistance", 500);
-      watershedTask.setParam("Generalize", true);
-      watershedTask.setParam("ReturnSnappedPoints", false);
-      // output parameters (required for an async GP service)
-      var outputWatershedArea;
-      watershedTask.setOutputParam("WatershedArea");
-      watershedTask.gpAsyncResultParam("WatershedArea", outputWatershedArea);
-      //var outputSnappedPoints;
-      //watershedTask.setOutputParam("SnappedPoints");
-      //watershedTask.gpAsyncResultParam("SnappedPoints", outputSnappedPoints);
-
-      msg = "Delineating the upstream contributing area...";
-      console.log(msg);
-      //messageControl.messages.watershed.addMsg(msg, 'info');
-      //$('#'+messageControl.messages.watershed.id).show();
-      watershedTask.run(function(error, result, response) {
-        // show the message window
-        if (error) {
-          // messages
-          msg = "Watershed: " + error.message + "(code:" + error.code + ")";
-          console.log(msg);
-          console.log(error);
-          //messageControl.messages.watershed.addMsg(msg, 'danger');
-          // resolve callback
-          w.resolve(error);
-        } else {
-          // messages
-          msg = "Watershed Delineation: Complete";
-          console.log(msg);
-          console.log(result);
-          //messageControl.messages.watershed.addMsg(msg, 'success');
-          // resolve callback
-          w.resolve(result);
-        }
-      });
-    });
-  
-  /* when runGP runs, it first hits $.Deferred. The first argument is a function
-   * that executes before anything else. That argument is a $.when function,
-   * which runs the two functions defined above. When done, the results
-   * are passed into a callback function that resolves the whole thing and
-   * returns the two results objects from runGP
-   */
-  var x = $.Deferred(function (def) {
-    // elevProfileResult, watershedResult
-    $.when(e, w).done(function (eR,wR) {
-      def.resolve(eR,wR);
-    });
-  });
-  return x;
-}
