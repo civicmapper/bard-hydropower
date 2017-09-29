@@ -91,8 +91,8 @@ var buttonControl = {
   reset: {
     elem: function() {return $('.reset-btn');},
     onClick: function(){
-      $('.reset-btn').click(function() {
-        resetAnalysis(true, true, true);
+      this.elem().click(function() {
+        resetAnalysis(true, true);
         //$('.reset-btn').prop("disabled", true);
         paramControl.readyToCalc();
         $('#tabStep1').trigger('click');
@@ -182,8 +182,9 @@ var Param = function(primary_class, defaultValue, validLower, validUpper, switch
      * resets the the value to the default that was provided when this class
      * was instantiated
      */
-    resetValue: function() {
+    reset: function() {
       this.value = this._defaultValue;
+      this.setOnForm();
     },
     /**
      * method: extract the value from the interface and store it here. By
@@ -251,15 +252,20 @@ var Param = function(primary_class, defaultValue, validLower, validUpper, switch
       }
     },
     /**
-     * takes the stored value and sets it on the associated form.
+     * by default takes the stored value and sets it on the associated form.
+     * optionally, provided value v is put in the form
      */
-    setOnForm: function() {
-      console.log(this.value, "!= null || !isNan(" + this.value + "):", (this.value != null || !isNan(this.value)));
-      
-      if (this.value != null || !isNan(this.value)) {
-        this.s().val(this.value);
+    setOnForm: function(v) {
+      if (!v) {
+        console.log(this.value, "!= null || !isNaN(" + this.value + "):", (this.value != null || !isNaN(this.value)));
+        
+        if (this.value != null || !isNaN(this.value)) {
+          this.s().val(this.value);
+        } else {
+          //this.s().val('');
+        }
       } else {
-        this.s().val('');
+         this.s().val(v);
       }
     },
     /**
@@ -333,6 +339,10 @@ var Result = function(dataClass, roundBy, vizClass, vizFunction) {
       if (this._vizClass) {
         console.log("Placeholder for generating a visualization");
       }
+    },
+    reset: function() {
+      this.value = null;
+      this.setOnPage();
     }
   };
   return r;
@@ -527,8 +537,11 @@ var paramControl = {
     // when a form changes (direct user input)
     $('input[type="text"].params').keyup(function(e) {
       console.log(">>> form changed (keyup) <<<");
-      //get/validate values from form
-      onEachParameter();
+      delay(function(){
+        //get/validate values from form
+        onEachParameter();
+      }, 300 );
+      
     });
     
     // when the checkbox changes:
@@ -675,7 +688,7 @@ function logIt() {
  * reset the state of buttons, results window, infoWindow.
  * optional param dictates if drawing info is also removed.
  */
-function resetAnalysis(clearLayers, clearResults, clearParams) {
+function resetAnalysis(clearLayers, clearHydropower) {
   
   // reset the analyze and results buttons to their initial state
   //buttonControl.analyze.reset();
@@ -686,13 +699,9 @@ function resetAnalysis(clearLayers, clearResults, clearParams) {
     drawnItems.clearLayers();
     watershedArea.clearLayers();
   }
-  // empty results modal and reset the hydropower object contents
-  if (clearResults) {
-    paramControl.resetResults();
-  }
-  if (clearParams) {
-    paramControl.resetParams();
-    // reset the params to defaults
+  // rest all params and empty the results
+  if (clearHydropower) {
+    paramControl.reset();
   }
 }
 

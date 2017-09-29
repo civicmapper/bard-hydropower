@@ -139,6 +139,7 @@ var gpControl = {
    * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
    */
   gpElevProfile: function (drawnPolyline) {
+    //Hydropower.params.head.setOnForm('Calculating...');
     var elevProfileService = L.esri.GP.service({
       url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
       useCors: true,
@@ -165,6 +166,7 @@ var gpControl = {
           msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
           console.log(msg, error.details);
           //paramsControl.notifications.addMsg(msg,'danger');
+          Hydropower.params.head.setOnForm();
         } else {
           // messages
           msg = "Elevation Profile: Complete";
@@ -178,6 +180,7 @@ var gpControl = {
     });
   },
   gpWatershed: function(drawnPoint) {
+    //Hydropower.params.area.setOnForm('Calculating...');
     var watershedService = L.esri.GP.service({
       url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
       useCors: true,
@@ -211,6 +214,7 @@ var gpControl = {
           msg = "Watershed: " + error.message + "(code:" + error.code + ")";
           console.log(msg, error.details);
           //paramsControl.notifications.addMsg(msg,'danger');
+          Hydropower.params.area.setOnForm();
         } else {
           // messages
           msg = "Watershed Delineation: Complete";

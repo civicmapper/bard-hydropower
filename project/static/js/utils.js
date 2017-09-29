@@ -2,6 +2,14 @@
  * utils.js
  */
 
+var delay = (function(){
+  var timer = 0;
+  return function(callback, ms){
+    clearTimeout (timer);
+    timer = setTimeout(callback, ms);
+  };
+})();
+
 /**
  * shorthand function for generating status messages in a Bootstrap alert.
  * Provides some default messages. if elementID is spec'd, will automatically
