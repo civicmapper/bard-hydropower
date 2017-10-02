@@ -290,6 +290,8 @@ var Param = function(primary_class, defaultValue, validLower, validUpper, switch
         c = "has-error";
       } else if (validation === "warning") {
         c = "has-warning";
+      } else {
+        resetParamStatus();
       }
       this.s().closest('div', 'form-group').addClass(c);
     },
@@ -623,7 +625,7 @@ var paramControl = {
     $('.results').empty();
   },
   /**
-   * parameter validation alert generation
+   * parameter messages alert generation
    */
   notifications: {
     id: '#params-notification',

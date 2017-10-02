@@ -139,3 +139,14 @@ body {
   background-color: rgb(231, 231, 231);
   color: rgb(75, 75, 75);
 }
+
+.has-feedback .form-control-feedback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+}

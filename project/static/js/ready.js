@@ -32,6 +32,7 @@ $(document).on("ready", function() {
 	// set up the draw control
 	drawControl.initDrawListeners(map);
 	
+	$(".gp-msg").hide();
 	
 	console.log("document is ready");
 	console.log("*****************************");
@@ -42,5 +43,6 @@ $(document).on("ready", function() {
  */
 $(document).on("load", function() {
 	$("#loading").hide();
+	
 	console.log("window is loaded");
 });

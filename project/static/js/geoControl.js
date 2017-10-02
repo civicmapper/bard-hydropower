@@ -139,7 +139,8 @@ var gpControl = {
    * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
    */
   gpElevProfile: function (drawnPolyline) {
-    //Hydropower.params.head.setOnForm('Calculating...');
+    Hydropower.params.head.resetParamStatus();
+    $('#gp-msg-head').fadeIn();
     var elevProfileService = L.esri.GP.service({
       url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
       useCors: true,
@@ -161,6 +162,7 @@ var gpControl = {
       //$('#'+messageControl.messages.elevprofile.id).show();
       // run the task
       elevProfileTask.run(function(error, result, response) {
+        $('#gp-msg-head').fadeOut();
         if (error) {
           // messages
           msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
@@ -180,6 +182,8 @@ var gpControl = {
     });
   },
   gpWatershed: function(drawnPoint) {
+    Hydropower.params.area.resetParamStatus();
+    $('#gp-msg-area').fadeIn();
     //Hydropower.params.area.setOnForm('Calculating...');
     var watershedService = L.esri.GP.service({
       url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
@@ -208,6 +212,7 @@ var gpControl = {
       //messageControl.messages.watershed.addMsg(msg, 'info');
       //$('#'+messageControl.messages.watershed.id).show();
       watershedTask.run(function(error, result, response) {
+        $('#gp-msg-area').fadeOut();
         // show the message window
         if (error) {
           // messages
