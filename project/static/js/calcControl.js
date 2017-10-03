@@ -99,6 +99,31 @@ var buttonControl = {
       });
     }
   },
+  sidebar : {
+    elem: function() {return $('.sidebar-toggle');},
+    onClick: function(){
+      this.elem().click(function(){
+        $("#sidebar").animate({
+            width: "toggle"
+        }, {
+          duration: 200,
+          start: function() {
+            if ($(".sidebar-wrapper").is(":visible")) {
+              $(".sidebar-wrapper").hide();
+            }
+          },
+          done: function() {
+            if (!($(".sidebar-wrapper").is(":visible"))) {
+              $(".sidebar-wrapper").show();              
+            }
+          },
+          always: function() {
+            map.invalidateSize();
+          }
+        });
+      });
+    }
+  },
   init : function() {
     // set buttons to initial states
     this.analyze.reset();
@@ -108,6 +133,7 @@ var buttonControl = {
     this.analyze.onClick();
     this.results.onClick();
     this.reset.onClick();
+    this.sidebar.onClick();
   }
 };
 

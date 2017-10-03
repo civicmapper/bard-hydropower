@@ -43,6 +43,5 @@ $(document).on("ready", function() {
  */
 $(document).on("load", function() {
 	$("#loading").hide();
-	
 	console.log("window is loaded");
 });

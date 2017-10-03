@@ -11,8 +11,6 @@ var map = L.map('map', {
   maxZoom : 22
 })
   .setView([42.0170202, -73.9144284], 18);
-  
-//var sidebar = L.control.sidebar('sidebar').addTo(map);
 
 var layer_streams = L.esri.featureLayer({
   url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7",
@@ -25,13 +23,13 @@ var layer_dams = L.esri.featureLayer({
 /**
   * add a vector map overlay for labeling (vector tiles are not supported
   * with L.esri.webmap natively, so we do it here instead)
-  *
+  */
 L.esri.Vector.basemap('Hybrid').addTo(map);
-*/
+//*/
 
-//L.esri.basemapLayer('Imagery').addTo(map);
-/*
-var webmap = L.esri.webMap('c7bad780627d4175abc7174278f69308', {map: map});
+L.esri.basemapLayer('Imagery').addTo(map);
+
+//var webmap = L.esri.webMap('c7bad780627d4175abc7174278f69308', {map: map});
 
 /**
  * do some things with the layers loads into the webmap object when it's loaded.
@@ -56,4 +54,4 @@ webmap.on('load', function() {
 });
 
 console.log(map.getPanes());
-*/
+//*/
