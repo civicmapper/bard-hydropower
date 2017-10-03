@@ -15,6 +15,11 @@ html {
   overflow-y: scroll;
 }
 
+html, body {
+  line-height: 1.5em;
+  font-stretch: semi-expanded;
+}
+
 a {
   cursor: pointer;
 }
@@ -59,7 +64,7 @@ body {
 
 #sidebar {
   display: block;
-  width: 40%;
+  width: 50%;
   height: 100%;
   max-width: 100%;
   float: left;
@@ -149,4 +154,17 @@ body {
   height: 34px;
   line-height: 34px;
   text-align: center;
+}
+
+.help-draw-icon {
+    /*width: 26px;*/
+    height: 16px;
+    display: inline-block;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px;
+    line-height: inherit;
+}
+
+ol li {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }

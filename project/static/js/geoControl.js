@@ -134,13 +134,16 @@ var gpControl = {
     watershed: {},
     profile: {}
   },
+  reset: function() {
+    this.raw = {watershed: {},profile: {}};
+  },
   /**
    * Elevation Profile geoprocessing service.
    * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
    */
   gpElevProfile: function (drawnPolyline) {
     Hydropower.params.head.resetParamStatus();
-    $('#gp-msg-head').fadeIn();
+    $('.gp-msg-head').fadeIn();
     var elevProfileService = L.esri.GP.service({
       url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
       useCors: true,
@@ -162,7 +165,7 @@ var gpControl = {
       //$('#'+messageControl.messages.elevprofile.id).show();
       // run the task
       elevProfileTask.run(function(error, result, response) {
-        $('#gp-msg-head').fadeOut();
+        $('.gp-msg-head').fadeOut();
         if (error) {
           // messages
           msg = "Elevation Profile: " + error.message + "(code:" + error.code + ")";
@@ -183,7 +186,7 @@ var gpControl = {
   },
   gpWatershed: function(drawnPoint) {
     Hydropower.params.area.resetParamStatus();
-    $('#gp-msg-area').fadeIn();
+    $('.gp-msg-area').fadeIn();
     //Hydropower.params.area.setOnForm('Calculating...');
     var watershedService = L.esri.GP.service({
       url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
@@ -212,7 +215,7 @@ var gpControl = {
       //messageControl.messages.watershed.addMsg(msg, 'info');
       //$('#'+messageControl.messages.watershed.id).show();
       watershedTask.run(function(error, result, response) {
-        $('#gp-msg-area').fadeOut();
+        $('.gp-msg-area').fadeOut();
         // show the message window
         if (error) {
           // messages
@@ -261,11 +264,11 @@ var gpControl = {
    */
   getHead: function(i) {
     var h = this._calcHead(this.raw.profile);
-    console.log("using custom getter: getHead");
+    //console.log("using custom getter: getHead");
     if (h) {
       // set the value (performs validation)
       i.setValue(_round(h,2));
-      console.log(h, i.value);
+      //console.log(h, i.value);
       return i.value;
     } else {
       return false;
@@ -277,11 +280,11 @@ var gpControl = {
   getArea: function(i) {
     // use the helper function to get area from the Esri results
     var a = this._getArea(this.raw.watershed);
-    console.log("using custom getter: getArea");
+    //console.log("using custom getter: getArea");
     if (a) {
       // set the value (performs validation)
       i.setValue(_round(a,2));
-      console.log(a, i.value);
+      //console.log(a, i.value);
       return i.value;
     } else {
       return false;
@@ -292,7 +295,7 @@ var gpControl = {
    */
   _calcHead: function(gpOutputProfile) {
     if (!$.isEmptyObject(gpOutputProfile)) {
-      console.log("Calculating head from", gpOutputProfile);
+      //console.log("Calculating head from", gpOutputProfile);
       // get the first line from the result object
       var line = gpOutputProfile.features[0];
       // get the coords from the line
@@ -303,10 +306,10 @@ var gpControl = {
       // save the difference
       var h = lastZ - firstZ;
       // (consider saving result as ABS value)
-      console.log("Head:", h, "meters");
+      //console.log("Head:", h, "meters");
       return h;
     } else {
-      console.log("no elevation profile has been created");
+      //console.log("no elevation profile has been created");
       return false;
     }
   },
@@ -315,13 +318,13 @@ var gpControl = {
    */
   _getArea: function(gpOutputWatershed) {
     if (!$.isEmptyObject(gpOutputWatershed)) {
-      console.log("Getting area from", gpOutputWatershed);
+      //console.log("Getting area from", gpOutputWatershed);
       // area (as square clicks) is buried in the result object. get it.
       var a = _round(gpOutputWatershed.features[0].properties.AreaSqKm, 2);
-      console.log("Area:", a, "sq. km.");
+      //console.log("Area:", a, "sq. km.");
       return a;
     } else {
-      console.log("no watershed has been delineated");
+      //console.log("no watershed has been delineated");
       return false;
     }
   },

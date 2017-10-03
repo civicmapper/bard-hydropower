@@ -15,8 +15,11 @@ $(document).on("ready", function() {
 		return false;
 	});
 	
-	$('.btn-goToParams').click(function(){
+	$('.btn-goToDrawing').click(function(){
 		$('#tabStep1').trigger('click');
+	});
+	$('.btn-goToParams').click(function(){
+		$('#tabStep2').trigger('click');
 	});
   
   // build the message control init
@@ -32,7 +35,9 @@ $(document).on("ready", function() {
 	// set up the draw control
 	drawControl.initDrawListeners(map);
 	
+	// make sure things are hidden
 	$(".gp-msg").hide();
+	//$("#site-tab-results").hide();
 	
 	console.log("document is ready");
 	console.log("*****************************");
