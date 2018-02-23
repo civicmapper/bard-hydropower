@@ -1,6 +1,6 @@
 # Bard Microydropower Calculator
 
-A simple map-based application for estimating the power potential of micro-hydropower installations.
+A simple map-based application for estimating the power potential of microhydropower installations.
 
 ## Software
 
