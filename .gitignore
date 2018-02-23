@@ -1,22 +1,18 @@
-/project/config.py
+# editor 
+.vscode/
 
+# dependencies
 node_modules/
 
+# caches
 *.pyc
-.DS_Store
-*.psd
+__pycache__
+project/static/.webassets-cache/
 
 # virtualenv directories
 env/
 venv/
 ENV/
 
-# webassets
-project/static/.webassets-cache/
-project/static/bundle.js
-project/static/bundle.css
-
-# komodo project stuff
-.komodotools
-*.komodoproject
-project/test.db
+# project secrets
+/project/config.py
