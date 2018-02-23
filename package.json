@@ -22,7 +22,6 @@
     "esri-leaflet": "^2.1.1",
     "esri-leaflet-vector": "^1.0.7",
     "jquery": "^2.1.4",
-    "leaflet": "^1.2.0",
-    "leaflet-sidebar": "^0.2.0"
+    "leaflet": "^1.2.0"
   }
 }
