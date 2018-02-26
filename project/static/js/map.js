@@ -9,7 +9,7 @@
  */
 var map = L.map("map", {
     maxZoom: 22
-}).setView([42.0170202, -73.9144284], 12);
+}).setView([42.921683, -76.2419582], 7);
 
 var layer_streams = L.esri
     .featureLayer({
