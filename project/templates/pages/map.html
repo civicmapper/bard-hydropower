@@ -134,7 +134,7 @@
                                                 </h3>
                                             </div>
                                             <div class="panel-body">
-                                                <h4><span class="results-head">0</span> <small>Meters</small></h3>
+                                                <h4><span class="results-head">0</span> <small>Feet</small></h3>
                                                     <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
                                             </div>
                                         </div>
@@ -146,7 +146,7 @@
                                                 </h3>
                                             </div>
                                             <div class="panel-body">
-                                                <h4><span class="results-area">0</span> <small>Sq. Km.</small></h4>
+                                                <h4><span class="results-area">0</span> <small>Acres</small></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -186,7 +186,7 @@
                                         <div class="input-group">
                                             <input disabled id="head-form-field" type="text" class="form-control params params-head" aria-describedby="head-form-units" placeholder="Sketch a microhydro installation on the map to derive this parameter">
                                             <span id="gp-msg-head" class="gp-msg gp-msg-head fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
-                                            <span class="input-group-addon" id="head-form-units"><small>Meters</small></span>
+                                            <span class="input-group-addon" id="head-form-units"><small>Feet</small></span>
                                         </div>
                                     </div>
                                 </div>
@@ -200,7 +200,7 @@
                                         <div class="input-group">
                                             <input disabled id="area-form-field" type="text" class="form-control params params-area" aria-describedby="area-form-units" placeholder="Sketch a microhydro installation on the map to derive this parameter">
                                             <span id="gp-msg-area" class="gp-msg gp-msg-area fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
-                                            <span class="input-group-addon" id="area-form-units"><small>Sq. Km.</small></span>
+                                            <span class="input-group-addon" id="area-form-units"><small>Acres</small></span>
                                         </div>
                                     </div>
                                 </div>
@@ -314,7 +314,7 @@
                                 </div>
                                 <div class="panel-body">
                                     <h2>
-                                        <span class="results-head"></span> <small>Meters</small>
+                                        <span class="results-head"></span> <small>Feet</small>
                                         <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
                                     </h2>
                                 </div>
@@ -326,7 +326,7 @@
                                     <h3 class="panel-title">Contributing Area</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h2><span class="results-area"></span> <small>Sq. Km.</small></h2>
+                                    <h2><span class="results-area"></span> <small>Acres</small></h2>
                                 </div>
                             </div>
                         </div>
@@ -340,8 +340,8 @@
                                     <h4 class="panel-title">Constants</h4>
                                 </div>
                                 <ul class="list-group">
-                                    <li class="list-group-item">Environmental Flow: <span class="results-envn results"></span></li>
-                                    <li class="list-group-item">Efficiency: <span class="results-effy results"></span></li>
+                                    <li class="list-group-item">Environmental Flow: <span class="results-envn results"></span> cubic meters per second</li>
+                                    <li class="list-group-item">Efficiency: <span class="results-effy results"></span> %</li>
                                     <li class="list-group-item">Rate: $<span class="results-rate results"></span></li>
                                 </ul>
                             </div>
@@ -379,7 +379,7 @@
 <script src="{{ url_for('static', filename='libs/bootstrap-toggle/bootstrap-toggle.min.js') }}"></script>
 <script src="{{ url_for('static', filename='libs/bootstrap-slider/bootstrap-slider.min.js') }}"></script>
 <!--D3-->
-<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<!-- <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
 <!--LEAFLET-->
 <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
@@ -389,6 +389,9 @@
 <script src="https://unpkg.com/esri-leaflet@2.0.8"></script>
 <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
 <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+<script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.2.8"></script>
+
 
 <!-- ESRI-LEAFLET-WEBMAP
 	<script src="https://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
@@ -404,11 +407,7 @@
 {{ JSGlue.include() }}
 <script>
     // ArcGIS token passed from Flask to javascript (rendered by Jinja2)
-    var arcgis_token = {
-        {
-            arcgis_token | tojson
-        }
-    };
+    var arcgis_token = '{{arcgis_token | tojson}}';
     console.log(arcgis_token);
 </script>
 {% assets "bundle_js" %}

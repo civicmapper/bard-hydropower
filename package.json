@@ -20,6 +20,7 @@
     "bootstrap-slider": "^9.8.1",
     "d3": "^4.10.0",
     "esri-leaflet": "^2.1.1",
+    "esri-leaflet-geocoder": "^2.2.9",
     "esri-leaflet-vector": "^1.0.7",
     "jquery": "^2.1.4",
     "leaflet": "^1.2.0"
