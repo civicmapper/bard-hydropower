@@ -11,24 +11,57 @@ var map = L.map("map", {
     maxZoom: 22
 }).setView([42.921683, -76.2419582], 7);
 
-var layer_streams = L.esri
-    .featureLayer({
-        url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7"
-    })
-    .addTo(map);
+// var layer_streams = L.esri
+//     .featureLayer({
+//         url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/7"
+//     })
+//     .addTo(map);
 
-var layer_dams = L.esri
-    .featureLayer({
-        url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/1"
+// var layer_dams = L.esri
+//     .featureLayer({
+//         url: "https://services.arcgis.com/vT1c5Cjxbz2EbiZw/arcgis/rest/services/BardMicroHydro/FeatureServer/1"
+//     })
+//     .addTo(map);
+
+var basemaps = [
+    L.esri.basemapLayer("Topographic", {
+        label: "Esri Topographic",
+        pane: "tilePane"
+    }),
+    L.esri.basemapLayer("ImageryClarity", {
+        label: "Esri Imagery",
+        pane: "tilePane"
     })
-    .addTo(map);
+];
+
+map.addControl(
+    L.control.basemaps({
+        basemaps: basemaps,
+        tileX: 0, // tile X coordinate
+        tileY: 0, // tile Y coordinate
+        tileZ: 1 // tile zoom level
+    })
+);
 
 /**
- * add a vector map overlay for labeling (vector tiles are not supported
- * with L.esri.webmap natively, so we do it here instead)
+ * add a vector map overlay for labeling. Since vector tiles are not supported
+ * with L.esri.webmap natively, and we're using the Leaflet-Basemaps plugin,
+ * we need to add/remove this overlay via event listener
  */
-L.esri.basemapLayer("Imagery").addTo(map);
-L.esri.Vector.basemap("Hybrid").addTo(map);
+
+var imageryBasemapLabels = L.esri.Vector.basemap("Hybrid", {
+    pane: "overlayPane"
+});
+
+map.on("baselayerchange", function(e) {
+    // console.log(e);
+    if (e.options.label == "Esri Imagery") {
+        imageryBasemapLabels.addTo(map);
+        console.log(imageryBasemapLabels, imageryBasemapLabels.getPane());
+    } else {
+        imageryBasemapLabels.removeFrom(map);
+    }
+});
 
 /**
  * create the geocoder/search widget and supporting L.layerGroup
