@@ -356,6 +356,7 @@ var Result = function(dataClass, roundBy, vizClass, vizFunction) {
             // if there is also a viz class, then call that helper function
             if (this._vizClass) {
                 console.log("Placeholder for generating a visualization");
+                this._vizFunction();
             }
         },
         reset: function() {
@@ -379,7 +380,7 @@ function cgVizHead(i) {
 }
 
 function cgVizArea(i) {
-    gpControl.vizArea(i);
+    gpControl.vizArea();
 }
 
 /**
@@ -414,8 +415,9 @@ var Hydropower = {
     results: {
         powr: new Result(".results-powr", 2, null),
         cost: new Result(".results-cost", 2, null),
-        area: new Result(".results-area", 2, ".results-area-viz", function(i) {
-            cgVizArea(i);
+        area: new Result(".results-area", 2, ".results-area-viz", function() {
+            console.log("results-area-viz");
+            cgVizArea();
         }),
         head: new Result(".results-head", 2, ".results-head-viz", function(i) {
             cgVizHead(i);

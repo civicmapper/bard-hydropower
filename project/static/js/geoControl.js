@@ -194,7 +194,6 @@ var gpControl = {
                     // save the result, applying unit conversion in the process
                     gpControl.setHead(result.OutputProfile, 3.28084);
                     paramControl.onGPComplete();
-                    vizArea;
                 }
             });
         });
@@ -246,7 +245,6 @@ var gpControl = {
                     // save the result
                     // save the result, applying unit conversion in the process
                     gpControl.setArea(result.WatershedArea);
-                    this.vizArea();
                     paramControl.onGPComplete();
                 }
             });
@@ -354,17 +352,17 @@ var gpControl = {
     /**
      * generate a visualization of the elevation profile results
      */
-    vizHead: function(element) {
-        console.log("vizHead", element);
+    vizHead: function() {
+        console.log("vizHead");
     },
     /**
      * generate a visualization of the watershed delineation
      */
     vizArea: function() {
+        console.log("vizArea", this.raw.watershed);
         if (!$.isEmptyObject(this.raw.watershed)) {
-            console.log("vizArea", element);
             watershedArea.clearLayers();
-            watershedArea.addLayer(L.geoJSON(this.raw.watershed.WatershedArea));
+            watershedArea.addLayer(L.geoJSON(this.raw.watershed));
         }
     }
 };
