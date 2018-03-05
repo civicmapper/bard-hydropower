@@ -76,21 +76,31 @@ def get_token():
 # ---------------------------------------------------
 # pages (rendered from templates)
 
-## home page
+# home page
+
+
 @app.route('/home/')
 @app.route('/index/')
 @app.route('/')
 def home():
     #t = get_token()
-    #return render_template('pages/home.html')
+    # return render_template('pages/home.html')
     return redirect(url_for('map'), code=302)
 
-## map view
+# map view
+
+
 @app.route('/map/')
 def map():
     t = get_token()
     session['arcgis_token'] = t['access_token']
-    return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
+    return render_template(
+        'pages/map.html',
+        tokens={
+            "arcgis": session['arcgis_token'],
+            "mapbox": app.config['MAPBOX_ACCESS_TOKEN']
+        }
+    )
     '''
     if 'arcgis_token' not in session:
         t = get_token()
@@ -100,16 +110,21 @@ def map():
         return render_template('pages/map.html', arcgis_token=session['arcgis_token'])
     '''
 
+
 @app.route('/calc/')
 def calc():
     return render_template('pages/calc.html')
-## help
+# help
+
+
 @app.route('/help/')
 def help():
     return redirect(url_for('map'), code=302)
-    #return render_template('pages/help.html')
+    # return render_template('pages/help.html')
 
-## Calculator API
+# Calculator API
+
+
 @app.route('/hydropower/calculator/api')
 def api():
     """
@@ -119,9 +134,9 @@ def api():
     efficiency: efficiency default is 0.7. optional.
     """
 
-    response = {"messages" : []}
+    response = {"messages": []}
     result = {}
-    
+
     try:
         area = float(request.args.get('area'))
         head = float(request.args.get('head'))
@@ -131,46 +146,49 @@ def api():
     except:
         response['messages'].append('Input parameters could not be parsed.')
         status = 400
-    
+
     if ((area and head)):
         result['head'] = head
         result['area'] = area
-        #calculate power
+        # calculate power
         result['q-available'] = area * 1.6
-        #where envflow is a range from 0.1 to 0.5 with default value of 0.3
+        # where envflow is a range from 0.1 to 0.5 with default value of 0.3
         if envflow:
             result['envflow'] = envflow
         else:
             result['envflow'] = 0.3
         result['q-env'] = (result['area'] * result['envflow'])
         result['q-useable'] = result['q-available'] - result['q-env']
-        #where efficiency is a variable with default value 0.7 
+        # where efficiency is a variable with default value 0.7
         if efficiency:
             result['efficiency'] = efficiency
         else:
             result['efficiency'] = 0.7
-        #where rate has a default of $0.10
+        # where rate has a default of $0.10
         if rate:
             result['rate'] = rate
         else:
             result['rate'] = 0.1
-        
+
         #Power in kW
-        p = result['q-useable'] * result['head'] * (0.084) * result['efficiency']
+        p = result['q-useable'] * result['head'] * \
+            (0.084) * result['efficiency']
         result['power'] = round(p, 2)
-        
-        #cost = rate * hours per year * kilowatts
+
+        # cost = rate * hours per year * kilowatts
         c = result['rate'] * 8766 * p
-        
+
         response["status"] = "success"
-        
+
         if head <= 0:
             response["status"] = "warning"
-            response["messages"].append("Head provided was <= 0. The result will be nonsense.")
+            response["messages"].append(
+                "Head provided was <= 0. The result will be nonsense.")
         if area <= 0:
             response["status"] = "warning"
-            response["messages"].append("Area provided was <= 0. The result will be nonsense.")
-            
+            response["messages"].append(
+                "Area provided was <= 0. The result will be nonsense.")
+
         response["messages"].append("The calculation completed successfully.")
         response["result"] = result
         status = 200
@@ -180,7 +198,6 @@ def api():
         response["messages"].append("required parameters were not provided")
         status = 400
 
-        
     # ---------------------------------------------------------------
     # handle the response
     # build the response
@@ -193,25 +210,28 @@ def api():
 # ------------------------------------------------
 # Error Handling
 
-## Error handler 500
+# Error handler 500
 @app.errorhandler(500)
 def internal_error(error):
-    #db_session.rollback()
+    # db_session.rollback()
     return render_template('errors/500.html'), 500
 
-## Error handler 404
+# Error handler 404
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
 
-## Error Logging
+
+# Error Logging
 if not app.debug:
     file_handler = FileHandler('error.log')
     file_handler.setFormatter(
-        Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+        Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
     )
     app.logger.setLevel(logging.INFO)
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
-
