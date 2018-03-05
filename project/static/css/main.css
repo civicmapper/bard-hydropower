@@ -186,6 +186,6 @@ ol li {
     border-radius: 6px !important;
 }
 
-.leaflet-gl-layer .mapboxgl-map {
-    z-index: 250;
+.mapboxgl-map {
+    z-index: 250 !important;
 }

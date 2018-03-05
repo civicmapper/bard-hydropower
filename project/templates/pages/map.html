@@ -383,13 +383,15 @@
 <!--LEAFLET-->
 <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
-<script src="{{ url_for('static', filename='libs/leaflet.control.custom/Leaflet.Control.Custom.js') }}"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
+<!-- <script src="{{ url_for('static', filename='libs/leaflet.control.custom/Leaflet.Control.Custom.js') }}"></script> -->
 <script src="{{ url_for('static', filename='libs/leaflet-basemaps/L.Control.Basemaps-min.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='libs/leaflet-omnivore/leaflet-omnivore.min.js') }}"></script> -->
 <!--ESRI-LEAFLET-->
 <script src="https://unpkg.com/esri-leaflet@2.1.3"></script>
-<script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script>
+<!-- <script src="https://unpkg.com/esri-leaflet-vector@1.0.3"></script> -->
 <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
-<script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script>
+<!-- <script src="https://unpkg.com/esri-leaflet-gp@2.0.1"></script> -->
 <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.8"></script>
 
 
@@ -407,8 +409,13 @@
 {{ JSGlue.include() }}
 <script>
     // ArcGIS token passed from Flask to javascript (rendered by Jinja2)
-    var arcgis_token = '{{arcgis_token | tojson}}';
-    console.log(arcgis_token);
+    var tokens = JSON.parse('{{tokens | tojson}}');
+    console.log(tokens);
+    // geodata served from Flask's static files directory
+    var geodata = {
+        "nysdams": "{{ url_for('static', filename='assets/data/nysdams.geojson') }}"
+    }
+    console.log(geodata.nysdams);
 </script>
 {% assets "bundle_js" %}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
