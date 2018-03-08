@@ -15,4 +15,4 @@ venv/
 ENV/
 
 # project secrets
-/project/config.py
+/app/config.py

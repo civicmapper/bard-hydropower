@@ -1,0 +1,415 @@
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Bard Microhydropower Calculator</title>
+
+    <!-- meta -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- /meta -->
+
+    <link href="{{ url_for('static', filename='css/bundle.core.css') }}" type="text/css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <!-- <link href="{{ url_for('static', filename='libs/bootstrap/theme-bootstrap.min.css') }}" type="text/css" rel="stylesheet"> -->
+    <!-- <link href="{{ url_for('static', filename='libs/bootstrap-toggle/bootstrap-toggle.min.css') }}" type="text/css" rel="stylesheet" /> -->
+    <!-- <link href="{{ url_for('static', filename='libs/bootstrap-slider/bootstrap-slider.min.css') }}" type="text/css" rel="stylesheet" /> -->
+    <!-- Font-Awesome -->
+    <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    <!-- Leaflet -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" /> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" /> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.9/dist/esri-leaflet-geocoder.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css"> -->
+    <!-- <link href="{{ url_for('static', filename='libs/leaflet-basemaps/L.Control.Basemaps.css') }}" type="text/css" rel="stylesheet" /> -->
+    <!-- Application -->
+    <!-- <link href="{{ url_for('static', filename='css/layout.main.css') }}" type="text/css" rel="stylesheet" /> -->
+    <!-- <link href="{{ url_for('static', filename='css/main.css') }}" type="text/css" rel="stylesheet" /> -->
+    <!-- <link href="{{ url_for('static', filename='css/main.responsive.css') }}" type="text/css" rel="stylesheet" /> -->
+
+    <!-- legacy browser support -->
+    <script src="{{ url_for('static', filename='js/support/modernizr-2.8.2.min.js') }}"></script>
+    <!--[if lt IE 9]><script src="{{ url_for('static', filename='js/support/respond-1.4.2.min.js') }}"></script><![endif]-->
+    <!-- /legacy browser support -->
+
+</head>
+
+<body>
+
+    {% include 'layout/nav.html' %}
+
+    <div class="modal" id="aboutModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Bard Microhydropower Calculator</h3>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs nav-justified" id="aboutTabs">
+                        <li class="active">
+                            <a href="#about" data-toggle="tab">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</a>
+                        </li>
+                        <li>
+                            <a href="#help" data-toggle="tab">
+                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
+                        </li>
+                        <li>
+                            <a href="#methods" data-toggle="tab">
+                                <span class="glyphicon glyphicon-book" aria-hidden="true"></span> How It Works</a>
+                        </li>
+
+                    </ul>
+                    <div class="tab-content" id="aboutTabsContent">
+                        <div id="about" class="tab-pane active in">
+                            <p>About the project, terms of use, etc</p>
+                        </div>
+                        <div id="help" class="tab-pane">
+                            <p>How to use the tool</p>
+                        </div>
+                        <div id="methods" class="tab-pane">
+                            <p>How the tools works</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div id="container">
+
+        <div id="sidebar">
+            <div class="sidebar-wrapper">
+
+                <!--TABS-->
+                <ul class="nav nav-tabs nav-justified" id="stepControl">
+                    <li class="active">
+                        <a id="tabStep0" href="#step0" data-toggle="tab">Overview</a>
+                    </li>
+                    <li>
+                        <a id="tabStep1" href="#step1" data-toggle="tab">1. Site</a>
+                    </li>
+                    <li>
+                        <a id="tabStep2" href="#step2" data-toggle="tab">2. Parameters</a>
+                    </li>
+                    <li>
+                        <a id="tabStep3" href="#step3" data-toggle="tab">3. Results</a>
+                    </li>
+                </ul>
+
+                <!--TAB CONTENT-->
+                <div class="tab-content" id="aboutTabsContent">
+
+                    <div id="step0" class="tab-pane active in">
+                        <!--<div id="step0" class="tab-pane">-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h4>Estimate the power generation potential of a micro-hydroelectric turbine installation.</h4>
+                                <h4><small>This calculator will guide you through these steps:</small></h4>
+                                <ol>
+                                    <li><strong>Site Sketch.</strong> Use the map to identify and sketch a potential micro-hydro location. The calculator will automatically generate an elevation profile, estimate head, and delineate the contributing area
+                                        using available topographic data.</li>
+                                    <li><strong>Parameters.</strong> Input calculation coefficients and other assumptions; sensible defaults are provided. Optionally, override the head and area estimates provided in step 1 as needed.</li>
+                                    <li><strong>Results.</strong> View the analysis results.</li>
+                                </ol>
+                                <hr>
+                                <a id="btn-getStarted" class="btn btn-default btn-block btn-lg btn-goToDrawing" role="button" href="#step1">Get Started <i class="fa fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="step1" class="tab-pane">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h4>First, find a location for a potential micro-hydro installation.</h4>
+                                <p>Use the map to the left and the available layers to find locations suitable for microhydro installation. Streams and weir locations are shown to help; switch the basemap from imagery to terrain to get a better sense of
+                                    the topography.
+                                </p>
+                                <hr>
+                                <h4>Then, sketch a conceptual installation.</h4>
+                                <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-draw-polyline" href="#" title="Draw a line."></a></span> Use the draw tool to draw a line from a point downstream (lower elevation)
+                                    to a point upstream (higher elevation) to indicate the potential location of a micro-hydro installation.
+                                    <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-edit" href="#" title="Edit layers."></a></span> Use the edit button to modify your sketch.
+                                    </p>
+                                    <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-remove" href="#" title="Delete layers."></a></span> Use the delete button to delete your sketch.
+                                    </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="site-tab-results">
+                                    <h4>From the map:</h4>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Head <span class="gp-msg gp-msg-head well"><small>Calculating...</small><i class="fa fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Estimating Head...</span></span>
+                                                    </h3>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <h4><span class="results-head">0</span> <small>Feet</small></h3>
+                                                        <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Area <span class="gp-msg gp-msg-area well"><small>Calculating...</small><i class="fa fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Delineating Area...</span></span>
+                                                    </h3>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <h4><span class="results-area">0</span> <small>Sq. Miles</small></h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <a class="btn btn-default btn-block btn-goToParams" role="button" href="#step2">Adjust Parameters <i class="fa fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="step2" class="tab-pane">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <form class="form-horizontal">
+                                    <!-- HEAD & AREA -->
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <h4>Head & Area</h4>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p class="small param-instructions">Optionally, manually enter the Head and/or Area here; indicate with the switch whether you want to use the value from the map or the one you've provided for the calculation.</p>
+                                        </div>
+                                    </div>
+
+                                    <br>
+
+                                    <div class="form-group has-feedback">
+                                        <label class="control-label col-sm-2" for="head-form-field">Head</label>
+                                        <div class="col-sm-3">
+                                            <input id="head-form-check" type="checkbox" data-on="Form" data-off="Map" class="switch params-head" data-toggle="toggle">
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input disabled id="head-form-field" type="text" class="form-control params params-head" aria-describedby="head-form-units" placeholder="Sketch a microhydro installation on the map to derive this parameter">
+                                                <span id="gp-msg-head" class="gp-msg gp-msg-head fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
+                                                <span class="input-group-addon" id="head-form-units"><small>Feet</small></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group has-feedback">
+                                        <label class="control-label col-sm-2" for="area-form-field">Area</label>
+                                        <div class="col-sm-3">
+                                            <input id="area-form-check" type="checkbox" data-on="Form" data-off="Map" class="switch params-area" data-toggle="toggle">
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input disabled id="area-form-field" type="text" class="form-control params params-area" aria-describedby="area-form-units" placeholder="Sketch a microhydro installation on the map to derive this parameter">
+                                                <span id="gp-msg-area" class="gp-msg gp-msg-area fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
+                                                <span class="input-group-addon" id="area-form-units"><small>Sq. Miles</small></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- CONSTANTS  -->
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <h4>Constants</h4>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p class="small param-instructions">Adjust the parameters below, or leave at provided defaults.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-6" for="eff-form-field">Efficiency</label>
+                                                <div class="col-sm-6">
+                                                    <input id="eff-form-field" type="text" class="form-control params params-effy" aria-describedby="eff-form-units" placeholder="default: 0.7" value=0.7>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <input id="eff-param-slider" class="param-slider params" data-slider-id='eff-form-field' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-6" for="env-form-field">Environmental Flow</label>
+                                                <div class="col-sm-6">
+                                                    <input id="env-form-field" type="text" class="form-control params params-envn" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <input id="env-param-slider" class="param-slider params" data-slider-id='env-form-field' type="text" data-slider-min="0" data-slider-max="0.5" data-slider-step="0.01" data-slider-value="0.3" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-3" for="rate-form-field">Cost/KwH</label>
+                                                <div class="col-sm-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon" id="rate-form-units"><small>$</small></span>
+                                                        <input id="rate-form-field" type="text" class="form-control params params-rate" aria-describedby="rate-form-units" placeholder="default: 0.10" value=0.10>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- CALCULATE BUTTON -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <span id="params-msg-status"></span>
+                                <button id="params-analyze-btn" class="btn btn-primary btn-block btn-lg analyze-btn" type="submit">Calculate</button>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <span id="params-notification"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RESULTS TAB -->
+                    <div id="step3" class="tab-pane">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h2 class="panel-title">Power Potential</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <h1><span class="results-powr results"></span> <small>kilowatt hours</small></h1>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h2 class="panel-title">Value</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <h1>$<span class="results-cost results"></span> <small>/ year</small></h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Head</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <h2>
+                                            <span class="results-head"></span> <small>Feet</small>
+                                            <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Contributing Area</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <h2><span class="results-area"></span> <small>Sq. Miles</small></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="panel panel-default">
+                                    <!-- Default panel contents -->
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Constants</h4>
+                                    </div>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Environmental Flow: <span class="results-envn results"></span> cubic feet per second</li>
+                                        <li class="list-group-item">Efficiency: <span class="results-effy results"></span> %</li>
+                                        <li class="list-group-item">Rate: $<span class="results-rate results"></span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-sm-7">
+                                <button class="btn btn-primary btn-block btn-goToParams" type="submit">Adjust Parameters <i class="fa fa-cogs"></i></i></button>
+                            </div>
+                            <div class="col-sm-5">
+                                <button id="reset-btn" class="btn btn-default btn-block reset-btn" type="submit">Start Over <i class="fa fa-rotate-left"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <!--TAB CONTENT-->
+
+            </div>
+            <!--SIDEBAR WRAPPER-->
+        </div>
+        <!--SIDEBAR-->
+
+        <div id="map"></div>
+
+    </div>
+
+    <!--APPLICATION SCRIPTS-->
+    <script>
+        // ArcGIS token passed from Flask to javascript (rendered by Jinja2)
+        var tokens = JSON.parse('{{tokens | tojson}}');
+        console.log(tokens);
+        // geodata served from Flask's static files directory
+        var geodata = {
+                "nysdams": "{{ url_for('static', filename='assets/data/nysdams.geojson') }}"
+            }
+            // console.log(geodata.nysdams);
+    </script>
+    {{ JSGlue.include() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.core.js') }}"></script>
+
+</body>
+
+</html>
