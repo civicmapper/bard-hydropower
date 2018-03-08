@@ -104,7 +104,7 @@ var map = L.map("map", {
  * add layers
  */
 map.addLayer(layer_dams_clusters);
-map.addLayer(watershedArea);
+// map.addLayer(watershedArea);
 map.addLayer(searchResults);
 
 /**
@@ -122,7 +122,11 @@ map.addControl(
 // layer control
 map.addControl(
     L.control
-    .layers({}, { "NYS Dams": layer_dams_clusters, "National Hydrography": layer_streams })
+    .layers({}, {
+        "NYS Dams": layer_dams_clusters,
+        "National Hydrography": layer_streams,
+        "Delineated Watershed": watershedArea
+    })
     .setPosition("bottomright")
 );
 // geocoding conrol
