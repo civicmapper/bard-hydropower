@@ -35,7 +35,9 @@ _to be completed._
 
 * Token
 
-### Quickstart
+### Development Quickstart
+
+_(for editing HTML and Python only)_
 
 To develop this, you must have installed:
 
@@ -44,14 +46,14 @@ To develop this, you must have installed:
 * GulpJS installed (available via `npm`)
 * `git` installed, also available from the command line.
 
-1.  Clone the repository.
+#### 1. Clone the repository.
 
 ```shell
 git clone https://github.com/civicmapper/bard-hydropower
 cd bard-hydropower
 ```
 
-1.  Initialize a Python virtual environment and install Python dependencies with Python `pipenv`:
+#### 2. Initialize a Python virtual environment and install Python dependencies with Python `pipenv`:
 
 If you don't have `pipenv` (and you won't with an out-of-the-box python installation)
 
@@ -67,7 +69,7 @@ pipenv install
 
 ...to install dependencies, and then:
 
-1.  Run a basic development server:
+#### 3. Run a basic development server:
 
 ```shell
 pipenv shell python run.py
@@ -75,15 +77,17 @@ pipenv shell python run.py
 
 Navigate to [http://localhost:5000](http://localhost:5000) to see the site.
 
-Note that this only serves up compiled client-side code built stored with the repository. It does not run the client-side build tasks.
+This is sufficient for modifying `html` in the `app/templates/` folder, or changing any of the python scripts. However, it only serves up pre-compiled client-side code stored under `app/static/`; it does not run the client-side build tasks, so you won't see edits made to code in `src` if you only develop using this method.
 
 You can kill this development server by pressing `ctrl-c` in the command line.
 
-### Client-Side Development
+### Client-Side Development 
+
+_for editing JS, CSS, HTML, and python_ 
 
 (assuming you've installed Python dependencies above)
 
-1.  Install javascript dependencies
+#### 1. Install javascript dependencies
 
 In the repository root:
 
@@ -93,7 +97,7 @@ npm install
 
 This will download and install a whole lot of javascript in a `node_modules` folder.
 
-2.  Run a browser-synced development server
+#### 2. Run a browser-synced development server
 
 ```shell
 gulp watch
@@ -107,7 +111,7 @@ This does a bunch of things:
 * it fires up the Python-Flask application and its development web server for you (runs `pipenv shell python run.py`)
 * it opens up your default browser and loads the page.
 
-3.  Develop and see changes as they happen
+#### 3. Develop and see changes as they happen
 
 With #2 complete, when you change code in the `src` folder, the browser will either:
 
