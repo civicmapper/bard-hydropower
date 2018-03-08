@@ -9,6 +9,7 @@
  * DRAWING
  */
 var convertSQKMtoACRES = 247.105381;
+var convertSQKMtoSQMI = 0.386102;
 var convertMETERStoFEET = 3.280841;
 
 /*******************************************************************************
@@ -192,7 +193,7 @@ var gpControl = {
                     console.log(msg, result);
                     //paramsControl.notifications.addMsg(msg,'success');
                     // save the result, applying unit conversion in the process
-                    gpControl.setHead(result.OutputProfile, 3.28084);
+                    gpControl.setHead(result.OutputProfile, convertMETERStoFEET);
                     paramControl.onGPComplete();
                 }
             });
@@ -244,7 +245,7 @@ var gpControl = {
                     //paramsControl.notifications.addMsg(msg,'success');
                     // save the result
                     // save the result, applying unit conversion in the process
-                    gpControl.setArea(result.WatershedArea);
+                    gpControl.setArea(result.WatershedArea, convertSQKMtoSQMI);
                     paramControl.onGPComplete();
                 }
             });
@@ -272,7 +273,7 @@ var gpControl = {
     setArea: function(gpOutputWatershed, conversion_factor) {
         this.raw.watershed = gpOutputWatershed;
         // use the helper function to get area from the Esri results
-        var w = this._getArea(this.raw.watershed, convertSQKMtoACRES);
+        var w = this._getArea(this.raw.watershed, conversion_factor);
         // apply the converstion factor
         var w2 = w * conversion_factor;
         console.log(w2);
@@ -300,7 +301,7 @@ var gpControl = {
      */
     getArea: function(i) {
         // use the helper function to get area from the Esri results
-        var a = this._getArea(this.raw.watershed, convertSQKMtoACRES);
+        var a = this._getArea(this.raw.watershed, convertSQKMtoSQMI);
         console.log("using custom getter: getArea");
         if (a) {
             // set the value (performs validation)
@@ -342,7 +343,7 @@ var gpControl = {
             // area (as square clicks) is buried in the result object. get it and convert
             var w = gpOutputWatershed.features[0].properties.AreaSqKm;
             // var result = _round(w, 2);
-            console.log("Area:", w, "square kilometers");
+            // console.log("Area:", w, "square kilometers");
             return w * conversion_factor;
         } else {
             //console.log("no watershed has been delineated");

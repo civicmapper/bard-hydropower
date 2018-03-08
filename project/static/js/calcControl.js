@@ -429,7 +429,14 @@ var Hydropower = {
     /**
      * client-side hydropower calculation
      */
-    calculatePower: function(area, head, envflow, efficiency, rate) {
+    calculatePower: function(
+            area,
+            head,
+            envflow,
+            efficiency,
+            rate,
+            watershedYield
+        ) {
             var validation = [];
             // if params are provided, overwrite any existing ones
             if (area) {
@@ -457,19 +464,26 @@ var Hydropower = {
             } else {
                 validation.push(true);
             }
+            // default watershed yield value (not a parameter currently)
+            var y = 1.6;
+            if (watershedYield) {
+                y = watershedYield;
+            }
 
             // if parameters validate (this addresses validation for those explicitly
             // provided), then run the calculation
             if (validation.indexOf(false) == -1) {
                 var _int = {};
                 // Calculate power from stored parameters
-                _int.qAvailable = this.params.area.value * 1.6;
+                _int.qAvailable = this.params.area.value * y;
                 _int.qEnv = this.params.area.value * this.params.envn.value;
                 _int.qUseable = _int.qAvailable - _int.qEnv;
                 //console.log(_int);
                 // Power in kW
                 var p =
-                    _int.qUseable * this.params.head.value * 0.084 * this.params.effy.value;
+                    _int.qUseable *
+                    (this.params.head.value / 11.8) *
+                    this.params.effy.value;
                 // Cost = rate * hours per year * kilowatts
                 var c = this.params.rate.value * 8766 * p;
                 console.log("power:", p, " $$$:", c);
