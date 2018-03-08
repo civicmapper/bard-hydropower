@@ -1,7 +1,3 @@
-#----------------------------------------------------------------------------#
-# APP CONFIGURATION
-#----------------------------------------------------------------------------#
-
 # standard library imports
 
 import os
@@ -15,7 +11,7 @@ import requests
 import pdb
 
 #----------------------------------------------------------------------------
-# APPLICATION CONFIG
+# APPLICATION SETUP
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')

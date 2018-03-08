@@ -1,23 +1,14 @@
 # project/_config.py
-
-import os
-from datetime import timedelta
-
-# Grabs the folder where the script runs.
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-# Enable debug mode.
+# Enable debug mode. Be sure to set this to false for production!
 DEBUG = True
 
-# Secret key for session management.
+# Secret key for session management. Make sure this is long and very random.
 SECRET_KEY = ""
 
-# Session lifetime (matches lifetime of Esri tokens)
-# PERMANENT_SESSION_LIFETIME = timedelta(seconds=3600)
-
-# ESRI IDs for accessing premium AGOL services (elevation and hydrology)
+# ESRI IDs for accessing premium AGOL services (elevation and hydrology).
+# Get this by registering an application with from developers.arcgis.com.
 ESRI_APP_CLIENT_ID = ''
 ESRI_APP_CLIENT_SECRET = ''
 
-# MAPBOX Token for better custom basemaps
+# MAPBOX Token for custom basemaps. Get this from www.mapbox.com.
 MAPBOX_ACCESS_TOKEN = ""
