@@ -1,31 +1,57 @@
 {
-  "name": "bard-hydropower",
-  "version": "0.3.0",
-  "description": "*under development*",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/civicmapper/bard-hydropower.git"
-  },
-  "author": "CivicMapper",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/civicmapper/bard-hydropower/issues"
-  },
-  "homepage": "https://github.com/civicmapper/bard-hydropower#readme",
-  "dependencies": {
-    "@mapbox/leaflet-omnivore": "^0.3.4",
-    "bootstrap-slider": "^9.8.1",
-    "d3": "^4.10.0",
-    "esri-leaflet": "^2.1.1",
-    "esri-leaflet-geocoder": "^2.2.9",
-    "esri-leaflet-vector": "^1.0.7",
-    "jquery": "^2.1.4",
-    "leaflet": "^1.2.0",
-    "leaflet-basemaps": "^0.2.3",
-    "leaflet-omnivore": "^0.3.4"
-  }
+    "name": "bard-hydropower",
+    "version": "0.3.0",
+    "description": "*under development*",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/civicmapper/bard-hydropower.git"
+    },
+    "author": "CivicMapper",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/civicmapper/bard-hydropower/issues"
+    },
+    "homepage": "https://github.com/civicmapper/bard-hydropower#readme",
+    "devDependencies": {
+        "browser-sync": "^2.23.5",
+        "browserify": "^15.2.0",
+        "envify": "^4.1.0",
+        "eslint": "^4.16.0",
+        "eslint-config-standard": "^11.0.0-beta.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-node": "^5.2.1",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "gulp": "github:gulpjs/gulp#71c094a51c7972d26f557899ddecab0210ef3776",
+        "gulp-clean-css": "^3.9.2",
+        "gulp-cli": "^2.0.1",
+        "gulp-concat": "^2.6.1",
+        "gulp-load-plugins": "^1.5.0",
+        "gulp-sourcemaps": "^1.12.1",
+        "gulp-uglify": "^3.0.0",
+        "gulp-util": "^3.0.8",
+        "vinyl-buffer": "^1.0.1",
+        "vinyl-source-stream": "^2.0.0",
+        "vueify": "^9.4.1",
+        "watchify": "^3.9.0"
+    },
+    "dependencies": {
+        "bootstrap": "^3.3.7",
+        "bootstrap-slider": "^9.8.1",
+        "bootstrap-toggle": "^2.2.2",
+        "esri-leaflet": "^2.1.3",
+        "esri-leaflet-geocoder": "^2.2.9",
+        "esri-leaflet-gp": "^2.0.3",
+        "font-awesome": "^4.7.0",
+        "jquery": "^3.0.0",
+        "leaflet": "^1.3.1",
+        "leaflet-basemaps": "^0.2.3",
+        "leaflet-draw": "^1.0.2",
+        "leaflet-omnivore": "^0.3.4",
+        "leaflet.markercluster": "^1.3.0"
+    }
 }
