@@ -1,4 +1,6 @@
 # Bard Microydropower Calculator
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcivicmapper%2Fbard-hydropower.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcivicmapper%2Fbard-hydropower?ref=badge_shield)
+
 
 A map-based application for estimating the power potential of microhydropower installations. 
 
@@ -143,3 +145,7 @@ As of this writing, AWS Elastic Beanstalk supports Python 3.4.
 ## Credits
 
 Application by Christian Gass @ CivicMapper.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcivicmapper%2Fbard-hydropower.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcivicmapper%2Fbard-hydropower?ref=badge_large)
