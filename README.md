@@ -39,7 +39,7 @@ _to be completed._
 
 ### Development Quickstart
 
-_(for editing HTML and Python only)_
+_(for editing HTML and Python only)._
 
 To develop this, you must have installed:
 
@@ -48,14 +48,14 @@ To develop this, you must have installed:
 * GulpJS installed (available via `npm`)
 * `git` installed, also available from the command line.
 
-#### 1. Clone the repository.
+#### 1. Clone the repository
 
 ```shell
 git clone https://github.com/civicmapper/bard-hydropower
 cd bard-hydropower
 ```
 
-#### 2. Initialize a Python virtual environment and install Python dependencies with Python `pipenv`:
+#### 2. Initialize a Python virtual environment and install Python dependencies with Python `pipenv`
 
 If you don't have `pipenv` (and you won't with an out-of-the-box python installation)
 
@@ -71,7 +71,7 @@ pipenv install
 
 ...to install dependencies, and then:
 
-#### 3. Run a basic development server:
+#### 3. Run a basic development server
 
 ```shell
 pipenv shell python run.py
@@ -83,9 +83,9 @@ This is sufficient for modifying `html` in the `app/templates/` folder, or chang
 
 You can kill this development server by pressing `ctrl-c` in the command line.
 
-### Client-Side Development 
+### Client-Side Development
 
-_for editing JS, CSS, HTML, and python_ 
+_for editing JS, CSS, HTML, and python._
 
 (assuming you've installed Python dependencies above)
 
