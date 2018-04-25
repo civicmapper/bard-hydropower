@@ -230,7 +230,7 @@ var gpControl = {
             //watershedTask.setOutputParam("SnappedPoints");
             //watershedTask.gpAsyncResultParam("SnappedPoints", outputSnappedPoints);
 
-            msg = "Delineating the upstream contributing area...";
+            var msg = "Delineating the upstream contributing area...";
             console.log(msg);
             //messageControl.messages.watershed.addMsg(msg, 'info');
             //jQuery('#'+messageControl.messages.watershed.id).show();

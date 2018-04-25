@@ -464,7 +464,14 @@ var Hydropower = {
         ),
         effy: new Param('input[type="text"].params-effy', 0.7, 0, 1, null, false),
         envn: new Param('input[type="text"].params-envn', 0.3, 0, 0.5, null, false),
-        rate: new Param('input[type="text"].params-rate', 0.1, 0, 0.1, null, false)
+        rate: new Param(
+            'input[type="text"].params-rate',
+            0.1,
+            0,
+            100000000,
+            null,
+            false
+        )
     },
     results: {
         powr: new Result(".results-powr", 2, null),
@@ -610,10 +617,11 @@ var paramControl = {
      */
     onEachParameter: function() {
         //console.log("*********** Parameters");
+        // console.log(this);
 
         var validation = [];
 
-        readyToCalc = this.readyToCalc;
+        var readyToCalc = paramControl.readyToCalc;
 
         jQuery.each(Hydropower.params, function(k, p) {
             console.log("----", k, "----");
@@ -672,7 +680,7 @@ var paramControl = {
         // when a form changes (direct user input)
         jQuery('input[type="text"].params').keyup(function(e) {
             //console.log(">>> form changed (keyup) <<<");
-            delay(function() {
+            setTimeout(function() {
                 //get/validate values from form
                 onEachParameter();
             }, 300);
