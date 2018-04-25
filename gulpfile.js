@@ -4,7 +4,7 @@ var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var cleanCss = require("gulp-clean-css");
 var sourcemaps = require("gulp-sourcemaps");
-// var babelify = require("babelify");
+var babelify = require("babelify");
 var browserify = require("browserify");
 var watchify = require("watchify");
 var source = require("vinyl-source-stream");
@@ -64,8 +64,7 @@ var bundlingConfigs = Object.keys(bundles);
  */
 bundlingConfigs.forEach(function(bundleName) {
     gulp.task("scripts:" + bundleName, function() {
-        return (
-            browserify({
+        return browserify({
                 basedir: ".",
                 insertGlobalVars: {
                     $: function(file, dir) {
@@ -80,10 +79,10 @@ bundlingConfigs.forEach(function(bundleName) {
                     // cache: {},
                     // packageCache: {}
             })
-            // .transform('babelify', {
-            //     presets: ['es2015'],
-            //     extensions: ['.js']
-            // })
+            .transform("babelify", {
+                presets: ["env"],
+                extensions: [".js"]
+            })
             .transform(
                 // Required in order to process node_modules files
                 {
@@ -96,16 +95,15 @@ bundlingConfigs.forEach(function(bundleName) {
             .bundle()
             .pipe(source(bundles[bundleName].js.dist.file))
             .pipe(buffer())
-            // .pipe(sourcemaps.init({ loadMaps: true }))
-            // .pipe(uglify())
+            .pipe(sourcemaps.init({ loadMaps: true }))
+            .pipe(uglify())
             .pipe(sourcemaps.write("./"))
             .pipe(gulp.dest(bundles[bundleName].js.dist.path))
             .pipe(
                 browserSync.reload({
                     stream: true
                 })
-            )
-        );
+            );
     });
 });
 
