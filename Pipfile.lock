@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1ac98459c6945bf3d6643c478852a926dc9f8cd0ccd45b457583c274fa2171ba"
+            "sha256": "5a14ee047f683f4fcbfe2871d2b568365a85e0f99f6fec156998627a6e4a86a7"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -181,6 +181,12 @@
             ],
             "version": "==0.4.0"
         },
+        "flask-markdown": {
+            "hashes": [
+                "sha256:d8c3f02545b395ad525b86760ad721a2c50efa3b8e602a8d486a1f47f68c6250"
+            ],
+            "version": "==0.3"
+        },
         "flask-sqlalchemy": {
             "hashes": [
                 "sha256:7f0e218fa9066b34b73fdc470386a37ee117b8a862db98c1bca8236d8cffe7a1"
@@ -218,6 +224,13 @@
                 "sha256:b6df99b2cd1c75d9d342e4335b535789b8da9107ec748212706ef7bbe5c2553b"
             ],
             "version": "==2.2.2"
+        },
+        "markdown": {
+            "hashes": [
+                "sha256:9ba587db9daee7ec761cfc656272be6aabe2ed300fece21208e4aab2e457bc8f",
+                "sha256:a856869c7ff079ad84a3e19cd87a64998350c2b94e9e08e44270faef33400f81"
+            ],
+            "version": "==2.6.11"
         },
         "markupsafe": {
             "hashes": [

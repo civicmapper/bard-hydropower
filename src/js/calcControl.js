@@ -122,7 +122,7 @@ var buttonControl = {
             this.elem().click(function() {
                 resetAnalysis(true, true);
                 paramControl.readyToCalc();
-                jQuery("#tabStep0").trigger("click");
+                jQuery("#tabStep1").trigger("click");
             });
         }
     },

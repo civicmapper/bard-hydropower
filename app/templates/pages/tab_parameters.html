@@ -1,5 +1,10 @@
 <div class="row">
     <div class="col-sm-12">
+        <h3>Adjust Parameters</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
         <form class="form-horizontal">
             <!-- HEAD & AREA -->
             <div class="row">
@@ -7,39 +12,39 @@
                     <h4>Head & Area</h4>
                 </div>
                 <div class="col-sm-9">
-                    <p class="small param-instructions">Optionally, manually enter the Head and/or Area here; indicate with the switch whether you want to use the value from the map or the one you've provided for the calculation.</p>
+                    <p class="param-instructions">Optionally, you can manually enter or override calculated values for the Head and/or Area here. To override and enter values yourself, flick the switch.</p>
                 </div>
             </div>
 
             <br>
 
             <div class="form-group has-feedback">
-                <label class="control-label col-sm-2" for="head-form-field">Head</label>
+                <label class="control-label col-sm-3" for="head-form-field">Head</label>
                 <div class="col-sm-5">
                     <div class="input-group">
                         <input disabled id="head-form-field" type="text" class="form-control params params-head" aria-describedby="head-form-units">
                         <span id="gp-msg-head" class="gp-msg gp-msg-head fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
                         <span class="input-group-addon" id="head-form-units"><small>Feet</small></span>
                     </div>
-                </div>                
-                
-                <div class="col-sm-5">
+                </div>
+
+                <div class="col-sm-4">
                     <input id="head-form-check" type="checkbox" class="switch params-head">
                 </div>
 
             </div>
 
             <div class="form-group has-feedback">
-                <label class="control-label col-sm-2" for="area-form-field">Area</label>
+                <label class="control-label col-sm-3" for="area-form-field">Area</label>
                 <div class="col-sm-5">
                     <div class="input-group">
                         <input disabled id="area-form-field" type="text" class="form-control params params-area" aria-describedby="area-form-units">
                         <span id="gp-msg-area" class="gp-msg gp-msg-area fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
                         <span class="input-group-addon" id="area-form-units"><small>Sq. Miles</small></span>
                     </div>
-                </div>                
-                
-                <div class="col-sm-5">
+                </div>
+
+                <div class="col-sm-4">
                     <input id="area-form-check" type="checkbox" class="switch params-area">
                 </div>
 
@@ -53,7 +58,7 @@
                     <h4>Constants</h4>
                 </div>
                 <div class="col-sm-9">
-                    <p class="small param-instructions">Adjust the parameters below, or leave at provided defaults.</p>
+                    <p class="param-instructions">Adjust the parameters below, or leave at provided defaults.</p>
                 </div>
             </div>
 

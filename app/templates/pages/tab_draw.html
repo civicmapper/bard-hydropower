@@ -1,22 +1,22 @@
 <div class="row">
     <div class="col-sm-12">
-        <h4>First, find a location for a potential micro-hydro installation.</h4>
-        <p>Use the map to the left and the available layers to find locations suitable for microhydro installation. Streams and weir locations are shown to help; switch the basemap from imagery to terrain to get a better sense of the topography.
+        <h3>Find a location for a potential micro-hydro installation.</h3>
+        <p>Use the map to the right, the search tool, and the available layers to find locations suitable for microhydro installation. Streams and weir locations are available as map layers. Switch the basemap between several available imagery and topographic
+            to get a better sense of the land.
         </p>
-        <h4>Then, sketch a conceptual installation.</h4>
-        <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-draw-polyline" href="#" title="Draw a line."></a></span> Use the draw tool to draw a line from a point downstream (lower elevation) to a point upstream
+        <h3>Sketch a conceptual installation.</h3>
+        <p><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-draw-polyline" href="#" title="Draw a line."></a></span> Use the draw tool to draw a line from a point downstream (lower elevation) to a point upstream
             (higher elevation) to indicate the potential location of a micro-hydro installation.
-            <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-edit" href="#" title="Edit layers."></a></span> Use the edit button to modify your sketch.
+            <p><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-edit" href="#" title="Edit layers."></a></span> Use the edit button to modify your sketch.
             </p>
-            <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-remove" href="#" title="Delete layers."></a></span> Use the delete button to delete your sketch.
+            <p><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-remove" href="#" title="Delete layers."></a></span> Use the delete button to delete your sketch.
             </p>
     </div>
 </div>
-<hr>
 <div class="row">
     <div class="col-sm-12">
         <div id="site-tab-results">
-            <h4>From the map:</h4>
+            <h4>Estimated from your sketch:</h4>
             <div class="row">
                 <div class="col-sm-6">
                     <div class="panel panel-default">
@@ -45,6 +45,12 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-sm-12">
+        <button id="reset-btn" class="btn btn-secondary btn-block btn-sm reset-btn" type="submit">Clear sketch <i class="fa fa-rotate-left"></i></button>
+    </div>
+</div>
+<hr>
 <div class="row">
     <div class="col-sm-12">
         <button class="btn btn-primary btn-block btn-goToParams" type="submit">Adjust Parameters <i class="fa fa-arrow-circle-right"></i></button>
