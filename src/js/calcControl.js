@@ -40,7 +40,7 @@ function makeAlert(msg, alertType, elementID) {
     var div1 = '<div class="alert alert-' + alertType + '" role="alert">';
     var div2 = "</div>";
     if (msg) {
-        console.log(msg);
+        // console.log(msg);
         alert = div1 + close + msg + div2;
     } else {
         alert = div1 + defaultMsg + div2;
@@ -237,7 +237,7 @@ var Param = function(
             if (i) {
                 this.value = parseFloat(i);
                 var validation = this.validate();
-                console.log(i, validation);
+                // console.log(i, validation);
                 return validation;
             } else {
                 return false;
@@ -404,12 +404,12 @@ var Result = function(dataClass, roundBy, vizClass, vizFunction) {
             }
 
             // set the data value on the page
-            console.log(this._dataClass, r);
+            // console.log(this._dataClass, r);
             this.domElement().html(r);
 
             // if there is also a viz class, then call that helper function
             if (this._vizClass) {
-                console.log("Placeholder for generating a visualization");
+                // console.log("Placeholder for generating a visualization");
                 this._vizFunction();
             }
         },
@@ -477,7 +477,7 @@ var Hydropower = {
         powr: new Result(".results-powr", 2, null),
         cost: new Result(".results-cost", 2, null),
         area: new Result(".results-area", 2, ".results-area-viz", function() {
-            console.log("results-area-viz");
+            // console.log("results-area-viz");
             cgVizArea();
         }),
         head: new Result(".results-head", 2, ".results-head-viz", function(i) {
@@ -547,7 +547,7 @@ var Hydropower = {
                     this.params.effy.value;
                 // Cost = rate * hours per year * kilowatts
                 var c = this.params.rate.value * 8766 * p;
-                console.log("power:", p, " $$$:", c);
+                // console.log("power:", p, " $$$:", c);
                 this.results.powr.value = p;
                 this.results.cost.value = c;
                 // success
@@ -621,10 +621,10 @@ var paramControl = {
 
         var validation = [];
 
-        var readyToCalc = paramControl.readyToCalc;
+        var rtc = paramControl.readyToCalc;
 
         jQuery.each(Hydropower.params, function(k, p) {
-            console.log("----", k, "----");
+            // console.log("----", k, "----");
 
             // load params from form to hp object and run validation
             var v = p.getFromForm();
@@ -632,8 +632,8 @@ var paramControl = {
             // set UI feedback based on validation results
             p.setParamStatus(v);
 
-            console.log("value =", p.value);
-            console.log("valid?", p.validate());
+            // console.log("value =", p.value);
+            // console.log("valid?", p.validate());
         });
 
         //return whether all forms have validated
@@ -641,16 +641,16 @@ var paramControl = {
         //console.log(">>> validation",validation);
 
         if (validation.indexOf(false) == -1) {
-            readyToCalc(true);
+            rtc(true);
         } else {
-            readyToCalc(false);
+            rtc(false);
         }
 
         //console.log(Hydropower);
         //console.log("***********");
     },
     onEachResult: function() {
-        console.log("*********** Parameters");
+        // console.log("*********** Parameters");
         jQuery.each(Hydropower.results, function(k, r) {
             //console.log("----", k, "----");
             // if there is a corresponding result for the params, copy it over.
@@ -707,16 +707,16 @@ var paramControl = {
         // get state of checkbox and enable/disable the form accordingly
         if (jQuery(i).prop("checked")) {
             form.prop("disabled", false);
-            form.prop(
-                "placeholder",
-                "Enter value here to override the map-derived value"
-            );
+            // form.prop(
+            //     "placeholder",
+            //     "Enter value here to override the map-derived value"
+            // );
         } else {
             form.prop("disabled", true);
-            form.prop(
-                "placeholder",
-                "Sketch a microhydro installation on the map to derive this parameter"
-            );
+            // form.prop(
+            //     "placeholder",
+            //     "Sketch a microhydro installation on the map to derive this parameter"
+            // );
 
             // if disabling, also remove the status
             //paramControl.resetParamStatus('#'+form.attr("id"));
@@ -798,11 +798,12 @@ var paramControl = {
     init: function() {
         // Initialize the custom switches and forms
         // switches
-        jQuery('input[type="checkbox"].params').bootstrapToggle({
-            on: '<i class="fa fa-arrow-right"></i>',
-            off: "Map",
+        jQuery('input[type="checkbox"].switch').bootstrapToggle({
+            on: "<small><i class='fa fa-arrow-left'></i> Override</small>",
+            off: "<small>Use Values From Map</small>",
             onstyle: "default",
-            offstyle: "primary"
+            offstyle: "primary",
+            size: "normal"
         });
         // sliders
         jQuery(".param-slider").slider({
@@ -867,7 +868,7 @@ function resetAnalysis(clearLayers, clearHydropower) {
  *
  */
 function calculationController(autoTab) {
-    console.log(">>> Calculation Controller <<<");
+    // console.log(">>> Calculation Controller <<<");
 
     var success = Hydropower.calculatePower();
     if (success) {

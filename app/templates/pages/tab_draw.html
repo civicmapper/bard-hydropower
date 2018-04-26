@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-sm-12">
+        <h4>First, find a location for a potential micro-hydro installation.</h4>
+        <p>Use the map to the left and the available layers to find locations suitable for microhydro installation. Streams and weir locations are shown to help; switch the basemap from imagery to terrain to get a better sense of the topography.
+        </p>
+        <h4>Then, sketch a conceptual installation.</h4>
+        <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-draw-polyline" href="#" title="Draw a line."></a></span> Use the draw tool to draw a line from a point downstream (lower elevation) to a point upstream
+            (higher elevation) to indicate the potential location of a micro-hydro installation.
+            <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-edit" href="#" title="Edit layers."></a></span> Use the edit button to modify your sketch.
+            </p>
+            <p class="small"><span class="leaflet-draw-toolbar leaflet-bar help-draw-icon"><a disabled class="leaflet-draw-edit-remove" href="#" title="Delete layers."></a></span> Use the delete button to delete your sketch.
+            </p>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="site-tab-results">
+            <h4>From the map:</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Head <span class="gp-msg gp-msg-head well"><small>Calculating...</small><i class="fa fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Estimating Head...</span></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <h4><span class="results-head">0</span> <small>Feet</small></h3>
+                                <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Area <span class="gp-msg gp-msg-area well"><small>Calculating...</small><i class="fa fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Delineating Area...</span></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <h4><span class="results-area">0</span> <small>Sq. Miles</small></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <button class="btn btn-primary btn-block btn-goToParams" type="submit">Adjust Parameters <i class="fa fa-arrow-circle-right"></i></button>
+    </div>
+</div>

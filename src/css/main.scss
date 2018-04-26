@@ -60,7 +60,7 @@ body,
 }
 
 body {
-    padding-top: 40px;
+    padding-top: 50px;
 }
 
 #map {
@@ -142,7 +142,7 @@ input[type="checkbox"] {
 
 .navbar-header .navbar-icon {
     line-height: 50px;
-    height: 50px;
+    height: 60px;
 }
 
 .navbar-header a.navbar-icon {
@@ -195,4 +195,16 @@ ol li {
 
 .mapboxgl-map {
     z-index: 250 !important;
+}
+
+// .toggle-label {
+//     line-height: 1em;
+// }
+label.btn {
+    line-height: 1em;
+}
+
+.toggle {
+    width: 100% !important;
+    height: 43px !important;
 }

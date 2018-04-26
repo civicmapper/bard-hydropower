@@ -41,6 +41,7 @@ map.addControl(
             rectangle: false,
             circle: false,
             marker: false,
+            circlemarker: false,
             polyline: {
                 allowIntersection: true,
                 guidelineDistance: 10,
@@ -265,7 +266,7 @@ var gpControl = {
         // use the helper function to calc head from the Esri results
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
         // apply the converstion factor
-        var h2 = h * conversion_factor;
+        var h2 = Math.abs(h * conversion_factor);
         console.log(h2);
         // set the value (performs validation)
         Hydropower.params.head.setValue(utils._round(h2, 2));
@@ -291,7 +292,7 @@ var gpControl = {
      */
     getHead: function(i) {
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
-        console.log("using custom getter: getHead");
+        // console.log("using custom getter: getHead");
         if (h) {
             // set the value (performs validation)
             i.setValue(utils._round(h, 2));
@@ -307,7 +308,7 @@ var gpControl = {
     getArea: function(i) {
         // use the helper function to get area from the Esri results
         var a = this._getArea(this.raw.watershed, convertSQKMtoSQMI);
-        console.log("using custom getter: getArea");
+        // console.log("using custom getter: getArea");
         if (a) {
             // set the value (performs validation)
             i.setValue(utils._round(a, 2));

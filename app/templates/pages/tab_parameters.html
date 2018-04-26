@@ -1,0 +1,120 @@
+<div class="row">
+    <div class="col-sm-12">
+        <form class="form-horizontal">
+            <!-- HEAD & AREA -->
+            <div class="row">
+                <div class="col-sm-3">
+                    <h4>Head & Area</h4>
+                </div>
+                <div class="col-sm-9">
+                    <p class="small param-instructions">Optionally, manually enter the Head and/or Area here; indicate with the switch whether you want to use the value from the map or the one you've provided for the calculation.</p>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="form-group has-feedback">
+                <label class="control-label col-sm-2" for="head-form-field">Head</label>
+                <div class="col-sm-5">
+                    <div class="input-group">
+                        <input disabled id="head-form-field" type="text" class="form-control params params-head" aria-describedby="head-form-units">
+                        <span id="gp-msg-head" class="gp-msg gp-msg-head fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
+                        <span class="input-group-addon" id="head-form-units"><small>Feet</small></span>
+                    </div>
+                </div>                
+                
+                <div class="col-sm-5">
+                    <input id="head-form-check" type="checkbox" class="switch params-head">
+                </div>
+
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="control-label col-sm-2" for="area-form-field">Area</label>
+                <div class="col-sm-5">
+                    <div class="input-group">
+                        <input disabled id="area-form-field" type="text" class="form-control params params-area" aria-describedby="area-form-units">
+                        <span id="gp-msg-area" class="gp-msg gp-msg-area fa fa-2x fa-cog fa-spin fa-fw form-control-feedback"></span>
+                        <span class="input-group-addon" id="area-form-units"><small>Sq. Miles</small></span>
+                    </div>
+                </div>                
+                
+                <div class="col-sm-5">
+                    <input id="area-form-check" type="checkbox" class="switch params-area">
+                </div>
+
+            </div>
+
+            <hr>
+
+            <!-- CONSTANTS  -->
+            <div class="row">
+                <div class="col-sm-3">
+                    <h4>Constants</h4>
+                </div>
+                <div class="col-sm-9">
+                    <p class="small param-instructions">Adjust the parameters below, or leave at provided defaults.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-6" for="eff-form-field">Efficiency</label>
+                        <div class="col-sm-6">
+                            <input id="eff-form-field" type="text" class="form-control params params-effy" aria-describedby="eff-form-units" placeholder="default: 0.7" value=0.7>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <input id="eff-param-slider" class="param-slider params" data-slider-id='eff-form-field' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-6" for="env-form-field">Environmental Flow</label>
+                        <div class="col-sm-6">
+                            <input id="env-form-field" type="text" class="form-control params params-envn" aria-describedby="env-form-units" placeholder="default: 0.3" value=0.3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <input id="env-param-slider" class="param-slider params" data-slider-id='env-form-field' type="text" data-slider-min="0" data-slider-max="0.5" data-slider-step="0.01" data-slider-value="0.3" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="rate-form-field">Cost/KwH</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="rate-form-units"><small>$</small></span>
+                                <input id="rate-form-field" type="text" class="form-control params params-rate" aria-describedby="rate-form-units" placeholder="default: 0.10" value=0.10>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<hr>
+
+<!-- CALCULATE BUTTON -->
+<div class="row">
+    <div class="col-sm-12">
+        <span id="params-msg-status"></span>
+        <button id="params-analyze-btn" class="btn btn-primary btn-block btn-lg analyze-btn" type="submit">Calculate</button>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-sm-12">
+        <span id="params-notification"></span>
+    </div>
+</div>
