@@ -861,6 +861,7 @@ function resetAnalysis(clearLayers, clearHydropower) {
         paramControl.reset();
     }
 }
+global.resetAnalysis = resetAnalysis;
 
 /**
  * calculationController: called from the Calculate Button. Talks to Hydropower
