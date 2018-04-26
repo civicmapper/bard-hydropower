@@ -2,6 +2,7 @@
 
 A map-based application for estimating the power potential of microhydropower installations.
 
+
 Built as a demonstration project in collaboration with [Bard College](http://www.bard.edu/) and [Current Hydro](http://www.currenthydro.com/).
 
 ## Architecture Overview
