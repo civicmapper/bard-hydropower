@@ -7,15 +7,19 @@ from logging import Formatter, FileHandler
 # dependencies
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
 from flask_jsglue import JSGlue
+from flaskext.markdown import Markdown
 import requests
-import pdb
+# import pdb
 
 #----------------------------------------------------------------------------
 # APPLICATION SETUP
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+# add JSGlue plugin
 jsglue = JSGlue(app)
+# add Markdown plugin
+Markdown(app)
 
 #----------------------------------------------------------------------------
 # HELPERS

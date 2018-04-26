@@ -41,6 +41,7 @@ map.addControl(
             rectangle: false,
             circle: false,
             marker: false,
+            circlemarker: false,
             polyline: {
                 allowIntersection: true,
                 guidelineDistance: 10,
@@ -89,6 +90,9 @@ var drawControl = {
      * GP inputs
      */
     getPointsForGP: function(layer) {
+        // if we've come this far, reset the analysis
+        resetAnalysis(true, true);
+        paramControl.readyToCalc();
         // get coordinates used by GP tools
         var latlngs = layer._defaultShape ?
             layer._defaultShape() :
@@ -264,8 +268,14 @@ var gpControl = {
         this.raw.profile = gpOutputProfile;
         // use the helper function to calc head from the Esri results
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
+        // var h2;
         // apply the converstion factor
         var h2 = h * conversion_factor;
+        // if (h < 0) {
+        //     h2 = h * conversion_factor * -1;
+        // } else {
+        //     h2 = h * conversion_factor;
+        // }
         console.log(h2);
         // set the value (performs validation)
         Hydropower.params.head.setValue(utils._round(h2, 2));
@@ -291,7 +301,7 @@ var gpControl = {
      */
     getHead: function(i) {
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
-        console.log("using custom getter: getHead");
+        // console.log("using custom getter: getHead");
         if (h) {
             // set the value (performs validation)
             i.setValue(utils._round(h, 2));
@@ -307,7 +317,7 @@ var gpControl = {
     getArea: function(i) {
         // use the helper function to get area from the Esri results
         var a = this._getArea(this.raw.watershed, convertSQKMtoSQMI);
-        console.log("using custom getter: getArea");
+        // console.log("using custom getter: getArea");
         if (a) {
             // set the value (performs validation)
             i.setValue(utils._round(a, 2));
@@ -331,7 +341,7 @@ var gpControl = {
             var firstZ = coords[0][2];
             var lastZ = coords[coords.length - 1][2];
             // save the difference
-            var h = lastZ - firstZ;
+            var h = Math.abs(lastZ - firstZ);
             console.log("Head:", h, "meters");
             return h * conversion_factor;
         } else {

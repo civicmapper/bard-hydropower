@@ -1,0 +1,39 @@
+<div class="modal" id="aboutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title">Microhydropower Calculator</h3>
+                <h3><small>A project by Bard College and Current Hydro</small></h3>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs nav-justified" id="aboutTabs">
+                    <li class="active">
+                        <a href="#about" data-toggle="tab">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</a>
+                    </li>
+                    <li>
+                        <a href="#methods" data-toggle="tab">
+                            <span class="glyphicon glyphicon-book" aria-hidden="true"></span> How It Works</a>
+                    </li>
+
+                </ul>
+                <div class="tab-content" id="aboutTabsContent">
+                    <div id="about" class="tab-pane active in">
+                        <p>The Microhydropower Calculator was built by
+                            <a href="http://www.civicmapper.com">CivicMapper</a> on behalf of
+                            <a href="http://spatialanalytixllc.com/">Spatial Analytix LLC</a>, for
+                            <a href="http://www.bard.edu/">Bard College</a> and
+                            <a href="http://www.currenthydro.com/">Current Hydro LLC</a>.</p>
+                    </div>
+                    <div id="methods" class="tab-pane">
+                        {% filter markdown %} {% include 'pages/help_methods.md' %} {% endfilter %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

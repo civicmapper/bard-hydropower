@@ -1,0 +1,77 @@
+<div class="row">
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Power Potential</h2>
+            </div>
+            <div class="panel-body">
+                <h2><span class="results-powr results"></span><br><small>kilowatt hours</small></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Value</h2>
+            </div>
+            <div class="panel-body">
+                <h2>$<span class="results-cost results"></span><br><small>/ year</small></h2>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Head</h3>
+            </div>
+            <div class="panel-body">
+                <h3>
+                    <span class="results-head"></span> <small>Feet</small>
+                    <!--<div id="profile-viz" class="well">>>> interactive elevation profile visualization here <<<</div>-->
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Contributing Area</h3>
+            </div>
+            <div class="panel-body">
+                <h3><span class="results-area"></span> <small>Sq. Miles</small></h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <h4 class="panel-title">Constants</h4>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item">Environmental Flow: <span class="pull-right"><span class="results-envn results"></span> cubic feet per second</span>
+                </li>
+                <li class="list-group-item">Efficiency: <span class="pull-right"><span class="results-effy results"></span></span>
+                </li>
+                <li class="list-group-item">Rate: <span class="pull-right">$<span class="results-rate results"></span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-sm-7">
+        <button class="btn btn-primary btn-block btn-goToParams" type="submit">Adjust Parameters <i class="fa fa-cogs"></i></button>
+    </div>
+    <div class="col-sm-5">
+        <button id="reset-btn" class="btn btn-default btn-block reset-btn" type="submit">Start Over <i class="fa fa-rotate-left"></i></button>
+    </div>
+</div>

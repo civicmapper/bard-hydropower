@@ -10,7 +10,8 @@ var watchify = require("watchify");
 var source = require("vinyl-source-stream");
 var buffer = require("vinyl-buffer");
 var envify = require("envify/custom");
-var vueify = require("vueify");
+var sass = require("gulp-sass");
+// var vueify = require("vueify");
 
 var browserSync = require("browser-sync");
 var exec = require("child_process").exec;
@@ -21,18 +22,21 @@ var bundles = {
     core: {
         css: {
             src: [
-                "src/css/bootstrap-theme.min.css",
+                // "src/css/_variables.scss",
+                // "src/css/bootswatch.scss",
+                // "src/css/bootstrap-theme-simplex.min.css",
+                "src/css/boostrap-custom.scss",
                 "node_modules/font-awesome/css/font-awesome.min.css",
-                "src/css/main.css",
-                "src/css/main.responsive.css",
-                "src/css/layout.main.css",
+                "src/css/main.scss",
+                "src/css/main.responsive.scss",
+                "src/css/layout.main.scss",
                 "node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css",
                 "node_modules/bootstrap-toggle/css/bootstrap-toggle.min.css",
                 "node_modules/leaflet/dist/leaflet.css",
                 "node_modules/leaflet-draw/dist/leaflet.draw.css",
                 "node_modules/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css",
                 "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
-                "src/css/MarkerCluster.Default.css",
+                "src/css/MarkerCluster.Default.scss",
                 "node_modules/leaflet-basemaps/L.Control.Basemaps.css"
             ],
             dist: {
@@ -64,7 +68,8 @@ var bundlingConfigs = Object.keys(bundles);
  */
 bundlingConfigs.forEach(function(bundleName) {
     gulp.task("scripts:" + bundleName, function() {
-        return browserify({
+        return (
+            browserify({
                 basedir: ".",
                 insertGlobalVars: {
                     $: function(file, dir) {
@@ -79,10 +84,10 @@ bundlingConfigs.forEach(function(bundleName) {
                     // cache: {},
                     // packageCache: {}
             })
-            .transform("babelify", {
-                presets: ["env"],
-                extensions: [".js"]
-            })
+            // .transform("babelify", {
+            //     presets: ["env"],
+            //     extensions: [".js"]
+            // })
             .transform(
                 // Required in order to process node_modules files
                 {
@@ -95,15 +100,16 @@ bundlingConfigs.forEach(function(bundleName) {
             .bundle()
             .pipe(source(bundles[bundleName].js.dist.file))
             .pipe(buffer())
-            .pipe(sourcemaps.init({ loadMaps: true }))
-            .pipe(uglify())
-            .pipe(sourcemaps.write("./"))
+            // .pipe(sourcemaps.init({ loadMaps: true }))
+            // .pipe(uglify())
+            // .pipe(sourcemaps.write("./"))
             .pipe(gulp.dest(bundles[bundleName].js.dist.path))
             .pipe(
                 browserSync.reload({
                     stream: true
                 })
-            );
+            )
+        );
     });
 });
 
@@ -117,13 +123,14 @@ gulp.task(
 );
 
 /**
- * BUNDLE CSS
+ * BUNDLE S/CSS
  */
 bundlingConfigs.forEach(function(bundleName) {
     gulp.task("styles:" + bundleName, function() {
         return gulp
             .src(bundles[bundleName].css.src)
             .pipe(concat(bundles[bundleName].css.dist.file))
+            .pipe(sass().on("error", sass.logError))
             .pipe(cleanCss())
             .pipe(gulp.dest(bundles[bundleName].css.dist.path))
             .pipe(
@@ -249,6 +256,7 @@ gulp.task(
         // re-run these tasks if source directories change
         function() {
             gulp.watch("src/css/*.css", gulp.parallel("pack-css"));
+            gulp.watch("src/css/*.scss", gulp.parallel("pack-css"));
             gulp.watch("src/js/*.js", gulp.parallel("pack-js"));
         }
     )

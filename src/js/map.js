@@ -21,11 +21,11 @@ var geocoding = require("esri-leaflet-geocoder");
 var layer_dams = L.geoJSON(null, {
     pointToLayer: function(point, latlng) {
         return L.circleMarker(latlng, {
-            radius: 5,
+            radius: 4,
             fillColor: "#fff",
             fillOpacity: 1,
-            color: "#d9230f",
-            weight: 7,
+            color: "#2baae2",
+            weight: 6,
             opacity: 0.5
         });
     },
@@ -50,9 +50,9 @@ var layer_dams = L.geoJSON(null, {
  */
 var layer_dams_clusters = L.markerClusterGroup({
     polygonOptions: {
-        color: "#d9230f",
+        color: "#2baae2",
         opacity: 0.6,
-        fillColor: "#d9230f",
+        fillColor: "#2baae2",
         fillOpacity: 0.2
     }
 });
@@ -120,15 +120,15 @@ var basemaps = [
  */
 var map = L.map("map", {
     maxZoom: 22
-        // }).setView([42.921683, -76.2419582], 7);
-}).setView([42.0169164, -73.9141064], 18);
+}).setView([42.921683, -76.2419582], 7);
+// }).setView([42.0169164, -73.9141064], 18);
 // so map variable can be accessed in other modules:
 global.map = map;
 
 /**
  * add layers
  */
-// map.addLayer(layer_dams_clusters);
+map.addLayer(layer_dams_clusters);
 // map.addLayer(watershedArea);
 map.addLayer(searchResults);
 
