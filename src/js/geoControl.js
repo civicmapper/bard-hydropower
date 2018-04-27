@@ -91,7 +91,7 @@ var drawControl = {
      */
     getPointsForGP: function(layer) {
         // if we've come this far, reset the analysis
-        resetAnalysis(true, true);
+        resetAnalysis(false, true);
         paramControl.readyToCalc();
         // get coordinates used by GP tools
         var latlngs = layer._defaultShape ?
