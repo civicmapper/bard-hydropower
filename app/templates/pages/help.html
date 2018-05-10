@@ -4,7 +4,9 @@
             <div class="modal-header">
                 <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3 class="modal-title">Microhydropower Calculator</h3>
-                <h3><small>A project by Bard College and Current Hydro</small></h3>
+                <h3>
+                    <small>A project by Bard College and Current Hydro</small>
+                </h3>
             </div>
             <div class="modal-body">
                 <ul class="nav nav-tabs nav-justified" id="aboutTabs">
@@ -20,11 +22,7 @@
                 </ul>
                 <div class="tab-content" id="aboutTabsContent">
                     <div id="about" class="tab-pane active in">
-                        <p>The Microhydropower Calculator was built by
-                            <a href="http://www.civicmapper.com">CivicMapper</a> on behalf of
-                            <a href="http://spatialanalytixllc.com/">Spatial Analytix LLC</a>, for
-                            <a href="http://www.bard.edu/">Bard College</a> and
-                            <a href="http://www.currenthydro.com/">Current Hydro LLC</a>.</p>
+                        {% filter markdown %} {% include 'pages/help_about.md' %} {% endfilter %}
                     </div>
                     <div id="methods" class="tab-pane">
                         {% filter markdown %} {% include 'pages/help_methods.md' %} {% endfilter %}

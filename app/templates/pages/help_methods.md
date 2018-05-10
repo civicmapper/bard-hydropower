@@ -1,7 +1,6 @@
+This tool uses a basic formula for estimating power generation potential; it is suitable for planning purposes only. The underlying elevation data driving the calculations is provided by the US Geological Survey through web service hosted by [ESRI](https://www.esri.com/en-us/home). Where available, head calculations rely on high resolution elevation data services hosted by the [NY State GIS Program Office](http://gis.ny.gov/elevation/DEM-web-services.htm).
 
 [Current Hydro](http://www.currenthydro.com/) provides an overview of microhydropower technology on their website.
-
-This tool uses a basic formula for estimating power generation potential; it is suitable for planning purposes only.
 
 #### Variables
 
@@ -16,16 +15,16 @@ This tool uses a basic formula for estimating power generation potential; it is 
 
 #### Calculation
 
-##### Estimate potential watershed yield 
+##### Estimate potential watershed yield
 
-  * `Qt = A * Y` (cubic feet per second)
-  * `Qe = A * F` (cubic feet per second)
-  * `Qu = Qt - Qe` useable yield from the watershed (cubic feet per second)
+* `Qt = A * Y` This is how much water theoretically comes down the stream (cubic feet per second).
+* `Qe = A * F` This is how much water is needed to maintain basic ecosystem function (cubic feet per second).
+* `Qu = Qt - Qe` Useable yield from the watershed (cubic feet per second).
 
 #### Calculate Power Generation
 
-  * `P = (Qu * H / 11.8) x e` power generated, in kilowatt-hours
+* `P = (Qu * H / 11.8) x e` power generated, in kilowatt-hours
 
 #### Calculate Power Value
 
-  * `V = R * 8766 * P` annual value of power generated, in dollars
+* `V = R * 8766 * P` annual value of power generated, in dollars
