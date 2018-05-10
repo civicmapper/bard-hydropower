@@ -19,7 +19,7 @@ var geocoding = require("esri-leaflet-geocoder");
  * In the future this should be re-published as a proper geoservice endpoint.
  */
 var layer_dams = L.geoJSON(null, {
-    pointToLayer: function(point, latlng) {
+    pointToLayer: function (point, latlng) {
         return L.circleMarker(latlng, {
             radius: 4,
             fillColor: "#fff",
@@ -29,7 +29,7 @@ var layer_dams = L.geoJSON(null, {
             opacity: 0.5
         });
     },
-    onEachFeature: function(feature, layer) {
+    onEachFeature: function (feature, layer) {
         if (feature.properties) {
             var p = feature.properties;
             layer.bindPopup(
@@ -59,7 +59,7 @@ var layer_dams_clusters = L.markerClusterGroup({
 /**
  * asynchronous retrieval of dams data.
  */
-jQuery.getJSON("/static/assets/data/nysdams.geojson", function(data) {
+jQuery.getJSON("/static/assets/data/nysdams.geojson", function (data) {
     layer_dams.addData(data);
     layer_dams_clusters.addLayer(layer_dams);
 });
@@ -160,7 +160,7 @@ map.addControl(
     .geosearch({
         position: "topright"
     })
-    .on("results", function(data) {
+    .on("results", function (data) {
         searchResults.clearLayers();
         for (var i = data.results.length - 1; i >= 0; i--) {
             var result = L.circleMarker(data.results[i].latlng).bindPopup(
@@ -175,6 +175,6 @@ map.addControl(
 /*******************************************************************************
  * map listeners
  */
-map.on("click", function(e) {
+map.on("click", function (e) {
     searchResults.clearLayers();
 });

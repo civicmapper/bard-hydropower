@@ -1,12 +1,21 @@
 /**
- * sketchInput.js
+ * geoControl.js
  *
  * Script for drawing inputs, and using that to derive Head and Area inputs
  * through a geoprocessing service
  */
+
+// Leaflet + Esri-Leaflet
 require("leaflet-draw");
-var esriGP = require("esri-leaflet-gp");
+var esriLeaflet = require("esri-leaflet");
+var esriLeafletGP = require("esri-leaflet-gp");
+// TurfJS
+var explode = require('@turf/explode');
+var lineChunk = require('@turf/line-chunk');
+var turfLength = require('@turf/length');
+// utilities
 var utils = require("./utils");
+
 
 /*******************************************************************************
  * DRAWING
@@ -66,7 +75,7 @@ var drawControl = {
     /**
      * calculate length
      */
-    calcLen: function(layer) {
+    calcLen: function (layer) {
         if (layer instanceof L.Polyline) {
             var latlngs = layer._defaultShape ?
                 layer._defaultShape() :
@@ -89,7 +98,7 @@ var drawControl = {
      * from the layer provided by DRAW event, push results to layers used for
      * GP inputs
      */
-    getPointsForGP: function(layer) {
+    getPointsForGP: function (layer) {
         // if we've come this far, reset the analysis
         resetAnalysis(false, true);
         paramControl.readyToCalc();
@@ -99,16 +108,15 @@ var drawControl = {
             layer.getLatLngs();
         drawnPolyline.setLatLngs(latlngs);
         drawnPoint.setLatLng(L.latLng(latlngs[latlngs.length - 1]));
-        // run the GP
-        gpControl.gpElevProfile(drawnPolyline);
-        gpControl.gpWatershed(drawnPoint);
+        // dispatch geoprocessing
+        gpControl.dispatch(drawnPolyline, drawnPoint);
     },
     /**
      * add drawing listeners to the map
      */
-    initDrawListeners: function(map) {
+    initDrawListeners: function (map) {
         // Map listener for drawing creation
-        map.on(L.Draw.Event.CREATED, function(event) {
+        map.on(L.Draw.Event.CREATED, function (event) {
             console.log("draw:created");
             // calculate drawing length
             drawControl.calcLen(event.layer);
@@ -121,9 +129,9 @@ var drawControl = {
             //messageControl.onDrawComplete();
         });
         // map listener for drawing edits
-        map.on(L.Draw.Event.EDITED, function(event) {
+        map.on(L.Draw.Event.EDITED, function (event) {
             console.log("draw:edited");
-            event.layers.eachLayer(function(layer) {
+            event.layers.eachLayer(function (layer) {
                 // create message related to drawing
                 // calculate drawing length
                 drawControl.calcLen(event.layer);
@@ -135,7 +143,7 @@ var drawControl = {
             //messageControl.onDrawComplete();
         });
         // map listener for drawing deletion
-        map.on("draw:deleted", function(e) {
+        map.on("draw:deleted", function (e) {
             console.log("draw:deleted");
             // remove message related to drawing
             //drawInfo.infoOnDrawDelete();
@@ -154,26 +162,156 @@ var gpControl = {
         watershed: {},
         profile: {}
     },
-    reset: function() {
+    reset: function () {
         this.raw = {
             watershed: {},
             profile: {}
         };
     },
+    dispatch: function (drawnPolyline, drawnPoint) {
+        // run the watershed GP asynchronously
+        gpControl.gpWatershed(drawnPoint);
+
+        // query the index with drawnPoint - this determines what elevation service we use for the profile
+        console.log("Checking for local high-res elevation services...")
+        esriLeaflet.query({
+                url: "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/"
+            })
+            .layer(0)
+            // find indices that intersect our drawing (the second, upstream point)
+            .intersects(drawnPoint.toGeoJSON())
+            // return these fields to us:
+            .fields(["NAME", "RESOLUTION", "YEAR", "COLLECTION", "CUSTODIAN", "TIF_NAME", "SQMI"])
+            // return the records to us so that highest resolution, newest records are first
+            .orderBy("RESOLUTION", "DESC")
+            .orderBy("YEAR", "DESC")
+            // we don't need geometry though
+            .returnGeometry(false)
+            // go get it
+            .run(function (error, featureCollection, response) {
+                console.log(featureCollection);
+                // if there is an error:
+                if (error || featureCollection.features.length == 0) {
+                    console.log("...none found. Falling back to USGS services.")
+                    // use the Esri service
+                    gpControl.gpElevProfile(drawnPolyline);
+                    // otherwise:
+                } else {
+                    // gpControl.gpElevProfile(drawnPolyline);
+                    // if we get results back, then
+                    // use the result (name) to query the lidar endpoint
+                    var lidarName = featureCollection.features[0].properties.NAME;
+                    var lidarService = 'https://elevation.its.ny.gov/arcgis/rest/services/' + lidarName + '/ImageServer';
+                    gpControl.queryLidarData(drawnPolyline, lidarService)
+                    // split up the polyline based on the lidar service
+                    // run multiple queries
+                    // return those
+                }
+
+            })
+
+    },
+    /**
+     * Query LiDAR data for elevation profile instead of using GP service
+     */
+    queryLidarData: function (drawnPolyline, endpoint) {
+
+        // drawn line to geojson
+        var line = drawnPolyline.toGeoJSON()
+
+        // length of line in meters
+        var drawingLength = turfLength(line, {
+            units: 'kilometers'
+        }) * 1000
+
+        // chunk up the line at 1 meter intervals
+        var sample_distance = 1 * 0.001 // 1 meter as kilometer
+        var chunk = lineChunk(line, sample_distance, {
+            units: 'kilometers'
+        });
+        // turn line chunks endpoints into sample points
+        var samplePoints = explode(chunk);
+
+        // temporary storage for analysis of chunks
+        results = {
+            lineString: [],
+            total: drawingLength
+        };
+
+        // calculate the interval between the sample points
+        var samplePointsCount = samplePoints.features.length;
+        console.log(samplePointsCount);
+        var pingLength = drawingLength / samplePointsCount;
+        var lengthIncrement = 0;
+
+        // for each sample
+        samplePoints.features.forEach(function (f, i) {
+            esriLeaflet.identifyImage({
+                    url: endpoint,
+                    useCors: true
+                })
+                .at([f.geometry.coordinates[1], f.geometry.coordinates[0]])
+                .run(function (error, identifyImageResponse, rawResponse) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        // elevation (in meters from service)
+                        elevation = Number(identifyImageResponse.pixel.properties.value)
+                        // add to the runningTotal for the drawing length
+                        lengthIncrement = lengthIncrement + pingLength;
+                        // create a linestring feature with a z value
+                        results.lineString.push([f.geometry.coordinates[1], f.geometry.coordinates[0], elevation])
+                        // if we've queried all the points,
+                        if (Object.keys(results.lineString).length == samplePointsCount) {
+                            console.log(results);
+                            // elevation profile is a geojson object
+                            // (same as the elev profile GP service result)
+                            var result = {
+                                "type": "FeatureCollection",
+                                "features": [{
+                                    "type": "Feature",
+                                    "geometry": {
+                                        "type": "LineString",
+                                        "coordinates": results.lineString
+                                    },
+                                    "properties": {
+                                        "OBJECTID": 1,
+                                        "DEMResolution": "",
+                                        "ProductName": "",
+                                        "Source": "",
+                                        "Source_URL": endpoint,
+                                        "ProfileLength": results.total,
+                                        "Shape_Length": results.total
+                                    },
+                                    "id": 1
+                                }]
+                            }
+                            // messages
+                            msg = "High Resolution Elevation Profile: Complete";
+                            console.log(msg, result);
+                            // save the result, applying unit conversion in the process
+                            gpControl.setHead(result, convertMETERStoFEET);
+                            paramControl.onGPComplete();
+                        }
+                    }
+                });
+        });
+        return null;
+    },
     /**
      * Elevation Profile geoprocessing service.
      * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
      */
-    gpElevProfile: function(drawnPolyline) {
+    gpElevProfile: function (drawnPolyline) {
         Hydropower.params.head.resetParamStatus();
         jQuery(".gp-msg-head").fadeIn();
-        var elevProfileService = esriGP.service({
+        var elevProfileService = esriLeafletGP.service({
             url: "http://elevation.arcgis.com/arcgis/rest/services/Tools/ElevationSync/GPServer/Profile",
             useCors: true,
             token: tokens.arcgis
         });
         var elevProfileTask = elevProfileService.createTask();
-        elevProfileTask.on("initialized", function() {
+        elevProfileTask.on("initialized", function () {
             // set input parameters
             elevProfileTask.setParam("DEMResolution ", "FINEST");
             elevProfileTask.setParam("ProfileIdField", "OID");
@@ -187,7 +325,7 @@ var gpControl = {
             //messageControl.messages.elevprofile.addMsg(msg, 'info');
             //jQuery('#'+messageControl.messages.elevprofile.id).show();
             // run the task
-            elevProfileTask.run(function(error, result, response) {
+            elevProfileTask.run(function (error, result, response) {
                 jQuery(".gp-msg-head").fadeOut();
                 if (error) {
                     // messages
@@ -208,17 +346,21 @@ var gpControl = {
             });
         });
     },
-    gpWatershed: function(drawnPoint) {
+    /**
+     * Watershed delineation geoprocessing service.
+     * @param L.Layer drawnPoint a point from which to start delineation (second point in our case)
+     */
+    gpWatershed: function (drawnPoint) {
         Hydropower.params.area.resetParamStatus();
         jQuery(".gp-msg-area").fadeIn();
         //Hydropower.params.area.setOnForm('Calculating...');
-        var watershedService = esriGP.service({
+        var watershedService = esriLeafletGP.service({
             url: "http://hydro.arcgis.com/arcgis/rest/services/Tools/Hydrology/GPServer/Watershed",
             useCors: true,
             token: tokens.arcgis
         });
         var watershedTask = watershedService.createTask();
-        watershedTask.on("initialized", function() {
+        watershedTask.on("initialized", function () {
             // InputPoints must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
             watershedTask.setParam("InputPoints", drawnPoint.toGeoJSON());
             watershedTask.setParam("SourceDatabase", "FINEST");
@@ -238,7 +380,7 @@ var gpControl = {
             console.log(msg);
             //messageControl.messages.watershed.addMsg(msg, 'info');
             //jQuery('#'+messageControl.messages.watershed.id).show();
-            watershedTask.run(function(error, result, response) {
+            watershedTask.run(function (error, result, response) {
                 jQuery(".gp-msg-area").fadeOut();
                 // show the message window
                 if (error) {
@@ -264,7 +406,7 @@ var gpControl = {
      * Given output from ESRI Elevation Profile service, store it and calculate
      * head. Called upon successful execution of GP.
      */
-    setHead: function(gpOutputProfile, conversion_factor) {
+    setHead: function (gpOutputProfile, conversion_factor) {
         this.raw.profile = gpOutputProfile;
         // use the helper function to calc head from the Esri results
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
@@ -285,7 +427,7 @@ var gpControl = {
      * Given output from ESRI Watershed service, store it and extract area.
      * Called upon successful execution of GP.
      */
-    setArea: function(gpOutputWatershed, conversion_factor) {
+    setArea: function (gpOutputWatershed, conversion_factor) {
         this.raw.watershed = gpOutputWatershed;
         // use the helper function to get area from the Esri results
         var w = this._getArea(this.raw.watershed, conversion_factor);
@@ -299,7 +441,7 @@ var gpControl = {
     /**
      * customer getter function for Head
      */
-    getHead: function(i) {
+    getHead: function (i) {
         var h = this._calcHead(this.raw.profile, convertMETERStoFEET);
         // console.log("using custom getter: getHead");
         if (h) {
@@ -314,7 +456,7 @@ var gpControl = {
     /**
      * customer getter function for Area
      */
-    getArea: function(i) {
+    getArea: function (i) {
         // use the helper function to get area from the Esri results
         var a = this._getArea(this.raw.watershed, convertSQKMtoSQMI);
         // console.log("using custom getter: getArea");
@@ -330,7 +472,7 @@ var gpControl = {
     /**
      * Calculate head from the ESRI Elevation Profile service result object.
      */
-    _calcHead: function(gpOutputProfile, conversion_factor) {
+    _calcHead: function (gpOutputProfile, conversion_factor) {
         if (!jQuery.isEmptyObject(gpOutputProfile)) {
             //console.log("Calculating head from", gpOutputProfile);
             // get the first line from the result object
@@ -352,7 +494,7 @@ var gpControl = {
     /**
      * Extract the area value from the ESRI Watershed service result object
      */
-    _getArea: function(gpOutputWatershed, conversion_factor) {
+    _getArea: function (gpOutputWatershed, conversion_factor) {
         if (!jQuery.isEmptyObject(gpOutputWatershed)) {
             //console.log("Getting area from", gpOutputWatershed);
             // area (as square clicks) is buried in the result object. get it and convert
@@ -368,13 +510,13 @@ var gpControl = {
     /**
      * generate a visualization of the elevation profile results
      */
-    vizHead: function() {
+    vizHead: function () {
         console.log("vizHead");
     },
     /**
      * generate a visualization of the watershed delineation
      */
-    vizArea: function() {
+    vizArea: function () {
         console.log("vizArea", this.raw.watershed);
         if (!jQuery.isEmptyObject(this.raw.watershed)) {
             watershedArea.clearLayers();
