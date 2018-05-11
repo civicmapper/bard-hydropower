@@ -23,6 +23,7 @@ var utils = require("./utils");
 var convertSQKMtoACRES = 247.105381;
 var convertSQKMtoSQMI = 0.386102;
 var convertMETERStoFEET = 3.280841;
+var convertMILEStoFEET = 5280
 
 /*******************************************************************************
  * DRAWING
@@ -154,6 +155,10 @@ var drawControl = {
 };
 global.drawControl = drawControl;
 
+/**
+ * geoprocessing controller object
+ */
+
 var gpControl = {
     /**
      * store the raw results of the GP services
@@ -192,7 +197,7 @@ var gpControl = {
                 console.log(featureCollection);
                 // if there is an error:
                 if (error || featureCollection.features.length == 0) {
-                    console.log("...none found. Falling back to USGS services.")
+                    console.log("...no high-resolution elevation data found for this area. Falling back to USGS services.")
                     // use the Esri service
                     gpControl.gpElevProfile(drawnPolyline);
                     // otherwise:
@@ -202,7 +207,8 @@ var gpControl = {
                     // use the result (name) to query the lidar endpoint
                     var lidarName = featureCollection.features[0].properties.NAME;
                     var lidarService = 'https://elevation.its.ny.gov/arcgis/rest/services/' + lidarName + '/ImageServer';
-                    gpControl.queryLidarData(drawnPolyline, lidarService)
+                    console.log("...found high resolution elevation data @", lidarService);
+                    gpControl.queryElevProfile(drawnPolyline, lidarService)
                     // split up the polyline based on the lidar service
                     // run multiple queries
                     // return those
@@ -212,9 +218,12 @@ var gpControl = {
 
     },
     /**
-     * Query LiDAR data for elevation profile instead of using GP service
+     * Query LiDAR data to generate an elevation profile.
+     * This does on the client side what the gpElevProfile function (below) requests
+     * be done on the server (more or less), except this way we can use whatever Image 
+     * Service we like.
      */
-    queryLidarData: function (drawnPolyline, endpoint) {
+    queryElevProfile: function (drawnPolyline, endpoint) {
 
         // drawn line to geojson
         var line = drawnPolyline.toGeoJSON()
@@ -224,28 +233,40 @@ var gpControl = {
             units: 'kilometers'
         }) * 1000
 
+        console.log("drawingLength:", drawingLength, "meters")
+
         // chunk up the line at 1 meter intervals
         var sample_distance = 1 * 0.001 // 1 meter as kilometer
-        var chunk = lineChunk(line, sample_distance, {
+        var chunk = lineChunk(line, sample_distance.toFixed(3), {
             units: 'kilometers'
         });
-        // turn line chunks endpoints into sample points
-        var samplePoints = explode(chunk);
+        // turn line chunks endpoints into sample points, and get every other one
+        var exploded = explode(chunk);
+        var samplePoints = [];
+        for (var i = 0; i < exploded.features.length; i++) {
+            if (i % 2 === 0) {
+                samplePoints.push(exploded.features[i]);
+            }
+        }
+        console.log(samplePoints);
 
-        // temporary storage for analysis of chunks
+
+        // temporary storage for results of chunk analysis,
+        // 
         results = {
-            lineString: [],
-            total: drawingLength
+            data: [], // used for chart.js-drawn elevation profile
+            lineString: [], // use for head calculation
+            total: drawingLength // used for chart.js-drawn elevation profile
         };
 
         // calculate the interval between the sample points
-        var samplePointsCount = samplePoints.features.length;
-        console.log(samplePointsCount);
+        var samplePointsCount = samplePoints.length;
+        console.log("elevation sampled at", samplePointsCount, "points");
         var pingLength = drawingLength / samplePointsCount;
         var lengthIncrement = 0;
 
         // for each sample
-        samplePoints.features.forEach(function (f, i) {
+        samplePoints.forEach(function (f, i) {
             esriLeaflet.identifyImage({
                     url: endpoint,
                     useCors: true
@@ -261,17 +282,24 @@ var gpControl = {
                         lengthIncrement = lengthIncrement + pingLength;
                         // create a linestring feature with a z value
                         results.lineString.push([f.geometry.coordinates[1], f.geometry.coordinates[0], elevation])
-                        // if we've queried all the points,
+                        // create data point for use in elevation profile
+                        results.data.push({
+                            x: lengthIncrement,
+                            y: elevation
+                        })
+                        // if we've queried all the points, then we create our final result.
                         if (Object.keys(results.lineString).length == samplePointsCount) {
-                            console.log(results);
+                            console.log("queryElevProfile", results);
                             // elevation profile is a geojson object
                             // (same as the elev profile GP service result)
+                            // store properties from our results object (above) here
                             var result = {
                                 "type": "FeatureCollection",
                                 "features": [{
                                     "type": "Feature",
                                     "geometry": {
                                         "type": "LineString",
+                                        // expected for head calculation
                                         "coordinates": results.lineString
                                     },
                                     "properties": {
@@ -280,8 +308,10 @@ var gpControl = {
                                         "ProductName": "",
                                         "Source": "",
                                         "Source_URL": endpoint,
-                                        "ProfileLength": results.total,
-                                        "Shape_Length": results.total
+                                        // convert from miles to feet:
+                                        "ProfileLength": results.total * convertMILEStoFEET,
+                                        // store x/y charting data points:
+                                        "ChartData": results.data
                                     },
                                     "id": 1
                                 }]
@@ -292,6 +322,7 @@ var gpControl = {
                             // save the result, applying unit conversion in the process
                             gpControl.setHead(result, convertMETERStoFEET);
                             paramControl.onGPComplete();
+                            return;
                         }
                     }
                 });
@@ -511,7 +542,21 @@ var gpControl = {
      * generate a visualization of the elevation profile results
      */
     vizHead: function () {
-        console.log("vizHead");
+        console.log("vizHead", this.raw.profile);
+        if (!jQuery.isEmptyObject(this.raw.profile)) {
+            // add the control to the map that contains the chart element.
+            if (!profileControl.getContainer()) {
+                console.log("added profile control to map")
+                profileControl.addTo(map);
+            }
+            // then add the data. this method updates the chart
+            if (profileControl.getContainer()) {
+                console.log("adding data to profile control")
+                profileControl.addData(this.raw.profile.features[0].properties.ChartData)
+            }
+            // profileControl.addData(this.raw.profile.features[0].properties.ChartData)
+        }
+
     },
     /**
      * generate a visualization of the watershed delineation

@@ -69,7 +69,7 @@ var buttonControl = {
      * analyze button
      */
     analyze: {
-        elem: function() {
+        elem: function () {
             return jQuery(".analyze-btn");
         },
         html: {
@@ -79,33 +79,33 @@ var buttonControl = {
         /**
          * call when correct params are in place
          */
-        enable: function() {
+        enable: function () {
             this.elem().prop("disabled", false);
         },
         /**
          * call when the calculation is in progress
          */
-        setActive: function() {
+        setActive: function () {
             this.elem().html(this.html.active);
         },
         /**
          * call when the calculation is complete
          */
-        setComplete: function() {
+        setComplete: function () {
             this.elem().html(this.html.resting);
         },
         /**
          * reset the button to initial state
          */
-        reset: function() {
+        reset: function () {
             this.elem().html(this.html.resting);
             this.elem().prop("disabled", true);
         },
         /**
          * click event for the button
          */
-        onClick: function() {
-            this.elem().click(function() {
+        onClick: function () {
+            this.elem().click(function () {
                 // unleash the calculationController
                 calculationController(true);
             });
@@ -115,11 +115,11 @@ var buttonControl = {
      * reset button
      */
     reset: {
-        elem: function() {
+        elem: function () {
             return jQuery(".reset-btn");
         },
-        onClick: function() {
-            this.elem().click(function() {
+        onClick: function () {
+            this.elem().click(function () {
                 resetAnalysis(true, true);
                 paramControl.readyToCalc();
                 jQuery("#tabStep1").trigger("click");
@@ -130,33 +130,33 @@ var buttonControl = {
      * sidebar toggle
      */
     sidebar: {
-        elem: function() {
+        elem: function () {
             return jQuery(".sidebar-toggle");
         },
-        onClick: function() {
-            this.elem().click(function() {
+        onClick: function () {
+            this.elem().click(function () {
                 jQuery("#sidebar").animate({
                     width: "toggle"
                 }, {
                     duration: 200,
-                    start: function() {
+                    start: function () {
                         if (jQuery(".sidebar-wrapper").is(":visible")) {
                             jQuery(".sidebar-wrapper").hide();
                         }
                     },
-                    done: function() {
+                    done: function () {
                         if (!jQuery(".sidebar-wrapper").is(":visible")) {
                             jQuery(".sidebar-wrapper").show();
                         }
                     },
-                    always: function() {
+                    always: function () {
                         map.invalidateSize();
                     }
                 });
             });
         }
     },
-    init: function() {
+    init: function () {
         // set buttons to initial states
         this.analyze.reset();
         // attach on those click events
@@ -183,7 +183,7 @@ global.buttonControl = buttonControl;
  * @param Function customGetter Used to get desired value for switchable
  *   parameters
  */
-var Param = function(
+var Param = function (
     primary_class,
     defaultValue,
     validLower,
@@ -207,13 +207,13 @@ var Param = function(
         /**
          * method: return DOM element (as jQuery object)
          */
-        s: function() {
+        s: function () {
             return jQuery(primary_class);
         },
         /**
          * checks the stored value against validation parameters
          */
-        validate: function() {
+        validate: function () {
             if (this.value) {
                 if (
                     this.value <= this._valid.upper &&
@@ -233,7 +233,7 @@ var Param = function(
          *
          * before setting the value, attempts to use parseFloat();
          */
-        setValue: function(i) {
+        setValue: function (i) {
             if (i) {
                 this.value = parseFloat(i);
                 var validation = this.validate();
@@ -247,7 +247,7 @@ var Param = function(
          * resets the the value to the default that was provided when this class
          * was instantiated
          */
-        reset: function() {
+        reset: function () {
             this.value = this._defaultValue;
             this.setOnForm();
         },
@@ -264,7 +264,7 @@ var Param = function(
          * then this function will ignore the custom getter and just get the value
          * from the form field.
          */
-        getFromForm: function(customGetter) {
+        getFromForm: function (customGetter) {
             var v, g, cg;
             // if the parameter is switchable
             if (this._hasSwitch) {
@@ -324,7 +324,7 @@ var Param = function(
          * by default takes the stored value and sets it on the associated form.
          * optionally, provided value v is put in the form
          */
-        setOnForm: function(v) {
+        setOnForm: function (v) {
             if (!v) {
                 //console.log(this.value, "!= null || !isNaN(" + this.value + "):", (this.value != null || !isNaN(this.value)));
 
@@ -340,16 +340,16 @@ var Param = function(
         /**
          * reset classes on the form to remove any indication of validation state
          */
-        resetParamStatus: function() {
+        resetParamStatus: function () {
             var s = this.s();
-            jQuery.each(["has-success", "has-warning", "has-error"], function(i, v) {
+            jQuery.each(["has-success", "has-warning", "has-error"], function (i, v) {
                 s.closest("div", "form-group").removeClass(v);
             });
         },
         /**
          * set classes on the form to visually show validation state
          */
-        setParamStatus: function(validation) {
+        setParamStatus: function (validation) {
             this.resetParamStatus();
             var c;
             if (validation === true) {
@@ -369,7 +369,7 @@ var Param = function(
     return p;
 };
 
-var Result = function(dataClass, roundBy, vizClass, vizFunction) {
+var Result = function (dataClass, roundBy, vizClass, vizFunction) {
     var r = {
         _dataClass: dataClass,
         _vizClass: vizClass,
@@ -382,19 +382,19 @@ var Result = function(dataClass, roundBy, vizClass, vizFunction) {
         /**
          * method: return DOM element for data (as jQuery object)
          */
-        domElement: function() {
+        domElement: function () {
             return jQuery(this._dataClass);
         },
         /**
          * method: return DOM element for viz (as jQuery object)
          */
-        vizElement: function() {
+        vizElement: function () {
             return jQuery(this._vizClass);
         },
         /**
          * take the value stored for the result and put on the page
          */
-        setOnPage: function() {
+        setOnPage: function () {
             // round the value if needed
             var r;
             if (this._roundBy) {
@@ -413,7 +413,7 @@ var Result = function(dataClass, roundBy, vizClass, vizFunction) {
                 this._vizFunction();
             }
         },
-        reset: function() {
+        reset: function () {
             this.value = null;
             this.setOnPage();
         }
@@ -448,7 +448,7 @@ var Hydropower = {
             0.0001,
             1000000,
             true,
-            function(i) {
+            function (i) {
                 return cgGetHead(i);
             }
         ),
@@ -458,7 +458,7 @@ var Hydropower = {
             0.0001,
             1000000000,
             true,
-            function(i) {
+            function (i) {
                 return cgGetArea(i);
             }
         ),
@@ -476,11 +476,11 @@ var Hydropower = {
     results: {
         powr: new Result(".results-powr", 2, null),
         cost: new Result(".results-cost", 2, null),
-        area: new Result(".results-area", 2, ".results-area-viz", function() {
+        area: new Result(".results-area", 2, ".results-area-viz", function () {
             // console.log("results-area-viz");
             cgVizArea();
         }),
-        head: new Result(".results-head", 2, ".results-head-viz", function(i) {
+        head: new Result(".results-head", 2, ".results-head-viz", function (i) {
             cgVizHead(i);
         }),
         effy: new Result(".results-effy", null, null),
@@ -490,74 +490,74 @@ var Hydropower = {
     /**
      * client-side hydropower calculation
      */
-    calculatePower: function(
-            area,
-            head,
-            envflow,
-            efficiency,
-            rate,
-            watershedYield
-        ) {
-            var validation = [];
-            // if params are provided, overwrite any existing ones
-            if (area) {
-                validation.push(this.params.area.setValue(area));
-            } else {
-                validation.push(true);
-            }
-            if (head) {
-                validation.push(this.params.head.setValue(head));
-            } else {
-                validation.push(true);
-            }
-            if (envflow) {
-                validation.push(this.params.envn.setValue(envflow));
-            } else {
-                validation.push(true);
-            }
-            if (efficiency) {
-                validation.push(this.params.effy.setValue(efficiency));
-            } else {
-                validation.push(true);
-            }
-            if (rate) {
-                validation.push(this.params.rate.setValue(rate));
-            } else {
-                validation.push(true);
-            }
-            // default watershed yield value (not a parameter currently)
-            var y = 1.6;
-            if (watershedYield) {
-                y = watershedYield;
-            }
-
-            // if parameters validate (this addresses validation for those explicitly
-            // provided), then run the calculation
-            if (validation.indexOf(false) == -1) {
-                var _int = {};
-                // Calculate power from stored parameters
-                _int.qAvailable = this.params.area.value * y;
-                _int.qEnv = this.params.area.value * this.params.envn.value;
-                _int.qUseable = _int.qAvailable - _int.qEnv;
-                //console.log(_int);
-                // Power in kW
-                var p =
-                    _int.qUseable *
-                    (this.params.head.value / 11.8) *
-                    this.params.effy.value;
-                // Cost = rate * hours per year * kilowatts
-                var c = this.params.rate.value * 8766 * p;
-                // console.log("power:", p, " $$$:", c);
-                this.results.powr.value = p;
-                this.results.cost.value = c;
-                // success
-                return true;
-            } else {
-                // fail
-                return false;
-            }
+    calculatePower: function (
+        area,
+        head,
+        envflow,
+        efficiency,
+        rate,
+        watershedYield
+    ) {
+        var validation = [];
+        // if params are provided, overwrite any existing ones
+        if (area) {
+            validation.push(this.params.area.setValue(area));
+        } else {
+            validation.push(true);
         }
-        /**
+        if (head) {
+            validation.push(this.params.head.setValue(head));
+        } else {
+            validation.push(true);
+        }
+        if (envflow) {
+            validation.push(this.params.envn.setValue(envflow));
+        } else {
+            validation.push(true);
+        }
+        if (efficiency) {
+            validation.push(this.params.effy.setValue(efficiency));
+        } else {
+            validation.push(true);
+        }
+        if (rate) {
+            validation.push(this.params.rate.setValue(rate));
+        } else {
+            validation.push(true);
+        }
+        // default watershed yield value (not a parameter currently)
+        var y = 1.6;
+        if (watershedYield) {
+            y = watershedYield;
+        }
+
+        // if parameters validate (this addresses validation for those explicitly
+        // provided), then run the calculation
+        if (validation.indexOf(false) == -1) {
+            var _int = {};
+            // Calculate power from stored parameters
+            _int.qAvailable = this.params.area.value * y;
+            _int.qEnv = this.params.area.value * this.params.envn.value;
+            _int.qUseable = _int.qAvailable - _int.qEnv;
+            //console.log(_int);
+            // Power in kW
+            var p =
+                _int.qUseable *
+                (this.params.head.value / 11.8) *
+                this.params.effy.value;
+            // Cost = rate * hours per year * kilowatts
+            var c = this.params.rate.value * 8766 * p;
+            // console.log("power:", p, " $$$:", c);
+            this.results.powr.value = p;
+            this.results.cost.value = c;
+            // success
+            return true;
+        } else {
+            // fail
+            return false;
+        }
+    }
+    /**
 	 * calculate power from input params using the API
 	 *
 	calculatePowerAPI: function(area,head,envflow,efficiency,rate,callback) {
@@ -601,7 +601,7 @@ var paramControl = {
     /**
      * performs validation and controls availability of calculate button
      */
-    readyToCalc: function(validated) {
+    readyToCalc: function (validated) {
         // true from checkParams means it's all good, enable calculation
         if (validated) {
             //console.log(">>> ready to calculate <<<");
@@ -615,7 +615,7 @@ var paramControl = {
     /**
      * load, validate, and provide feedback on each parameter
      */
-    onEachParameter: function() {
+    onEachParameter: function () {
         //console.log("*********** Parameters");
         // console.log(this);
 
@@ -623,7 +623,7 @@ var paramControl = {
 
         var rtc = paramControl.readyToCalc;
 
-        jQuery.each(Hydropower.params, function(k, p) {
+        jQuery.each(Hydropower.params, function (k, p) {
             // console.log("----", k, "----");
 
             // load params from form to hp object and run validation
@@ -649,9 +649,9 @@ var paramControl = {
         //console.log(Hydropower);
         //console.log("***********");
     },
-    onEachResult: function() {
+    onEachResult: function () {
         // console.log("*********** Parameters");
-        jQuery.each(Hydropower.results, function(k, r) {
+        jQuery.each(Hydropower.results, function (k, r) {
             //console.log("----", k, "----");
             // if there is a corresponding result for the params, copy it over.
             if (Hydropower.params[k]) {
@@ -665,29 +665,29 @@ var paramControl = {
      * attaches listeners for running validation anytime a control changes
      * gets, validates, sets values as appropriate
      */
-    onControlChange: function() {
+    onControlChange: function () {
         // when the form fields change:
 
         var onEachParameter = this.onEachParameter;
         var onSwitch = this.onSwitch;
 
         // when a form changes (potentially automated input)
-        jQuery('input[type="text"].params').change(function(e) {
+        jQuery('input[type="text"].params').change(function (e) {
             //console.log(">>> form changed <<<");
             //get/validate values from form
             onEachParameter();
         });
         // when a form changes (direct user input)
-        jQuery('input[type="text"].params').keyup(function(e) {
+        jQuery('input[type="text"].params').keyup(function (e) {
             //console.log(">>> form changed (keyup) <<<");
-            setTimeout(function() {
+            setTimeout(function () {
                 //get/validate values from form
                 onEachParameter();
             }, 300);
         });
 
         // when the checkbox changes:
-        jQuery('input[type="checkbox"].switch').change(function(e) {
+        jQuery('input[type="checkbox"].switch').change(function (e) {
             // use *this* switch to enable/disable the assoc. form.
             //console.log(">>> switch changed <<<");
             onSwitch(this);
@@ -699,7 +699,7 @@ var paramControl = {
         //jQuery('input').change(function(e) {logIt();});
         //jQuery('input').keyup(function(e) {logIt();});
     },
-    onSwitch: function(i) {
+    onSwitch: function (i) {
         // find the form associated with the checkbox (explicit DOM tree search)
         var form = jQuery(i)
             .closest(".form-group")
@@ -726,12 +726,12 @@ var paramControl = {
      * similar to onControlChange except is a callback that is fired when
      * GP is complete
      */
-    onGPComplete: function() {
+    onGPComplete: function () {
         console.log(">>> GP Complete. Re-evaluating parameters...");
         this.onEachParameter();
         this.onEachResult();
     },
-    onCalculateSuccess: function(autoTab) {
+    onCalculateSuccess: function (autoTab) {
         // some messages for debugging
         console.log("Success");
         console.log("Estimated power:", Hydropower.results.powr.value, "kW");
@@ -754,7 +754,7 @@ var paramControl = {
             jQuery("#tabStep3").trigger("click");
         }
     },
-    onCalculateFail: function() {
+    onCalculateFail: function () {
         var msg =
             "If you're seeing this message, things got pretty far but just didn't work out.";
         console.log(msg);
@@ -763,19 +763,19 @@ var paramControl = {
     /**
      * reset parameters to defaults
      */
-    reset: function() {
+    reset: function () {
         // clear the form fields and html
         jQuery(".params").trigger("reset");
         jQuery(".results").empty();
 
         // run each parameter's reset function
-        jQuery.each(Hydropower.params, function(k, p) {
+        jQuery.each(Hydropower.params, function (k, p) {
             p.reset();
         });
         // this will populate defaults again:
         this.onEachParameter();
         // run each result's reset function
-        jQuery.each(Hydropower.results, function(k, r) {
+        jQuery.each(Hydropower.results, function (k, r) {
             r.reset();
         });
     },
@@ -784,18 +784,18 @@ var paramControl = {
      */
     notifications: {
         id: "#params-notification",
-        init: function() {
+        init: function () {
             jQuery(this.id).hide();
         },
-        addMsg: function(msg, alertType) {
+        addMsg: function (msg, alertType) {
             makeAlert(msg, alertType, this.id);
             jQuery(this.id).fadeIn();
         },
-        clearMsg: function() {
+        clearMsg: function () {
             jQuery(this.id).fadeOut();
         }
     },
-    init: function() {
+    init: function () {
         // Initialize the custom switches and forms
         // switches
         jQuery('input[type="checkbox"].switch').bootstrapToggle({
@@ -807,14 +807,14 @@ var paramControl = {
         });
         // sliders
         jQuery(".param-slider").slider({
-            formatter: function(value) {
+            formatter: function (value) {
                 return value;
             }
         });
-        jQuery("#env-param-slider").on("slide", function(slideEvt) {
+        jQuery("#env-param-slider").on("slide", function (slideEvt) {
             jQuery("#env-form-field").val(slideEvt.value);
         });
-        jQuery("#eff-param-slider").on("slide", function(slideEvt) {
+        jQuery("#eff-param-slider").on("slide", function (slideEvt) {
             jQuery("#eff-form-field").val(slideEvt.value);
         });
         // initialize listeners
@@ -827,7 +827,7 @@ global.paramControl = paramControl;
 
 function logIt() {
     console.log("***********");
-    jQuery.each(Hydropower.params, function(k, v) {
+    jQuery.each(Hydropower.params, function (k, v) {
         console.log("----");
         console.log(k);
         v.getFromForm();
@@ -854,6 +854,7 @@ function resetAnalysis(clearLayers, clearHydropower) {
     if (clearLayers) {
         drawnItems.clearLayers();
         watershedArea.clearLayers();
+        profileControl.remove();
         gpControl.reset();
     }
     // rest all params and empty the results

@@ -8,6 +8,7 @@ require("leaflet.markercluster");
 require("leaflet-basemaps");
 var esri = require("esri-leaflet");
 var geocoding = require("esri-leaflet-geocoder");
+var epc = require("./profileControl");
 
 /*******************************************************************************
  * configure operational layers
@@ -120,8 +121,8 @@ var basemaps = [
  */
 var map = L.map("map", {
     maxZoom: 22
-}).setView([42.921683, -76.2419582], 7);
-// }).setView([42.0169164, -73.9141064], 18);
+    // }).setView([42.921683, -76.2419582], 7);
+}).setView([42.0169164, -73.9141064], 18);
 // so map variable can be accessed in other modules:
 global.map = map;
 
@@ -171,6 +172,15 @@ map.addControl(
         }
     })
 );
+
+/**
+ * establish controls to be added later
+ */
+
+// profile control gets created here, but only added to the map and populated w/
+// data *after geoprocessing*, and removed from map on reset. 
+var profileControl = epc.elevationProfileControl();
+global.profileControl = profileControl;
 
 /*******************************************************************************
  * map listeners
