@@ -296,7 +296,7 @@ var gpControl = {
                         jQuery(".gp-msg-head").fadeOut();
                     } else {
                         // elevation (in meters from service)
-                        elevation = Number(identifyImageResponse.pixel.properties.value)
+                        var elevation = Number(identifyImageResponse.pixel.properties.value)
                         // add to the runningTotal for the drawing length
                         lengthIncrement = lengthIncrement + pingLength;
                         // create a linestring feature with a z value
