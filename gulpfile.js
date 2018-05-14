@@ -66,28 +66,27 @@ var bundlingConfigs = Object.keys(bundles);
 /**
  * BUNDLE JS
  */
-bundlingConfigs.forEach(function(bundleName) {
-    gulp.task("scripts:" + bundleName, function() {
+bundlingConfigs.forEach(function (bundleName) {
+    gulp.task("scripts:" + bundleName, function () {
         return (
             browserify({
                 basedir: ".",
                 insertGlobalVars: {
-                    $: function(file, dir) {
+                    $: function (file, dir) {
                         return 'require("jquery")';
                     },
-                    jQuery: function(file, dir) {
+                    jQuery: function (file, dir) {
                         return 'require("jquery")';
                     }
                 },
                 debug: true,
                 entries: bundles[bundleName].js.src
-                    // cache: {},
-                    // packageCache: {}
+                // cache: {},
+                // packageCache: {}
             })
-            // .transform("babelify", {
-            //     presets: ["env"],
-            //     extensions: [".js"]
-            // })
+            .transform("babelify", {
+                presets: ["babel-preset-env"]
+            })
             .transform(
                 // Required in order to process node_modules files
                 {
@@ -100,9 +99,11 @@ bundlingConfigs.forEach(function(bundleName) {
             .bundle()
             .pipe(source(bundles[bundleName].js.dist.file))
             .pipe(buffer())
-            // .pipe(sourcemaps.init({ loadMaps: true }))
-            // .pipe(uglify())
-            // .pipe(sourcemaps.write("./"))
+            .pipe(sourcemaps.init({
+                loadMaps: true
+            }))
+            .pipe(uglify())
+            .pipe(sourcemaps.write("./"))
             .pipe(gulp.dest(bundles[bundleName].js.dist.path))
             .pipe(
                 browserSync.reload({
@@ -116,7 +117,7 @@ bundlingConfigs.forEach(function(bundleName) {
 gulp.task(
     "pack-js",
     gulp.parallel(
-        bundlingConfigs.map(function(name) {
+        bundlingConfigs.map(function (name) {
             return "scripts:" + name;
         })
     )
@@ -125,8 +126,8 @@ gulp.task(
 /**
  * BUNDLE S/CSS
  */
-bundlingConfigs.forEach(function(bundleName) {
-    gulp.task("styles:" + bundleName, function() {
+bundlingConfigs.forEach(function (bundleName) {
+    gulp.task("styles:" + bundleName, function () {
         return gulp
             .src(bundles[bundleName].css.src)
             .pipe(concat(bundles[bundleName].css.dist.file))
@@ -144,7 +145,7 @@ bundlingConfigs.forEach(function(bundleName) {
 gulp.task(
     "pack-css",
     gulp.parallel(
-        bundlingConfigs.map(function(name) {
+        bundlingConfigs.map(function (name) {
             return "styles:" + name;
         })
     )
@@ -177,8 +178,8 @@ var assets = {
 
 var assetConfigs = Object.keys(assets);
 
-assetConfigs.forEach(function(assetName) {
-    gulp.task("assets:" + assetName, function() {
+assetConfigs.forEach(function (assetName) {
+    gulp.task("assets:" + assetName, function () {
         return gulp
             .src(assets[assetName].src)
             .pipe(gulp.dest(assets[assetName].dist))
@@ -193,7 +194,7 @@ assetConfigs.forEach(function(assetName) {
 gulp.task(
     "copy-assets",
     gulp.parallel(
-        assetConfigs.map(function(name) {
+        assetConfigs.map(function (name) {
             return "assets:" + name;
         })
     )
@@ -232,10 +233,10 @@ gulp.task(
 gulp.task("build", gulp.parallel("pack-js", "pack-css", "copy-assets"));
 
 //Run Flask server
-gulp.task("runserver", function() {
+gulp.task("runserver", function () {
     var proc = exec("pipenv run python application.py");
 });
-gulp.task("browser-sync", function() {
+gulp.task("browser-sync", function () {
     browserSync({
         notify: true,
         proxy: "localhost:5000"
@@ -254,7 +255,7 @@ gulp.task(
         "pack-js",
         "copy-assets",
         // re-run these tasks if source directories change
-        function() {
+        function () {
             gulp.watch("src/css/*.css", gulp.parallel("pack-css"));
             gulp.watch("src/css/*.scss", gulp.parallel("pack-css"));
             gulp.watch("src/js/*.js", gulp.parallel("pack-js"));
