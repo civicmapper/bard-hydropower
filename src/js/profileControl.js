@@ -27,18 +27,21 @@ var ElevationProfileControl = L.Control.extend({
             },
             scales: {
                 xAxes: [{
-                    display: true,
-                    // scaleLabel: {
-                    //     display: true,
-                    //     labelString: ""
-                    // }
-                }],
-                yAxes: [{
-                    stacked: true,
+                    id: 'distance-axis',
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Elevation'
+                        labelString: 'Distance (ft)'
+                    }
+                }],
+                yAxes: [{
+                    id: 'elevation-axis',
+                    stacked: true,
+                    display: true,
+                    type: 'linear',
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Elevation (ft)'
                     }
                 }]
             },
@@ -46,16 +49,15 @@ var ElevationProfileControl = L.Control.extend({
                 display: false
             },
             elements: {
-                points: {
+                point: {
                     backgroundColor: "#2baae2",
-                    radius: 0,
-                    borderWidth: 0,
+                    borderColor: "#2baae2"
                 },
                 line: {
                     tension: 0, // disables bezier curves
-                    backgroundColor: "#2D8421",
+                    // backgroundColor: "#2D8421",
                     borderColor: "#2baae2",
-                    borderWidth: 4
+                    // borderWidth: 1.5
                 }
             }
         },
@@ -104,6 +106,8 @@ var ElevationProfileControl = L.Control.extend({
             data: {
                 labels: labelsForChartjs,
                 datasets: [{
+                    yAxisID: 'elevation-axis',
+                    xAxisID: 'distance-axis',
                     data: dataForChartjs,
                     fill: 'origin',
                     label: 'Elevation (ft.)'

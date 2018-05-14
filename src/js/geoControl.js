@@ -14,16 +14,28 @@ var explode = require('@turf/explode');
 var lineChunk = require('@turf/line-chunk');
 var turfLength = require('@turf/length');
 // utilities
+var simplifyJS = require('simplify-js');
 var utils = require("./utils");
 
 
 /*******************************************************************************
- * DRAWING
+ * CONSTANTS
  */
+
+// conversion factors
 var convertSQKMtoACRES = 247.105381;
 var convertSQKMtoSQMI = 0.386102;
 var convertMETERStoFEET = 3.280841;
 var convertMILEStoFEET = 5280
+
+// for simplifiying elevation profile results (simplify-js params)
+var simplifyTolerance = 0.25;
+var simplifyHighQuality = true;
+
+// ArcGIS services
+var hiresExtentsService = "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/";
+var hiresSourcesService = "https://elevation.its.ny.gov/arcgis/rest/services/";
+var hiresSourceField = "NAME"
 
 /*******************************************************************************
  * DRAWING
@@ -119,6 +131,8 @@ var drawControl = {
         // Map listener for drawing creation
         map.on(L.Draw.Event.CREATED, function (event) {
             console.log("draw:created");
+            // clear previous drawings
+            drawnItems.clearLayers();
             // calculate drawing length
             drawControl.calcLen(event.layer);
             // render the drawn layer
@@ -181,7 +195,7 @@ var gpControl = {
         // query the index with drawnPoint - this determines what elevation service we use for the profile
         console.log("Checking for local high-res elevation services...")
         esriLeaflet.query({
-                url: "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/"
+                url: hiresExtentsService
             })
             .layer(0)
             // find indices that intersect our drawing (the second, upstream point)
@@ -195,7 +209,7 @@ var gpControl = {
             .returnGeometry(false)
             // go get it
             .run(function (error, featureCollection, response) {
-                console.log(featureCollection);
+                // console.log(featureCollection);
                 // if there is an error:
                 if (error || featureCollection.features.length == 0) {
                     console.log("...no high-resolution elevation data found for this area. Falling back to USGS services.")
@@ -206,8 +220,8 @@ var gpControl = {
                     // gpControl.gpElevProfile(drawnPolyline);
                     // if we get results back, then
                     // use the result (name) to query the lidar endpoint
-                    var lidarName = featureCollection.features[0].properties.NAME;
-                    var lidarService = 'https://elevation.its.ny.gov/arcgis/rest/services/' + lidarName + '/ImageServer';
+                    var lidarName = featureCollection.features[0].properties[hiresSourceField];
+                    var lidarService = hiresSourcesService + lidarName + '/ImageServer';
                     console.log("...found high resolution elevation data @", lidarService);
                     gpControl.queryElevProfile(drawnPolyline, lidarService)
                     // split up the polyline based on the lidar service
@@ -250,7 +264,7 @@ var gpControl = {
                 samplePoints.push(exploded.features[i]);
             }
         }
-        console.log(samplePoints);
+        // console.log(samplePoints);
 
 
         // temporary storage for results of chunk analysis,
@@ -287,10 +301,12 @@ var gpControl = {
                         lengthIncrement = lengthIncrement + pingLength;
                         // create a linestring feature with a z value
                         results.lineString.push([f.geometry.coordinates[1], f.geometry.coordinates[0], elevation])
-                        // create data point for use in elevation profile
+                        // create data point for use in elevation profile (where x/y are in chart space, not coord space)
+                        var y = elevation * convertMETERStoFEET;
+                        var x = lengthIncrement * convertMETERStoFEET
                         results.data.push({
-                            x: lengthIncrement,
-                            y: elevation
+                            x: Number(x.toFixed(2)),
+                            y: Number(y.toFixed(2))
                         })
                         // if we've queried all the points, then we create our final result.
                         if (Object.keys(results.lineString).length == samplePointsCount) {
@@ -327,7 +343,7 @@ var gpControl = {
                             gpControl.setHead(result, convertMETERStoFEET);
                             paramControl.onGPComplete();
                             jQuery(".gp-msg-head").fadeOut();
-                            console.log("queryElevProfile", results);
+                            // console.log("queryElevProfile", results);
                             return;
                         }
                     }
@@ -455,7 +471,7 @@ var gpControl = {
         // } else {
         //     h2 = h * conversion_factor;
         // }
-        console.log(h2);
+        // console.log(h2);
         // set the value (performs validation)
         Hydropower.params.head.setValue(utils._round(h2, 2));
         return Hydropower.params.head.value;
@@ -548,7 +564,7 @@ var gpControl = {
      * generate a visualization of the elevation profile results
      */
     vizHead: function () {
-        console.log("vizHead", this.raw.profile);
+        // console.log("vizHead", this.raw.profile);
         if (!jQuery.isEmptyObject(this.raw.profile)) {
             // add the control to the map that contains the chart element.
             if (!profileControl.getContainer()) {
@@ -557,10 +573,10 @@ var gpControl = {
             }
             // then add the data. this method updates the chart
             if (profileControl.getContainer()) {
-                console.log("adding data to profile control")
-                profileControl.addData(this.raw.profile.features[0].properties.ChartData)
+                var simplifiedChartData = simplifyJS(this.raw.profile.features[0].properties.ChartData, simplifyTolerance, simplifyHighQuality);
+                console.log("adding data to profile control (simplified to", simplifiedChartData.length, "points)");
+                profileControl.addData(simplifiedChartData);
             }
-            // profileControl.addData(this.raw.profile.features[0].properties.ChartData)
         }
 
     },
@@ -568,7 +584,7 @@ var gpControl = {
      * generate a visualization of the watershed delineation
      */
     vizArea: function () {
-        console.log("vizArea", this.raw.watershed);
+        // console.log("vizArea", this.raw.watershed);
         if (!jQuery.isEmptyObject(this.raw.watershed)) {
             watershedArea.clearLayers();
             watershedArea.addLayer(L.geoJSON(this.raw.watershed));
