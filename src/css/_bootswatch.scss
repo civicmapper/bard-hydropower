@@ -1,16 +1,11 @@
 // Cosmo 3.3.7
 // Bootswatch
 // -----------------------------------------------------
-
 $web-font-path: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700" !default;
 @import url($web-font-path);
-
 // Navbar =====================================================================
-
 .navbar {
-
   &-inverse {
-
     .badge {
       background-color: #fff;
       color: $brand-primary;
@@ -19,9 +14,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400
 }
 
 // Buttons ====================================================================
-
 // Typography =================================================================
-
 body {
   -webkit-font-smoothing: antialiased;
 }
@@ -52,24 +45,19 @@ body {
 }
 
 // Tables =====================================================================
-
 table,
 .table {
-
   a:not(.btn) {
     text-decoration: underline;
   }
-
   .dropdown-menu a {
     text-decoration: none;
   }
-
   .success,
   .warning,
   .danger,
   .info {
     color: #fff;
-
     a {
       color: #fff;
     }
@@ -77,8 +65,6 @@ table,
 }
 
 // Forms ======================================================================
-
-
 .has-warning {
   .help-block,
   .control-label,
@@ -93,7 +79,6 @@ table,
   .form-control-feedback {
     color: $brand-warning;
   }
-
   .form-control,
   .form-control:focus,
   .input-group-addon {
@@ -115,7 +100,6 @@ table,
   .form-control-feedback {
     color: $brand-danger;
   }
-
   .form-control,
   .form-control:focus,
   .input-group-addon {
@@ -137,7 +121,6 @@ table,
   .form-control-feedback {
     color: $brand-success;
   }
-
   .form-control,
   .form-control:focus,
   .input-group-addon {
@@ -146,29 +129,24 @@ table,
 }
 
 // Navs =======================================================================
-
 .nav-pills {
-
-  & > li > a {
+  &>li>a {
     border-radius: 0;
   }
 }
 
 .dropdown-menu {
-
-  & > li > a:hover,
-  & > li > a:focus {
+  &>li>a:hover,
+  &>li>a:focus {
     background-image: none;
   }
 }
 
 // Indicators =================================================================
-
 .close {
   text-decoration: none;
   text-shadow: none;
   opacity: 0.4;
-
   &:hover,
   &:focus {
     opacity: 1;
@@ -177,7 +155,6 @@ table,
 
 .alert {
   border: none;
-
   .alert-link {
     text-decoration: underline;
     color: #fff;
@@ -189,7 +166,6 @@ table,
 }
 
 // Progress bars ==============================================================
-
 .progress {
   height: 8px;
   @include box-shadow(none);
@@ -200,14 +176,12 @@ table,
 }
 
 // Containers =================================================================
-
 .panel {
   &-heading,
   &-footer {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
   }
-
   &-default {
     .close {
       color: $text-color;
@@ -216,34 +190,28 @@ table,
 }
 
 a.list-group-item {
-
   &-success {
     &.active {
       background-color: $state-success-bg;
     }
-
     &.active:hover,
     &.active:focus {
       background-color: darken($state-success-bg, 5%);
     }
   }
-
   &-warning {
     &.active {
       background-color: $state-warning-bg;
     }
-    
     &.active:hover,
     &.active:focus {
       background-color: darken($state-warning-bg, 5%);
     }
   }
-
   &-danger {
     &.active {
       background-color: $state-danger-bg;
     }
-    
     &.active:hover,
     &.active:focus {
       background-color: darken($state-danger-bg, 5%);
@@ -259,4 +227,8 @@ a.list-group-item {
 
 .popover {
   color: $text-color;
+}
+
+.elevation-profile-chart {
+  padding: 10px;
 }
