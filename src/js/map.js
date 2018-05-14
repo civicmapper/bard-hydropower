@@ -121,8 +121,8 @@ var basemaps = [
  */
 var map = L.map("map", {
     maxZoom: 22
-    // }).setView([42.921683, -76.2419582], 7);
-}).setView([42.0169164, -73.9141064], 18);
+}).setView([42.921683, -76.2419582], 7);
+// }).setView([42.0169164, -73.9141064], 18);
 // so map variable can be accessed in other modules:
 global.map = map;
 

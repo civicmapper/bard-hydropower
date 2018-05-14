@@ -37,6 +37,8 @@ var hiresExtentsService = "https://elevation.its.ny.gov/arcgis/rest/services/DEM
 var hiresSourcesService = "https://elevation.its.ny.gov/arcgis/rest/services/";
 var hiresSourceField = "NAME"
 
+var msg;
+
 /*******************************************************************************
  * DRAWING
  */
