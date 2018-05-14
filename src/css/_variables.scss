@@ -12,10 +12,11 @@ $gray: lighten($gray-base, 33.5%) !default; // #555
 $gray-light: lighten($gray-base, 60%) !default; // #999
 $gray-lighter: lighten($gray-base, 90%) !default; // #eee
 $brand-primary: #2baae2 !default;
-$brand-success: #3fb618 !default;
-$brand-info: #9954bb !default;
-$brand-warning: #ff7518 !default;
-$brand-danger: #ff0039 !default;
+$brand-success-alt: #B3EE0E !default;
+$brand-success: #2D8421;
+$brand-info: #9A76B2 !default;
+$brand-warning: #FED600 !default;
+$brand-danger: #EA5D5C !default;
 //== Scaffolding
 //
 //## Settings for some of the most global styles.

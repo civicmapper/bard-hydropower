@@ -146,6 +146,7 @@ var drawControl = {
         // map listener for drawing deletion
         map.on("draw:deleted", function (e) {
             console.log("draw:deleted");
+            resetAnalysis(true, true);
             // remove message related to drawing
             //drawInfo.infoOnDrawDelete();
             // disable the analyze button
@@ -224,7 +225,8 @@ var gpControl = {
      * Service we like.
      */
     queryElevProfile: function (drawnPolyline, endpoint) {
-
+        Hydropower.params.head.resetParamStatus();
+        jQuery(".gp-msg-head").fadeIn();
         // drawn line to geojson
         var line = drawnPolyline.toGeoJSON()
 
@@ -274,7 +276,10 @@ var gpControl = {
                 .at([f.geometry.coordinates[1], f.geometry.coordinates[0]])
                 .run(function (error, identifyImageResponse, rawResponse) {
                     if (error) {
-                        console.log(error);
+                        console.log("Elevation Profile: Error getting high resolution data: ", error);
+                    } else if (error && Object.keys(results.lineString).length == samplePointsCount) {
+                        console.log("Elevation Profile: Error getting high resolution data: ", error);
+                        jQuery(".gp-msg-head").fadeOut();
                     } else {
                         // elevation (in meters from service)
                         elevation = Number(identifyImageResponse.pixel.properties.value)
@@ -289,7 +294,6 @@ var gpControl = {
                         })
                         // if we've queried all the points, then we create our final result.
                         if (Object.keys(results.lineString).length == samplePointsCount) {
-                            console.log("queryElevProfile", results);
                             // elevation profile is a geojson object
                             // (same as the elev profile GP service result)
                             // store properties from our results object (above) here
@@ -322,6 +326,8 @@ var gpControl = {
                             // save the result, applying unit conversion in the process
                             gpControl.setHead(result, convertMETERStoFEET);
                             paramControl.onGPComplete();
+                            jQuery(".gp-msg-head").fadeOut();
+                            console.log("queryElevProfile", results);
                             return;
                         }
                     }

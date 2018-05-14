@@ -1,5 +1,7 @@
 var Chart = require('chart.js');
 
+Chart.defaults.global.legend.display = false;
+
 var ElevationProfileControl = L.Control.extend({
     /**
      * options. accepts standard leaflet control options, plus has properties
@@ -17,7 +19,7 @@ var ElevationProfileControl = L.Control.extend({
             },
             tooltips: {
                 mode: 'index',
-                intersect: false,
+                intersect: true,
             },
             hover: {
                 mode: 'nearest',
@@ -44,8 +46,16 @@ var ElevationProfileControl = L.Control.extend({
                 display: false
             },
             elements: {
+                points: {
+                    backgroundColor: "#2baae2",
+                    radius: 0,
+                    borderWidth: 0,
+                },
                 line: {
-                    //tension: 0.1, // disables bezier curves
+                    tension: 0, // disables bezier curves
+                    backgroundColor: "#2D8421",
+                    borderColor: "#2baae2",
+                    borderWidth: 4
                 }
             }
         },
@@ -69,7 +79,7 @@ var ElevationProfileControl = L.Control.extend({
         // create the canvas in the container
         var canvas = L.DomUtil.create("canvas", "elevation-profile-chart", container)
         canvas.style.width = (this.options.width * 0.95) + "px";
-        canvas.style.height = (this.options.height * 0.95) + "px";
+        canvas.style.height = (this.options.height * 0.90) + "px";
         canvas.id = "elevation-profile-chart";
 
         // figure out what data we have to work with
@@ -90,11 +100,13 @@ var ElevationProfileControl = L.Control.extend({
         // make a new chart!
         this._chart = new Chart(L.DomUtil.get(canvas), {
             type: 'line',
-            options: this.options,
+            options: this.options.chartjsOptions,
             data: {
                 labels: labelsForChartjs,
                 datasets: [{
-                    data: dataForChartjs
+                    data: dataForChartjs,
+                    fill: 'origin',
+                    label: 'Elevation (ft.)'
                 }]
             }
         });
