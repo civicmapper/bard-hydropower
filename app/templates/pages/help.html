@@ -12,13 +12,16 @@
                 <ul class="nav nav-tabs nav-justified" id="aboutTabs">
                     <li class="active">
                         <a href="#about" data-toggle="tab">
-                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About</a>
+                            <span class="fa fa-info-circle" aria-hidden="true"></span> About</a>
                     </li>
                     <li>
                         <a href="#methods" data-toggle="tab">
-                            <span class="glyphicon glyphicon-book" aria-hidden="true"></span> How It Works</a>
+                            <span class="fa fa-book" aria-hidden="true"></span> How It Works</a>
                     </li>
-
+                    <li>
+                        <a href="#api" data-toggle="tab">
+                            <span class="fa fa-cogs" aria-hidden="true"></span> Calculator API</a>
+                    </li>
                 </ul>
                 <div class="tab-content" id="aboutTabsContent">
                     <div id="about" class="tab-pane active in">
@@ -26,6 +29,12 @@
                     </div>
                     <div id="methods" class="tab-pane">
                         {% filter markdown %} {% include 'pages/help_methods.md' %} {% endfilter %}
+                    </div>
+                    <div id="api" class="tab-pane">
+                        <p>
+                            Interested in running the calculator programmatically? You can access the formula through our
+                            <a href="/apidocs">Calculator API</a>.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -7,11 +7,17 @@ name = "pypi"
 
 [packages]
 
-flask = "*"
-flask-jsglue = "*"
-flask-markdown = "*"
+Flask = "*"
+Flask-JSGlue = "*"
+Flask-Markdown = "*"
 watchdog = "*"
 requests = "*"
+Flask-RESTful = "*"
+flasgger = "*"
+Flask-Cors = "*"
 
 
 [dev-packages]
+
+pylint = "*"
+"autopep8" = "*"

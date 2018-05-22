@@ -1,0 +1,66 @@
+Estimate the power generation potential of a micro-hydroelectric turbine installation.
+Estimate the power generation potential of a micro-hydroelectric turbine installation. This API uses a basic formula for estimating power generation potential; it is suitable for planning purposes only.
+---
+tags: 
+  - microhydropower calculator
+parameters:
+  - name: area
+    in: query
+    type: float
+    default: 0.0
+    description: The area of the watershed in *square miles* above the location of the microhydropower installation.
+  - name: head
+    in: query
+    type: float
+    default: 0.0
+    description: The elevation change in *feet* available for utilization by the microhydropower installation.
+  - name: price
+    in: query
+    type: float
+    default: 0.10
+    description: The value of a kilowatt-hour of electricity, used to estimate annual value of power produced by the installation.        
+  - name: efficiency
+    in: query
+    type: float
+    default: 0.7
+    description: The % efficiency of the microhydropower installation (0-1 scale).
+  - name: flow
+    in: query
+    type: float
+    default: 0.3
+    description: An assumption of environmental flow, in cubic feet per second. Range from 0.1 to 0.5 with default value of 0.3.
+  - name: yield
+    in: query
+    type: float
+    default: 1.6
+    description: The average annual watershed yield, in cubic feet per second per square mile. Default is 1.6.
+responses:
+  200:
+    description: results of the calculation are returned, along with user inputs
+    examples: {
+      "meta": {
+        "messages": [
+          "The calculation completed successfully."
+        ],
+        "status": "success"
+      },
+      "data": {
+        "inputs": {
+          "head": 10,
+          "yield": 1.6,
+          "efficiency": 0.7,
+          "price": 0.1,
+          "flow": 0.3,
+          "area": 80
+        },
+        "intermediate": {
+          "qAvailable": 128,
+          "qUseable": 104,
+          "qEnv": 24
+        },        
+        "results": {
+          "power": 61.69,
+          "value": 54077.45
+        }
+      }
+    }

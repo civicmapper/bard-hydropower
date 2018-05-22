@@ -9,9 +9,9 @@ from flask import Flask, render_template, request, session, redirect, url_for, f
 from flask_jsglue import JSGlue
 from flaskext.markdown import Markdown
 import requests
-# import pdb
 
-#----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
 # APPLICATION SETUP
 
 app = Flask(__name__)
@@ -20,8 +20,11 @@ app.config.from_pyfile('config.py')
 jsglue = JSGlue(app)
 # add Markdown plugin
 Markdown(app)
+# API
+from .api import *
 
-#----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
 # HELPERS
 
 
@@ -42,7 +45,7 @@ def get_token():
     print("token acquired: {0}".format(token))
     return token
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Controllers / Route Handlers
 
 
@@ -57,7 +60,6 @@ def home():
     """
 
     #t = get_token()
-    # return render_template('pages/home.html')
     return redirect(url_for('map'), code=302)
 
 
@@ -81,102 +83,6 @@ def map():
     )
 
 
-@app.route('/calc/')
-def calc():
-    return render_template('pages/calc.html')
-# help
-
-
-@app.route('/help/')
-def help():
-    return redirect(url_for('map'), code=302)
-    # return render_template('pages/help.html')
-
-# Calculator API
-
-
-@app.route('/hydropower/calculator/api')
-def api():
-    """
-    area: area of the watershed. required
-    head: difference between high elevation and low elevation relative to dam/weir. required
-    envflow: environmental flow requirement. default is 0.3, range options from 0.1-0.5. optional
-    efficiency: efficiency default is 0.7. optional.
-    """
-
-    response = {"messages": []}
-    result = {}
-
-    try:
-        area = float(request.args.get('area'))
-        head = float(request.args.get('head'))
-        envflow = float(request.args.get('envflow'))
-        efficiency = float(request.args.get('efficiency'))
-        rate = float(request.args.get('rate'))
-    except:
-        response['messages'].append('Input parameters could not be parsed.')
-        status = 400
-
-    if ((area and head)):
-        result['head'] = head
-        result['area'] = area
-        # calculate power
-        result['q-available'] = area * 1.6
-        # where envflow is a range from 0.1 to 0.5 with default value of 0.3
-        if envflow:
-            result['envflow'] = envflow
-        else:
-            result['envflow'] = 0.3
-        result['q-env'] = (result['area'] * result['envflow'])
-        result['q-useable'] = result['q-available'] - result['q-env']
-        # where efficiency is a variable with default value 0.7
-        if efficiency:
-            result['efficiency'] = efficiency
-        else:
-            result['efficiency'] = 0.7
-        # where rate has a default of $0.10
-        if rate:
-            result['rate'] = rate
-        else:
-            result['rate'] = 0.1
-
-        #Power in kW
-        p = result['q-useable'] * result['head'] * \
-            (0.084) * result['efficiency']
-        result['power'] = round(p, 2)
-
-        # cost = rate * hours per year * kilowatts
-        c = result['rate'] * 8766 * p
-
-        response["status"] = "success"
-
-        if head <= 0:
-            response["status"] = "warning"
-            response["messages"].append(
-                "Head provided was <= 0. The result will be nonsense.")
-        if area <= 0:
-            response["status"] = "warning"
-            response["messages"].append(
-                "Area provided was <= 0. The result will be nonsense.")
-
-        response["messages"].append("The calculation completed successfully.")
-        response["result"] = result
-        status = 200
-
-    else:
-        response["status"] = "error"
-        response["messages"].append("required parameters were not provided")
-        status = 400
-
-    # ---------------------------------------------------------------
-    # handle the response
-    # build the response
-    r = make_response(jsonify(response), status)
-    # add header to enable CORS
-    r.headers['Access-Control-Allow-Origin'] = '*'
-    return make_response(r)
-
-
 @app.errorhandler(500)
 def internal_error(error):
     return render_template('errors/500.html'), 500
@@ -186,7 +92,7 @@ def internal_error(error):
 def not_found_error(error):
     return render_template('errors/404.html'), 404
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # ERROR LOGGING
 
 
