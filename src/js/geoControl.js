@@ -10,13 +10,14 @@ require("leaflet-draw");
 var esriLeaflet = require("esri-leaflet");
 var esriLeafletGP = require("esri-leaflet-gp");
 // TurfJS
-var explode = require('@turf/explode');
-var lineChunk = require('@turf/line-chunk');
+var turfExplode = require('@turf/explode');
+var turfLineChunk = require('@turf/line-chunk');
 var turfLength = require('@turf/length');
+var turfCombine = require('@turf/combine');
+var turfMeta = require('@turf/meta');
 // utilities
 var simplifyJS = require('simplify-js');
 var utils = require("./utils");
-
 
 /*******************************************************************************
  * CONSTANTS
@@ -29,8 +30,9 @@ var convertMETERStoFEET = 3.280841;
 var convertMILEStoFEET = 5280
 
 // for simplifiying elevation profile results (simplify-js params)
+var sample_distance = 1 * 0.001 // 1 meter as kilometer
 var simplifyTolerance = 0.25;
-var simplifyHighQuality = true;
+var simplifyHighQuality = false;
 
 // ArcGIS services
 var hiresExtentsService = "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/";
@@ -190,9 +192,9 @@ var gpControl = {
             profile: {}
         };
     },
-    dispatch: function (drawnPolyline, drawnPoint) {
+    dispatch: function (drawnPolylineObj, drawnPointObj) {
         // run the watershed GP asynchronously
-        gpControl.gpWatershed(drawnPoint);
+        gpControl.gpWatershed(drawnPointObj);
 
         // query the index with drawnPoint - this determines what elevation service we use for the profile
         console.log("Checking for local high-res elevation services...")
@@ -201,7 +203,7 @@ var gpControl = {
             })
             .layer(0)
             // find indices that intersect our drawing (the second, upstream point)
-            .intersects(drawnPoint.toGeoJSON())
+            .intersects(drawnPointObj.toGeoJSON())
             // return these fields to us:
             .fields(["NAME", "RESOLUTION", "YEAR", "COLLECTION", "CUSTODIAN", "TIF_NAME", "SQMI"])
             // return the records to us so that highest resolution, newest records are first
@@ -216,7 +218,7 @@ var gpControl = {
                 if (error || featureCollection.features.length == 0) {
                     console.log("...no high-resolution elevation data found for this area. Falling back to USGS services.")
                     // use the Esri service
-                    gpControl.gpElevProfile(drawnPolyline);
+                    gpControl.gpElevProfile(drawnPolylineObj);
                     // otherwise:
                 } else {
                     // gpControl.gpElevProfile(drawnPolyline);
@@ -225,7 +227,7 @@ var gpControl = {
                     var lidarName = featureCollection.features[0].properties[hiresSourceField];
                     var lidarService = hiresSourcesService + lidarName + '/ImageServer';
                     console.log("...found high resolution elevation data @", lidarService);
-                    gpControl.queryElevProfile(drawnPolyline, lidarService)
+                    gpControl.queryElevProfile(drawnPolylineObj, lidarService)
                     // split up the polyline based on the lidar service
                     // run multiple queries
                     // return those
@@ -254,12 +256,11 @@ var gpControl = {
         console.log("drawingLength:", drawingLength, "meters")
 
         // chunk up the line at 1 meter intervals
-        var sample_distance = 1 * 0.001 // 1 meter as kilometer
-        var chunk = lineChunk(line, sample_distance.toFixed(3), {
+        var chunk = turfLineChunk(line, sample_distance.toFixed(3), {
             units: 'kilometers'
         });
         // turn line chunks endpoints into sample points, and get every other one
-        var exploded = explode(chunk);
+        var exploded = turfExplode(chunk);
         var samplePoints = [];
         for (var i = 0; i < exploded.features.length; i++) {
             if (i % 2 === 0) {
@@ -331,7 +332,7 @@ var gpControl = {
                                         "Source": "",
                                         "Source_URL": endpoint,
                                         // convert from miles to feet:
-                                        "ProfileLength": results.total * convertMILEStoFEET,
+                                        "ProfileLength": results.total, // * convertMILEStoFEET,
                                         // store x/y charting data points:
                                         "ChartData": results.data
                                     },
@@ -357,7 +358,7 @@ var gpControl = {
      * Elevation Profile geoprocessing service.
      * @param L.Layer drawnPolyline the polyline drawn with Leaflet.Draw
      */
-    gpElevProfile: function (drawnPolyline) {
+    gpElevProfile: function (drawnPolylineObj) {
         Hydropower.params.head.resetParamStatus();
         jQuery(".gp-msg-head").fadeIn();
         var elevProfileService = esriLeafletGP.service({
@@ -368,12 +369,31 @@ var gpControl = {
         var elevProfileTask = elevProfileService.createTask();
         elevProfileTask.on("initialized", function () {
             // set input parameters
-            elevProfileTask.setParam("DEMResolution ", "FINEST");
+            elevProfileTask.setParam("DEMResolution", "FINEST");
             elevProfileTask.setParam("ProfileIdField", "OID");
-            elevProfileTask.setParam("MaximumSampleDistance", 50000);
+            elevProfileTask.setParam("MaximumSampleDistance", 100);
             elevProfileTask.setParam("returnZ", true);
             // Input must be an L.LatLng, L.LatLngBounds, L.Marker or GeoJSON Point Line or Polygon object
-            elevProfileTask.setParam("InputLineFeatures", drawnPolyline.toGeoJSON());
+            var line = drawnPolylineObj.toGeoJSON();
+
+            // // this service can only take 
+            // var drawingLength = turfLength(line, {
+            //     units: 'kilometers'
+            // }) * 1000
+            // var sampleInterval = 10 * 0.001
+            // if (drawingLength >= 1000) {
+
+            // }
+            // chunk it up at 10m intervals
+            var chunked = turfLineChunk(line, sample_distance.toFixed(3), {
+                units: 'kilometers'
+            });
+            // console.log(chunked);
+            // turn those chunks back into a single line with many vertices
+            var combined = turfCombine(chunked);
+            // console.log(combined)
+            // pass that in as a parameter
+            elevProfileTask.setParam("InputLineFeatures", combined);
             // update status
             var msg = "Determining elevation profile...";
             console.log(msg);
@@ -390,6 +410,19 @@ var gpControl = {
                     //paramsControl.notifications.addMsg(msg,'danger');
                     Hydropower.params.head.setOnForm();
                 } else {
+                    // generate data for the chart from the result.
+                    var chartData = [];
+                    var lengthTotal = 0;
+                    turfMeta.coordEach(result.OutputProfile, function (cc, ci, fi, mfi, gi) {
+                        // create data point for use in elevation profile (where x/y are in chart space, not coord space)
+                        var y = cc[2] * convertMETERStoFEET;
+                        lengthTotal += (1 * convertMETERStoFEET);
+                        chartData.push({
+                            x: Number(lengthTotal.toFixed(2)),
+                            y: Number(y.toFixed(2))
+                        })
+                    })
+                    result.OutputProfile.features[0].properties.ChartData = chartData;
                     // messages
                     msg = "Elevation Profile: Complete";
                     console.log(msg, result);

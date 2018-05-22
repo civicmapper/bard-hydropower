@@ -9,8 +9,8 @@ var ElevationProfileControl = L.Control.extend({
      */
     options: {
         position: "bottomleft",
-        width: 640,
-        height: 480,
+        width: 400,
+        height: 300,
         controlClass: "panel panel-default",
         chartjsOptions: {
             responsive: true,
@@ -90,7 +90,7 @@ var ElevationProfileControl = L.Control.extend({
         // canvas.style.height = "90%";
         canvas.id = "elevation-profile-chart";
 
-        console.log(container, canvas);
+        // console.log(container, canvas);
 
         // figure out what data we have to work with
         var dataForChartjs, labelsForChartjs;
