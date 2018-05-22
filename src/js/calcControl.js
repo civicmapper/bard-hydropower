@@ -800,7 +800,7 @@ var paramControl = {
         // switches
         jQuery('input[type="checkbox"].switch').bootstrapToggle({
             on: "<small><i class='fa fa-arrow-left'></i> Override</small>",
-            off: "<small>Use Values From Map</small>",
+            off: "<small>Use Values From Map <i class='fa fa-arrow-right'></i></small>",
             onstyle: "default",
             offstyle: "primary",
             size: "normal"

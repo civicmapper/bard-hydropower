@@ -46,17 +46,17 @@
             <div class="sidebar-wrapper">
 
                 <!--TABS-->
-                <ul class="nav nav-tabs nav-justified" id="stepControl">
-                    <li class="active">
+                <ul class="nav nav-pills nav-justified" id="stepControl">
+                    <li role="presentation" class="active">
                         <a id="tabStep0" href="#overview" data-toggle="tab">Overview</a>
                     </li>
-                    <li>
+                    <li role="presentation">
                         <a id="tabStep1" href="#site" data-toggle="tab">1. Site</a>
                     </li>
-                    <li>
+                    <li role="presentation">
                         <a id="tabStep2" href="#parameters" data-toggle="tab">2. Parameters</a>
                     </li>
-                    <li>
+                    <li role="presentation">
                         <a id="tabStep3" href="#results" data-toggle="tab">3. Results</a>
                     </li>
                 </ul>
@@ -64,18 +64,18 @@
                 <!--TAB CONTENT-->
                 <div class="tab-content" id="aboutTabsContent">
 
-                    <div id="overview" class="tab-pane active in">
+                    <div id="overview" class="tab-pane active fade in">
                         {% include 'pages/tab_start.html' %}
                     </div>
 
-                    <div id="site" class="tab-pane">
+                    <div id="site" class="tab-pane fade">
                         {% include 'pages/tab_draw.html' %}
                     </div>
 
-                    <div id="parameters" class="tab-pane">
+                    <div id="parameters" class="tab-pane fade">
                         {% include 'pages/tab_parameters.html' %}
                     </div>
-                    <div id="results" class="tab-pane">
+                    <div id="results" class="tab-pane fade">
                         {% include 'pages/tab_results.html' %}
                     </div>
 
@@ -94,9 +94,9 @@
         // console.log(tokens);
         // geodata served from Flask's static files directory
         var geodata = {
-                "nysdams": "{{ url_for('static', filename='assets/data/nysdams.geojson') }}"
-            }
-            // console.log(geodata.nysdams);
+            "nysdams": "{{ url_for('static', filename='assets/data/nysdams.geojson') }}"
+        }
+        // console.log(geodata.nysdams);
     </script>
     {{ JSGlue.include() }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.core.js') }}"></script>
