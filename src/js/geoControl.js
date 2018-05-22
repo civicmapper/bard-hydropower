@@ -271,7 +271,7 @@ var gpControl = {
 
         // temporary storage for results of chunk analysis,
         // 
-        results = {
+        var results = {
             data: [], // used for chart.js-drawn elevation profile
             lineString: [], // use for head calculation
             total: drawingLength // used for chart.js-drawn elevation profile
