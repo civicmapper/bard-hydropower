@@ -74,6 +74,11 @@ var layer_streams = esri.dynamicMapLayer({
     token: tokens.arcgis
 });
 
+var layer_lidaridx = esri.dynamicMapLayer({
+    url: "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/",
+    opacity: 0.5
+})
+
 /**
  * hold geocoding results here
  */
@@ -151,7 +156,9 @@ map.addControl(
     .layers({}, {
         "NYS Dams": layer_dams_clusters,
         "National Hydrography": layer_streams,
-        "Delineated Watershed": watershedArea
+        "Delineated Watershed": watershedArea,
+        "NYS LiDAR Availability": layer_lidaridx
+
     })
     .setPosition("bottomright")
 );
@@ -193,9 +200,9 @@ global.profileControl = profileControl;
 map.on("click", function (e) {
     searchResults.clearLayers();
 });
-map.on("zoom", function (e) {
-    console.log("zoom", map.getZoom());
-})
+// map.on("zoom", function (e) {
+//     console.log("zoom", map.getZoom());
+// })
 
 /**
  * Mapbox basemaps are only available up to zoom 18,
