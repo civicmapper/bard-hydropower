@@ -1,4 +1,4 @@
-var Chart = require('chart.js');
+var Chart = require("chart.js");
 
 Chart.defaults.global.legend.display = false;
 
@@ -8,40 +8,41 @@ var ElevationProfileControl = L.Control.extend({
      * for chartJS configuration options and, optionally, chart data
      */
     options: {
-        position: 'bottomleft',
+        position: "bottomleft",
         width: 640,
-        height: 200,
+        height: 480,
         controlClass: "panel panel-default",
         chartjsOptions: {
             responsive: true,
+            maintainAspectRatio: false,
             title: {
-                display: false,
+                display: false
             },
             tooltips: {
-                mode: 'index',
-                intersect: true,
+                mode: "index",
+                intersect: true
             },
             hover: {
-                mode: 'nearest',
+                mode: "nearest",
                 intersect: true
             },
             scales: {
                 xAxes: [{
-                    id: 'distance-axis',
+                    id: "distance-axis",
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Distance (ft)'
+                        labelString: "Distance (ft)"
                     }
                 }],
                 yAxes: [{
-                    id: 'elevation-axis',
+                    id: "elevation-axis",
                     stacked: true,
                     display: true,
-                    type: 'linear',
+                    type: "linear",
                     scaleLabel: {
                         display: true,
-                        labelString: 'Elevation (ft)'
+                        labelString: "Elevation (ft)"
                     }
                 }]
             },
@@ -56,12 +57,12 @@ var ElevationProfileControl = L.Control.extend({
                 line: {
                     tension: 0, // disables bezier curves
                     // backgroundColor: "#2D8421",
-                    borderColor: "#2baae2",
+                    borderColor: "#2baae2"
                     // borderWidth: 1.5
                 }
             }
         },
-        data: null,
+        data: null
     },
     /**
      * refence to chartjs object
@@ -71,52 +72,59 @@ var ElevationProfileControl = L.Control.extend({
      * for working with addTo(map) function
      */
     onAdd: function (map) {
-
         // create the container for the chart canvas
         this._map = map;
         var container = L.DomUtil.create("div", this.options.controlClass);
         container.style.width = this.options.width + "px";
         container.style.height = this.options.height + "px";
         container.id = "elevation-profile-container";
+
         // create the canvas in the container
-        var canvas = L.DomUtil.create("canvas", "elevation-profile-chart", container)
-        canvas.style.width = (this.options.width * 0.95) + "px";
-        canvas.style.height = (this.options.height * 0.90) + "px";
+        var canvas = L.DomUtil.create(
+            "canvas",
+            "elevation-profile-chart",
+            container
+        );
+        // canvas.style.width = this.options.width * 0.95 + "px";
+        // canvas.style.height = (this.options.height * 0.90) + "px";
+        // canvas.style.height = "90%";
         canvas.id = "elevation-profile-chart";
+
+        console.log(container, canvas);
 
         // figure out what data we have to work with
         var dataForChartjs, labelsForChartjs;
         // if data has been passed in via options, use that
         if (this.options.data) {
-            dataForChartjs = this.options.data
+            dataForChartjs = this.options.data;
             labelsForChartjs = dataForChartjs.map(i => i.x.toFixed(2));
             // otherwise chartjs needs data, so we give it an empty thing
         } else {
-            labelsForChartjs: [0]
+            labelsForChartjs: [0];
             dataForChartjs = [{
                 x: 0,
                 y: 0
-            }]
+            }];
         }
 
         // make a new chart!
         this._chart = new Chart(L.DomUtil.get(canvas), {
-            type: 'line',
+            type: "line",
             options: this.options.chartjsOptions,
             data: {
                 labels: labelsForChartjs,
                 datasets: [{
-                    yAxisID: 'elevation-axis',
-                    xAxisID: 'distance-axis',
+                    yAxisID: "elevation-axis",
+                    xAxisID: "distance-axis",
                     data: dataForChartjs,
-                    fill: 'origin',
-                    label: 'Elevation (ft.)'
+                    fill: "origin",
+                    label: "Elevation (ft.)"
                 }]
             }
         });
         return container;
     },
-    /** 
+    /**
      * for initial data add (when no chart already exists)
      * and update of chart (when chart exists)
      */
@@ -125,7 +133,7 @@ var ElevationProfileControl = L.Control.extend({
         var labels = data.map(i => i.x.toFixed(2));
         this._chart.data.labels = labels;
         // this._chart.data.datasets[0] == data;
-        this._chart.data.datasets.forEach((dataset) => {
+        this._chart.data.datasets.forEach(dataset => {
             dataset.data = data;
         });
         this._chart.update();
@@ -136,9 +144,9 @@ var ElevationProfileControl = L.Control.extend({
      */
     onRemove: function (map) {
         this._container = null;
-        this._chart.destroy()
+        this._chart.destroy();
     }
-})
+});
 
 var elevationProfileControl = function (options) {
     return new ElevationProfileControl(options);
