@@ -120,7 +120,7 @@ var basemaps = [
  * map configuration
  */
 var map = L.map("map", {
-    maxZoom: 22
+    maxZoom: 19
 }).setView([42.921683, -76.2419582], 7);
 // }).setView([42.0169164, -73.9141064], 18);
 // so map variable can be accessed in other modules:
@@ -185,6 +185,36 @@ global.profileControl = profileControl;
 /*******************************************************************************
  * map listeners
  */
+
+/**
+ * clicking on the map will clear any search results that have been
+ * added from the geocoder 
+ */
 map.on("click", function (e) {
     searchResults.clearLayers();
 });
+map.on("zoom", function (e) {
+    console.log("zoom", map.getZoom());
+})
+
+/**
+ * Mapbox basemaps are only available up to zoom 18,
+ * whereas Esri basemaps are available at 19.
+ * If user switches from Esri to Mapbox basemap while at 
+ * zoom 19, set zoom to 18.
+ * This uses the label option set in the 'basemaps' object
+ * to make the determination what basemap we're using.
+ */
+map.on("baselayerchange", function (e) {
+    console.log("switched to", e.options.label, "basemap");
+    if (e.options.label.indexOf('Mapbox') != -1) {
+        if (map.getZoom() > 18) {
+            map.setZoom(18);
+        }
+        map.setMaxZoom(18);
+        return;
+    } else {
+        map.setMaxZoom(19);
+        return;
+    }
+})
