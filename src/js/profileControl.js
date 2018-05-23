@@ -37,12 +37,14 @@ var ElevationProfileControl = L.Control.extend({
                 }],
                 yAxes: [{
                     id: "elevation-axis",
-                    stacked: true,
                     display: true,
                     type: "linear",
                     scaleLabel: {
                         display: true,
                         labelString: "Elevation (ft)"
+                    },
+                    ticks: {
+                        beginAtZero: false
                     }
                 }]
             },
