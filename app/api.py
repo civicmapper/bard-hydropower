@@ -1,5 +1,5 @@
 from . import app as application
-from flask import jsonify, make_response
+from flask import jsonify, make_response, redirect
 from flask_restful import Resource, Api, reqparse, inputs
 from flasgger import Swagger, swag_from
 from flask_cors import CORS
@@ -180,3 +180,8 @@ class MicrohydropowerCalculator(Resource):
 
 
 api.add_resource(MicrohydropowerCalculator, '/api/calculator/')
+
+
+@application.route('/api/')
+def apiRedirect():
+    return redirect('/apidocs/', code=302)
