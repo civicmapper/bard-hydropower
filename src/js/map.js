@@ -77,7 +77,23 @@ var layer_streams = esri.dynamicMapLayer({
 var layer_lidaridx = esri.dynamicMapLayer({
     url: "https://elevation.its.ny.gov/arcgis/rest/services/DEM_Extents/MapServer/",
     opacity: 0.5
-})
+}).bindPopup(
+    function (err, featureCollection, response) {
+        if (featureCollection.features.length > 0) {
+            var response = "<h4>NYS LiDAR</h4>";
+            featureCollection.features.forEach(function (f, i) {
+                response += L.Util.template(
+                    "<hr><p><b>{0}</b></p><p>Resolution: <b>{1}</b></p><p>year: <b>{2}</b></p>", {
+                        0: f.properties.NAME,
+                        1: f.properties.RESOLUTION,
+                        2: f.properties.YEAR,
+                    }
+                )
+            })
+            return response;
+        }
+    }
+);
 
 /**
  * hold geocoding results here
@@ -156,8 +172,8 @@ map.addControl(
     .layers({}, {
         "NYS Dams": layer_dams_clusters,
         "National Hydrography": layer_streams,
-        "Delineated Watershed": watershedArea,
-        "NYS LiDAR Availability": layer_lidaridx
+        "NYS LiDAR Availability": layer_lidaridx,
+        "Delineated Watershed": watershedArea
 
     })
     .setPosition("bottomright")
