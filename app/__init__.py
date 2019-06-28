@@ -95,14 +95,14 @@ def not_found_error(error):
 # ----------------------------------------------------------------------------
 # ERROR LOGGING
 
-
+# remove file writes for pushing to App Engine
 if not app.debug:
-    file_handler = FileHandler('error.log')
-    file_handler.setFormatter(
-        Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-    )
+    #file_handler = FileHandler('error.log')
+    #file_handler.setFormatter(
+    #    Formatter(
+    #        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+    #)
     app.logger.setLevel(logging.INFO)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-    app.logger.info('errors')
+    #file_handler.setLevel(logging.INFO)
+    #app.logger.addHandler(file_handler)
+    app.logger.info('Starting log')

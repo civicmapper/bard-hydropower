@@ -1,0 +1,9 @@
+# this is for GCP / Google Cloud Platform
+
+runtime: python37
+
+handlers:
+- url: /static
+  static_dir: app/static
+- url: /.*
+  script: auto
